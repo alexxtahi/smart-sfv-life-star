@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Database\Seeder;
+
+class UserSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        
+          // Account 1 for test
+          DB::table('users')->insert([
+            'full_name' => "Michel Kouame",
+            'email' => 'wilfredkouame93@gmail.com',
+            'login' => 'wilfredkouame93@gmail.com',
+            'contact' => '00000000',
+            'role' => 'Gerant',
+            'password' => bcrypt('kendalldasilva@21032021'),
+            'created_at' => now()
+          ]);
+    }
+}
