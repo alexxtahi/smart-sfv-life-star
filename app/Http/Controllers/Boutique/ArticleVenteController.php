@@ -595,6 +595,7 @@ class ArticleVenteController extends Controller
     }
     public function articlesVendusByQuantite(){
         $date_jour = date("Y-m-d");
+         
        $datas = DB::table('caisse_ouvertes')
                     ->join('caisses','caisses.id','=','caisse_ouvertes.caisse_id')
                     ->join('users','users.id','=','caisse_ouvertes.user_id')
@@ -606,6 +607,16 @@ class ArticleVenteController extends Controller
                     <table border="2" cellspacing="0" width="100%">';
         $grandTotal=0;
         foreach($datas as $data){
+            
+             $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.client_id',null]])
+                                            ->join('articles','articles.id','article_ventes.article_id')
+                                            ->join('unites','unites.id','article_ventes.unite_id')
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+        $totalCiasse = 0;
+        if(count($articles)>0)  {
+                                            
            $outPut .= '<tr>
                             <td  colspan="4" cellspacing="0" border="2" align="left">&nbsp; Caisse : <b>'.$data->libelle_caisse.'</b></td>
                             <td  colspan="4" cellspacing="0" border="2" align="left">&nbsp; Caissier(e) : <b>'.$data->full_name.'</b></td>
@@ -620,13 +631,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-                $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.client_id',null]])
-                                            ->join('articles','articles.id','article_ventes.article_id')
-                                            ->join('unites','unites.id','article_ventes.unite_id')
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
-                $totalCiasse = 0;
+               
+               
             foreach($articles as $article){
                 $totalCiasse = $totalCiasse + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -641,11 +647,23 @@ class ArticleVenteController extends Controller
                         </tr>';
                         
             }
-           $outPut.= '<tr><td colspan="8" cellspacing="0" border="2" align="left">&nbsp; Total <b>'.number_format($totalCiasse, 0, ',', ' ').'</b></td></tr>';
-          $grandTotal = $grandTotal + $totalCiasse;
+
+               $outPut.= '<tr><td colspan="8" cellspacing="0" border="2" align="left">&nbsp; Total <b>'.number_format($totalCiasse, 0, ',', ' ').'</b></td></tr>';
+               $grandTotal = $grandTotal + $totalCiasse;
+            }
         }
-       
-         $outPut .= '<tr>
+        
+        $articlesHorsC =  ArticleVente::where('ventes.client_id','!=',null)
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('unites','unites.id','article_ventes.unite_id')
+                                            ->join('articles','articles.id','article_ventes.article_id')
+                                            ->whereDate('ventes.date_vente',$date_jour)
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+        $totalHorsC = 0;
+       if(count($articles)>0)  {
+           
+            $outPut .= '<tr>
                         <td  colspan="8" cellspacing="0" border="2"><h3 align="center">Vente hors caisse</h3></td>
                     </tr>
                         <tr>
@@ -658,14 +676,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-        $articlesHorsC =  ArticleVente::where('ventes.client_id','!=',null)
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('unites','unites.id','article_ventes.unite_id')
-                                            ->join('articles','articles.id','article_ventes.article_id')
-                                            ->whereDate('ventes.date_vente',$date_jour)
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
-        $totalHorsC = 0;
+        
+      
          foreach($articlesHorsC as $article){
                 $totalHorsC= $totalHorsC + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -681,6 +693,8 @@ class ArticleVenteController extends Controller
                         
             }
         $outPut.= '<tr><td colspan="8" cellspacing="0" border="2" align="left">&nbsp; Total hors caisse <b>'.number_format($totalHorsC, 0, ',', ' ').'</b></td></tr>';
+       }
+        
         $outPut .='</table></div>';
         $outPut.='<br/> Somme totale : <b> '.number_format($grandTotal+$totalHorsC, 0, ',', ' ').' F CFA</b>';
         $outPut.= $this->footer();
@@ -710,6 +724,16 @@ class ArticleVenteController extends Controller
                     <table border="2" cellspacing="0" width="100%">';
         $grandTotal=0;
         foreach($datas as $data){
+            
+            $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['article_ventes.article_id',$article_id]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('unites','unites.id','article_ventes.unite_id')
+                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
+                                            ->whereDate('ventes.date_vente','<=',$dateFin)
+                                            ->select('article_ventes.*','unites.libelle_unite')
+                                            ->get();
+         $totalCiasse = 0;
+         if(count($articles)>0)  {                                  
            $outPut .= '<tr>
                             <td  colspan="3" cellspacing="0" border="2" align="left">&nbsp; Caisse : <b>'.$data->libelle_caisse.'</b></td>
                             <td  colspan="3" cellspacing="0" border="2" align="left">&nbsp; Caissier(e) : <b>'.$data->full_name.'</b></td>
@@ -722,14 +746,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-                $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['article_ventes.article_id',$article_id]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('unites','unites.id','article_ventes.unite_id')
-                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
-                                            ->whereDate('ventes.date_vente','<=',$dateFin)
-                                            ->select('article_ventes.*','unites.libelle_unite')
-                                            ->get();
-                $totalCiasse = 0;
+                
+               
             foreach($articles as $article){
                 $totalCiasse = $totalCiasse + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -745,8 +763,10 @@ class ArticleVenteController extends Controller
            $outPut.= '<tr><td colspan="6" cellspacing="0" border="2" align="left">&nbsp; Total <b>'.number_format($totalCiasse, 0, ',', ' ').'</b></td></tr>';
           $grandTotal = $grandTotal + $totalCiasse;
         }
-       
-         $outPut .= '<tr>
+    }
+     $totalHorsC = 0;
+     if(count($articles)>0)  {   
+           $outPut .= '<tr>
                         <td  colspan="6" cellspacing="0" border="2"><h3 align="center">Vente hors caisse</h3></td>
                     </tr>
                         <tr>
@@ -764,7 +784,7 @@ class ArticleVenteController extends Controller
                                             ->whereDate('ventes.date_vente','<=',$dateFin)
                                             ->select('article_ventes.*','unites.libelle_unite')
                                             ->get();
-        $totalHorsC = 0;
+       
          foreach($articlesHorsC as $article){
                 $totalHorsC= $totalHorsC + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -778,11 +798,15 @@ class ArticleVenteController extends Controller
                         
             }
         $outPut.= '<tr><td colspan="6" cellspacing="0" border="2" align="left">&nbsp; Total hors caisse <b>'.number_format($totalHorsC, 0, ',', ' ').'</b></td></tr>';
+         
+     }
+       
         $outPut .='</table></div>';
         $outPut.='<br/> Somme totale : <b> '.number_format($grandTotal+$totalHorsC, 0, ',', ' ').' F CFA</b>';
         $outPut.= $this->footer();
         return $outPut;
     }
+    
     //Mouvement sur une période
     public function articlesVendusByQuantitePeriodePdf($debut,$fin){
         $pdf = \App::make('dompdf.wrapper');
@@ -803,6 +827,16 @@ class ArticleVenteController extends Controller
                     <table border="2" cellspacing="0" width="100%">';
         $grandTotal=0;
         foreach($datas as $data){
+             $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.client_id',null]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('articles','articles.id','=','article_ventes.article_id')
+                                            ->join('unites','unites.id','=','article_ventes.unite_id')
+                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
+                                            ->whereDate('ventes.date_vente','<=',$dateFin)
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+              $totalCiasse = 0;
+            if(count($articles)>0)  {  
            $outPut .= '<tr>
                             <td  colspan="4" cellspacing="0" border="2" align="left">&nbsp; Caisse : <b>'.$data->libelle_caisse.'</b></td>
                             <td  colspan="4" cellspacing="0" border="2" align="left">&nbsp; Caissier(e) : <b>'.$data->full_name.'</b></td>
@@ -817,15 +851,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-                $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.client_id',null]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('articles','articles.id','=','article_ventes.article_id')
-                                            ->join('unites','unites.id','=','article_ventes.unite_id')
-                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
-                                            ->whereDate('ventes.date_vente','<=',$dateFin)
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
-                $totalCiasse = 0;
+               
+              
             foreach($articles as $article){
                 $totalCiasse = $totalCiasse + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -843,8 +870,20 @@ class ArticleVenteController extends Controller
            $outPut.= '<tr><td colspan="8" cellspacing="0" border="2" align="left">&nbsp; Total <b>'.number_format($totalCiasse, 0, ',', ' ').'</b></td></tr>';
           $grandTotal = $grandTotal + $totalCiasse;
         }
+            
+        }
        
-         $outPut .= '<tr>
+       $articlesHorsC =  ArticleVente::where('ventes.client_id','!=',null)
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('articles','articles.id','=','article_ventes.article_id')
+                                            ->join('unites','unites.id','=','article_ventes.unite_id')
+                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
+                                            ->whereDate('ventes.date_vente','<=',$dateFin)
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+        $totalHorsC = 0;
+       if(count($articlesHorsC)>0)  {        
+           $outPut .= '<tr>
                         <td  colspan="8" cellspacing="0" border="2"><h3 align="center">Vente hors caisse</h3></td>
                     </tr>
                         <tr>
@@ -857,14 +896,7 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-        $articlesHorsC =  ArticleVente::where('ventes.client_id','!=',null)
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('articles','articles.id','=','article_ventes.article_id')
-                                            ->join('unites','unites.id','=','article_ventes.unite_id')
-                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
-                                            ->whereDate('ventes.date_vente','<=',$dateFin)
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
+        
         $totalHorsC = 0;
          foreach($articlesHorsC as $article){
                 $totalHorsC= $totalHorsC + $article->quantite*$article->prix-$article->remise_sur_ligne;
@@ -880,6 +912,9 @@ class ArticleVenteController extends Controller
                         </tr>';
                         
             }
+           
+       }                              
+         
         $outPut.= '<tr><td colspan="8" cellspacing="0" border="2" align="left">&nbsp; Total hors caisse <b>'.number_format($totalHorsC, 0, ',', ' ').'</b></td></tr>';
         $outPut .='</table></div>';
         $outPut.='<br/> Somme totale : <b> '.number_format($grandTotal+$totalHorsC, 0, ',', ' ').' F CFA</b>';
@@ -907,7 +942,15 @@ class ArticleVenteController extends Controller
                     <table border="2" cellspacing="0" width="100%">';
         $grandTotal=0;
         foreach($datas as $data){
-           $outPut .= '<tr>
+            
+               $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['article_ventes.article_id',$article_id]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('unites','unites.id','article_ventes.unite_id')
+                                            ->select('article_ventes.*','unites.libelle_unite')
+                                            ->get();
+        $totalCiasse = 0;
+        if(count($articles)>0) {
+             $outPut .= '<tr>
                             <td  colspan="3" cellspacing="0" border="2" align="left">&nbsp; Caisse : <b>'.$data->libelle_caisse.'</b></td>
                             <td  colspan="3" cellspacing="0" border="2" align="left">&nbsp; Caissier(e) : <b>'.$data->full_name.'</b></td>
                         </tr>
@@ -919,12 +962,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-                $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['article_ventes.article_id',$article_id]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('unites','unites.id','article_ventes.unite_id')
-                                            ->select('article_ventes.*','unites.libelle_unite')
-                                            ->get();
-                $totalCiasse = 0;
+             
+                
             foreach($articles as $article){
                 $totalCiasse = $totalCiasse + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -938,10 +977,20 @@ class ArticleVenteController extends Controller
                         
             }
            $outPut.= '<tr><td colspan="6" cellspacing="0" border="2" align="left">&nbsp; Total <b>'.number_format($totalCiasse, 0, ',', ' ').'</b></td></tr>';
+            
+        }                                   
+          
           $grandTotal = $grandTotal + $totalCiasse;
         }
-      
-        $outPut .= '<tr>
+        
+        $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['article_ventes.article_id',$article_id]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('unites','unites.id','article_ventes.unite_id')
+                                            ->select('article_ventes.*','unites.libelle_unite')
+                                            ->get();
+       $totalHorsC = 0;
+         if(count($articlesHorsC)>0) {
+             $outPut .= '<tr>
                         <td  colspan="6" cellspacing="0" border="2"><h3 align="center">Vente hors caisse</h3></td>
                     </tr>
                     <tr>
@@ -952,13 +1001,9 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-        $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['article_ventes.article_id',$article_id]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('unites','unites.id','article_ventes.unite_id')
-                                            ->select('article_ventes.*','unites.libelle_unite')
-                                            ->get();
         
-        $totalHorsC = 0;
+        
+        
          foreach($articlesHorsC as $article){
                 $totalHorsC= $totalHorsC + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -972,6 +1017,9 @@ class ArticleVenteController extends Controller
                         
             }
         $outPut.= '<tr><td colspan="6" cellspacing="0" border="2" align="left">&nbsp; Total hors caisse <b>'.number_format($totalHorsC, 0, ',', ' ').'</b></td></tr>';
+             
+         }
+        
         $outPut .='</table></div>';
         $outPut.='<br/> Somme totale : <b> '.number_format($grandTotal+$totalHorsC, 0, ',', ' ').' F CFA</b>';
         $outPut.= $this->footer();
@@ -997,7 +1045,16 @@ class ArticleVenteController extends Controller
                     <table border="2" cellspacing="0" width="100%">';
         $grandTotal=0;
         foreach($datas as $data){
-           $outPut .= '<tr>
+            
+             $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.depot_id',$depot_id]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('unites','unites.id','article_ventes.unite_id')
+                                            ->join('articles','articles.id','article_ventes.article_id')
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+              $totalCiasse = 0;
+           if(count($articles)>0)     {
+                $outPut .= '<tr>
                             <td  colspan="4" cellspacing="0" border="2" align="left">&nbsp; Caisse : <b>'.$data->libelle_caisse.'</b></td>
                             <td  colspan="4" cellspacing="0" border="2" align="left">&nbsp; Caissier(e) : <b>'.$data->full_name.'</b></td>
                         </tr>
@@ -1011,13 +1068,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-                $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.depot_id',$depot_id]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('unites','unites.id','article_ventes.unite_id')
-                                            ->join('articles','articles.id','article_ventes.article_id')
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
-                $totalCiasse = 0;
+               
+              
             foreach($articles as $article){
                 $totalCiasse = $totalCiasse + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -1033,10 +1085,22 @@ class ArticleVenteController extends Controller
                         
             }
            $outPut.= '<tr><td colspan="8" cellspacing="0" border="2" align="left">&nbsp; Total <b>'.number_format($totalCiasse, 0, ',', ' ').'</b></td></tr>';
+               
+           }                            
+          
           $grandTotal = $grandTotal + $totalCiasse;
         }
-      
-        $outPut .= '<tr>
+        
+        $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['ventes.depot_id',$depot_id]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('unites','unites.id','article_ventes.unite_id')
+                                            ->join('articles','articles.id','article_ventes.article_id')
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+                       $totalHorsC = 0;                      
+      if(count($articlesHorsC)>0){
+          
+           $outPut .= '<tr>
                         <td  colspan="8" cellspacing="0" border="2"><h3 align="center">Vente hors caisse</h3></td>
                     </tr>
                     <tr>
@@ -1049,14 +1113,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-        $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['ventes.depot_id',$depot_id]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('unites','unites.id','article_ventes.unite_id')
-                                            ->join('articles','articles.id','article_ventes.article_id')
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
+                        
         
-        $totalHorsC = 0;
          foreach($articlesHorsC as $article){
                 $totalHorsC= $totalHorsC + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -1072,6 +1130,9 @@ class ArticleVenteController extends Controller
                         
             }
         $outPut.= '<tr><td colspan="8" cellspacing="0" border="2" align="left">&nbsp; Total hors caisse <b>'.number_format($totalHorsC, 0, ',', ' ').'</b></td></tr>';
+      }
+       
+
         $outPut .='</table></div>';
         $outPut.='<br/> Somme totale : <b> '.number_format($grandTotal+$totalHorsC, 0, ',', ' ').' F CFA</b>';
         $outPut.= $this->footer();
@@ -1098,8 +1159,16 @@ class ArticleVenteController extends Controller
         $outPut .= '<div class="container-table" font-size:12px;><h3 align="center"><u>Journal de mouvement de stock du dépôt '.$info_depot->libelle_depot.' concernant '.$info_article->description_article.'</h3>
                     <table border="2" cellspacing="0" width="100%">';
         $grandTotal=0;
+        
         foreach($datas as $data){
-           $outPut .= '<tr>
+            $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.depot_id',$depot_id],['article_ventes.article_id',$article_id]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('unites','unites.id','article_ventes.unite_id')
+                                            ->select('article_ventes.*','unites.libelle_unite')
+                                            ->get();
+             $totalCiasse = 0;                                
+            if(count($articles)>0){
+                  $outPut .= '<tr>
                             <td  colspan="3" cellspacing="0" border="2" align="left">&nbsp; Caisse : <b>'.$data->libelle_caisse.'</b></td>
                             <td  colspan="3" cellspacing="0" border="2" align="left">&nbsp; Caissier(e) : <b>'.$data->full_name.'</b></td>
                         </tr>
@@ -1111,12 +1180,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-                $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.depot_id',$depot_id],['article_ventes.article_id',$article_id]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('unites','unites.id','article_ventes.unite_id')
-                                            ->select('article_ventes.*','unites.libelle_unite')
-                                            ->get();
-                $totalCiasse = 0;
+                
+               
             foreach($articles as $article){
                 $totalCiasse = $totalCiasse + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -1130,10 +1195,20 @@ class ArticleVenteController extends Controller
                         
             }
            $outPut.= '<tr><td colspan="6" cellspacing="0" border="2" align="left">&nbsp; Total <b>'.number_format($totalCiasse, 0, ',', ' ').'</b></td></tr>';
+            }                                
+         
           $grandTotal = $grandTotal + $totalCiasse;
         }
       
-        $outPut .= '<tr>
+        $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['ventes.depot_id',$depot_id],['article_ventes.article_id',$article_id]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('unites','unites.id','article_ventes.unite_id')
+                                            ->select('article_ventes.*','unites.libelle_unite')
+                                            ->get();
+        $totalHorsC = 0;
+        
+        if(count($articlesHorsC)>0){
+              $outPut .= '<tr>
                         <td  colspan="6" cellspacing="0" border="2"><h3 align="center">Vente hors caisse</h3></td>
                     </tr>
                     <tr>
@@ -1144,13 +1219,9 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-        $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['ventes.depot_id',$depot_id],['article_ventes.article_id',$article_id]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('unites','unites.id','article_ventes.unite_id')
-                                            ->select('article_ventes.*','unites.libelle_unite')
-                                            ->get();
         
-        $totalHorsC = 0;
+        
+        
          foreach($articlesHorsC as $article){
                 $totalHorsC= $totalHorsC + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -1164,6 +1235,9 @@ class ArticleVenteController extends Controller
                         
             }
         $outPut.= '<tr><td colspan="6" cellspacing="0" border="2" align="left">&nbsp; Total hors caisse <b>'.number_format($totalHorsC, 0, ',', ' ').'</b></td></tr>';
+            
+        }
+      
         $outPut .='</table></div>';
         $outPut.='<br/> Somme totale : <b> '.number_format($grandTotal+$totalHorsC, 0, ',', ' ').' F CFA</b>';
         $outPut.= $this->footer();
@@ -1191,7 +1265,19 @@ class ArticleVenteController extends Controller
                     <table border="2" cellspacing="0" width="100%">';
         $grandTotal=0;
         foreach($datas as $data){
-           $outPut .= '<tr>
+            
+             $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.client_id',null],['ventes.depot_id',$depot]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('articles','articles.id','=','article_ventes.article_id')
+                                            ->join('unites','unites.id','=','article_ventes.unite_id')
+                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
+                                            ->whereDate('ventes.date_vente','<=',$dateFin)
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+             $totalCiasse = 0;
+             
+        if(count($articles)>0){
+             $outPut .= '<tr>
                             <td  colspan="4" cellspacing="0" border="2" align="left">&nbsp; Caisse : <b>'.$data->libelle_caisse.'</b></td>
                             <td  colspan="4" cellspacing="0" border="2" align="left">&nbsp; Caissier(e) : <b>'.$data->full_name.'</b></td>
                         </tr>
@@ -1205,15 +1291,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-                $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.client_id',null],['ventes.depot_id',$depot]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('articles','articles.id','=','article_ventes.article_id')
-                                            ->join('unites','unites.id','=','article_ventes.unite_id')
-                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
-                                            ->whereDate('ventes.date_vente','<=',$dateFin)
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
-                $totalCiasse = 0;
+               
+               
             foreach($articles as $article){
                 $totalCiasse = $totalCiasse + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -1229,10 +1308,23 @@ class ArticleVenteController extends Controller
                         
             }
            $outPut.= '<tr><td colspan="8" cellspacing="0" border="2" align="left">&nbsp; Total <b>'.number_format($totalCiasse, 0, ',', ' ').'</b></td></tr>';
+            
+        }
+          
           $grandTotal = $grandTotal + $totalCiasse;
         }
        
-         $outPut .= '<tr>
+          $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['ventes.depot_id',$depot]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('articles','articles.id','=','article_ventes.article_id')
+                                            ->join('unites','unites.id','=','article_ventes.unite_id')
+                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
+                                            ->whereDate('ventes.date_vente','<=',$dateFin)
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+           $totalHorsC = 0;
+        if(count($articlesHorsC)>0)  {
+                $outPut .= '<tr>
                         <td  colspan="8" cellspacing="0" border="2"><h3 align="center">Vente hors caisse</h3></td>
                     </tr>
                         <tr>
@@ -1245,15 +1337,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-        $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['ventes.depot_id',$depot]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('articles','articles.id','=','article_ventes.article_id')
-                                            ->join('unites','unites.id','=','article_ventes.unite_id')
-                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
-                                            ->whereDate('ventes.date_vente','<=',$dateFin)
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
-        $totalHorsC = 0;
+     
+        
          foreach($articlesHorsC as $article){
                 $totalHorsC= $totalHorsC + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -1269,6 +1354,9 @@ class ArticleVenteController extends Controller
                         
             }
         $outPut.= '<tr><td colspan="8" cellspacing="0" border="2" align="left">&nbsp; Total hors caisse <b>'.number_format($totalHorsC, 0, ',', ' ').'</b></td></tr>';
+            
+        } 
+     
         $outPut .='</table></div>';
         $outPut.='<br/> Somme totale : <b> '.number_format($grandTotal+$totalHorsC, 0, ',', ' ').' F CFA</b>';
         $outPut.= $this->footer();
@@ -1299,7 +1387,20 @@ class ArticleVenteController extends Controller
                     <table border="2" cellspacing="0" width="100%">';
         $grandTotal=0;
         foreach($datas as $data){
-           $outPut .= '<tr>
+            
+             $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.client_id',null],['ventes.depot_id',$depot_id],['article_ventes.article_id',$article_id]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('articles','articles.id','=','article_ventes.article_id')
+                                            ->join('unites','unites.id','=','article_ventes.unite_id')
+                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
+                                            ->whereDate('ventes.date_vente','<=',$dateFin)
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+            
+            $totalCiasse = 0;    
+           
+           if(count($articles)>0) {
+                 $outPut .= '<tr>
                             <td  colspan="3" cellspacing="0" border="2" align="left">&nbsp; Caisse : <b>'.$data->libelle_caisse.'</b></td>
                             <td  colspan="3" cellspacing="0" border="2" align="left">&nbsp; Caissier(e) : <b>'.$data->full_name.'</b></td>
                         </tr>
@@ -1311,15 +1412,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-                $articles =  ArticleVente::where([['ventes.caisse_ouverte_id',$data->id],['ventes.client_id',null],['ventes.depot_id',$depot_id],['article_ventes.article_id',$article_id]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('articles','articles.id','=','article_ventes.article_id')
-                                            ->join('unites','unites.id','=','article_ventes.unite_id')
-                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
-                                            ->whereDate('ventes.date_vente','<=',$dateFin)
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
-                $totalCiasse = 0;
+               
+                
             foreach($articles as $article){
                 $totalCiasse = $totalCiasse + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -1333,10 +1427,24 @@ class ArticleVenteController extends Controller
                         
             }
            $outPut.= '<tr><td colspan="6" cellspacing="0" border="2" align="left">&nbsp; Total <b>'.number_format($totalCiasse, 0, ',', ' ').'</b></td></tr>';
+               
+           }
+         
           $grandTotal = $grandTotal + $totalCiasse;
         }
        
-         $outPut .= '<tr>
+         $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['ventes.depot_id',$depot_id],['article_ventes.article_id',$article_id]])
+                                            ->join('ventes','ventes.id','article_ventes.vente_id')
+                                            ->join('articles','articles.id','=','article_ventes.article_id')
+                                            ->join('unites','unites.id','=','article_ventes.unite_id')
+                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
+                                            ->whereDate('ventes.date_vente','<=',$dateFin)
+                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
+                                            ->get();
+         $totalHorsC = 0;
+        
+        if(count($articlesHorsC)>0) {
+            $outPut .= '<tr>
                         <td  colspan="6" cellspacing="0" border="2"><h3 align="center">Vente hors caisse</h3></td>
                     </tr>
                         <tr>
@@ -1347,15 +1455,8 @@ class ArticleVenteController extends Controller
                             <th cellspacing="0" border="2" width="20%" align="center">Remise</th>
                             <th cellspacing="0" border="2" width="20%" align="center">Valeur net</th>
                         </tr>';
-        $articlesHorsC =  ArticleVente::where([['ventes.client_id','!=',null],['ventes.depot_id',$depot_id],['article_ventes.article_id',$article_id]])
-                                            ->join('ventes','ventes.id','article_ventes.vente_id')
-                                            ->join('articles','articles.id','=','article_ventes.article_id')
-                                            ->join('unites','unites.id','=','article_ventes.unite_id')
-                                            ->whereDate('ventes.date_vente','>=',$dateDebut)
-                                            ->whereDate('ventes.date_vente','<=',$dateFin)
-                                            ->select('article_ventes.*','articles.code_barre','articles.description_article','unites.libelle_unite')
-                                            ->get();
-        $totalHorsC = 0;
+      
+       
          foreach($articlesHorsC as $article){
                 $totalHorsC= $totalHorsC + $article->quantite*$article->prix-$article->remise_sur_ligne;
                 $outPut .= '<tr>
@@ -1369,6 +1470,9 @@ class ArticleVenteController extends Controller
                         
             }
         $outPut.= '<tr><td colspan="6" cellspacing="0" border="2" align="left">&nbsp; Total hors caisse <b>'.number_format($totalHorsC, 0, ',', ' ').'</b></td></tr>';
+            
+        }
+         
         $outPut .='</table></div>';
         $outPut.='<br/> Somme totale : <b> '.number_format($grandTotal+$totalHorsC, 0, ',', ' ').' F CFA</b>';
         $outPut.= $this->footer();

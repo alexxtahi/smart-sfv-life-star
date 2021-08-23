@@ -298,7 +298,7 @@
                                              </div>
                                              <select name="moyen_reglement_id_add" id="moyen_reglement_id_add" class="form-control" required ng-model="moyen_reglement.moyen_reglement_id">
                                                  @foreach($moyenReglements as $moyenReglement)
-                                                 <option  {{$moyenReglement->id==1 ? "selected"  : ""}} value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>
+                                                 <option  {{$moyenReglement->id}} value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>
                                                  @endforeach
                                              </select>
                                          </div>
@@ -356,7 +356,7 @@
                                              </div>
                                              <select name="moyen_reglement_id" id="moyen_reglement_id" class="form-control" required>
                                                  @foreach($moyenReglements as $moyenReglement)
-                                                 <option  {{$moyenReglement->id==1 ? "selected"  : ""}} value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>
+                                                 <option  {{$moyenReglement->id}} value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>
                                                  @endforeach
                                              </select>
                                          </div>
