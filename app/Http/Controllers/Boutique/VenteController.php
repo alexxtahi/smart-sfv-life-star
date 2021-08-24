@@ -13,6 +13,7 @@ use App\Models\Parametre\Article;
 use App\Models\Parametre\Caisse;
 use App\Models\Parametre\Client;
 use App\Models\Parametre\Depot;
+use App\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -866,7 +867,7 @@ class VenteController extends Controller
 
                     $vente->date_vente = Carbon::createFromFormat('d-m-Y', $data['date_vente']);
                     $vente->client_id = $data['client_id'];
-                    $vente->divers = TRUE;
+                    $vente->divers = true;
                     $vente->updated_by = Auth::user()->id;
                     $vente->save();
                 }
@@ -1030,12 +1031,12 @@ class VenteController extends Controller
         $tva = 0;
         $vente_info = Vente::with('depot', 'caisse_ouverte')
             ->join('caisse_ouvertes', 'caisse_ouvertes.id', '=', 'ventes.caisse_ouverte_id')
-            ->join('reglements', 'reglements.id', '=', 'reglements.caisse_ouverte_id')
+            ->join('reglements', 'reglements.vente_id', '=', 'ventes.id')
             ->join('moyen_reglements', 'moyen_reglements.id', '=', 'reglements.moyen_reglement_id')
             ->join('caisses', 'caisses.id', '=', 'caisse_ouvertes.caisse_id')
             ->join('users', 'users.id', '=', 'caisse_ouvertes.user_id')
             ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', NULL], ['article_ventes.retourne', 0]])
-            ->select('ventes.*', 'moyen_reglements.libelle_moyen_reglement', 'caisses.libelle_caisse', 'users.full_name', DB::raw('sum(article_ventes.quantite*article_ventes.prix-article_ventes.remise_sur_ligne) as sommeTotale'), DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'))
+            ->select('ventes.*', 'moyen_reglements.libelle_moyen_reglement', 'caisses.libelle_caisse', 'users.full_name', DB::raw('sum(article_ventes.quantite*article_ventes.prix-article_ventes.remise_sur_ligne) as sommeTotale'), DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'), DB::raw('DATE_FORMAT(ventes.updated_at, "%d-%m-%Y à %H:%i:%s") as date_edit'))
             ->Where([['ventes.deleted_at', NULL], ['ventes.client_id', NULL], ['ventes.id', $vente]])
             ->groupBy('article_ventes.vente_id')
             ->first();
@@ -1043,8 +1044,12 @@ class VenteController extends Controller
             ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
             ->leftjoin('param_tvas', 'param_tvas.id', '=', 'articles.param_tva_id')
             ->select('article_ventes.*', 'param_tvas.montant_tva')
-            ->Where([['article_ventes.deleted_at', NULL], ['article_ventes.vente_id', $vente]])
+            ->Where([['article_ventes.deleted_at', null], ['article_ventes.vente_id', $vente]])
             ->get();
+        $userEdit = User::where('id', $vente_info['updated_by'])->first();
+        //var_dump($userEdit->full_name);
+        //echo "<script> alert(" . $userEdit->full_name . "); <script>"; // ! debug
+
 
         foreach ($articlesVentes as $article) {
             if ($article->article->param_tva_id != 0) {
@@ -1095,9 +1100,9 @@ class VenteController extends Controller
                    <p align="right" style="font-size:27px;"><b>Espèce reçu :&nbsp;&nbsp;' . number_format($vente_info['montant_payer'], 0, ',', ' ') . ' FCFA</b></p>
                    <p align="right" style="font-size:27px;"><b>Espèce rendu : &nbsp;&nbsp;' . number_format($vente_info['montant_payer'] - $montantApayer, 0, ',', ' ') . '  FCFA</b></p><hr/>
                    <p align="center" style="font-size:24px;"><b>Merci de votre visite. Repassez nous voir.</b></p>
-                   <p align="center"><img src="data:image/png;base64,' . base64_encode($generator->getBarcode(123456789, $generator::TYPE_CODE_128)) . '"></p>'
-            //<p align="center" style="font-size:27px;"><b>'.$vente_info["numero_ticket"].'</b></p>
-            . '<p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Editer le ' . date('d-m-Y') . ' à ' . date("H:i:s") . '</i></p>
+                   <p align="center"><img src="data:image/png;base64,' . base64_encode($generator->getBarcode(123456789, $generator::TYPE_CODE_128)) . '"></p>
+                    <p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Fait le ' . date('d-m-Y') . ' à ' . date("H:i:s") . '</i></p>
+                    <p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Editer le ' . $vente_info['date_edit'] . ' par ' . $userEdit->full_name . '</i></p>
                 </div>';
         return $content;
     }
