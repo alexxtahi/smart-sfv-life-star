@@ -13,11 +13,11 @@
 <link href="{{asset('assets/css/jquery.datetimepicker.min.css')}}" rel="stylesheet">
 @if(Auth::user()->role == '') <!-- droit du caissier: Caissier -->
 <div class="col-md-6">
-   @if($caisse_ouverte!=null) 
+   @if($caisse_ouverte!=null)
    <a class="btn btn-sm btn-danger pull-left" id="btnFermerCaisse"><i class="fa fa-lock"></i> Fermer la caisse</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        <a class="btn btn-sm btn-success">{{$caisse!=null ? $caisse->libelle_caisse: ""}} ouverte</a>
     @else
-        <a class="btn btn-sm btn-success pull-left" id="btnOuvrirCaisse"><i class="fa fa-unlock"></i> Ouvrir la caisse</a> 
+        <a class="btn btn-sm btn-success pull-left" id="btnOuvrirCaisse"><i class="fa fa-unlock"></i> Ouvrir la caisse</a>
     @endif
     <br/><br/>
 </div>
@@ -29,14 +29,14 @@
 @endif
 @if(Auth::user()->role != '') <!-- aucun accès caissier du caissier: Caissier -->
 <div class="col-md-3">
-   @if($caisse_ouverte!=null) 
+   @if($caisse_ouverte!=null)
    <a class="btn btn-sm btn-danger pull-left" id="btnFermerCaisse"><i class="fa fa-lock"></i> Fermer la caisse</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     @else
-        <a class="btn btn-sm btn-success pull-left" id="btnOuvrirCaisse"><i class="fa fa-unlock"></i> Ouvrir la caisse</a> 
+        <a class="btn btn-sm btn-success pull-left" id="btnOuvrirCaisse"><i class="fa fa-unlock"></i> Ouvrir la caisse</a>
     @endif
     <br/><br/>
 </div>
-@if($caisse_ouverte!=null) 
+@if($caisse_ouverte!=null)
 <div class="col-md-5">
     <p class="text-bold h3"> Total vente caisse : <span class="text-bold text-green" id="total_caisse_caissier">0</span></p>
 </div>
@@ -54,7 +54,7 @@
 @endif
 <table id="table" class="table table-primary table-striped box box-primary"
                data-pagination="true"
-               data-search="false" 
+               data-search="false"
                data-toggle="table"
                data-unique-id="id"
                data-show-toggle="false"
@@ -105,14 +105,14 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="box box-primary">
-                                <div class="col-md-6"> 
+                                <div class="col-md-6">
                                     <div class="widget-user-header ">
                                         <h3 class="widget-user-username">D&eacute;p&ocirc;t : {{$depot->libelle_depot}}</h3>
                                         <h5 class="widget-user-desc">Caisse : <b>{{$caisse!=null ? $caisse->libelle_caisse: ""}}</b></h5>
                                         <h5 class="widget-user-desc">Connect&eacute;(e) : <b>{{$auth_user->full_name}}</b></h5>
                                     </div>
                                 </div>
-                                <div class="col-md-6"> 
+                                <div class="col-md-6">
                                     <h5 class="text-bold text-red"><br/>
                                         <label>
                                             <input type="checkbox" id="attente" name="attente" ng-model="vente.attente" ng-checked="vente.attente">&nbsp; Cochez cette case pour metre le client en attente
@@ -120,7 +120,7 @@
                                     </h5>
                                 </div>
                                 <div class="col-md-6 remise_add_row"> <br/>
-                                    <a class="btn btn-sm btn-warning" id="btnRemise"><i class="fa fa-lock"></i> Faire une remise</a> 
+                                    <a class="btn btn-sm btn-warning" id="btnRemise"><i class="fa fa-lock"></i> Faire une remise</a>
                                 </div>
                             </div>
                         </div>
@@ -228,7 +228,7 @@
                                 <div class="form-group">
                                     <button type="button" id="btnModalAjoutArticle" class="btn btn-primary btn-xs pull-right"><i class="fa fa-plus">Ajouter un article</i></button>
                                 </div>
-                            </div> 
+                            </div>
                         </div><br/>
                         <table id="tableArticle" class="table table-success table-striped box box-success"
                                data-pagination="true"
@@ -251,7 +251,7 @@
                                 </tr>
                             </thead>
                         </table>
-                        <div class="row"> 
+                        <div class="row">
                             <div class="col-md-6"><br/>
                                 <ul class="nav nav-stacked" style="font-size: 15px;">
                                     <li><a class="text-bold" >Montant HT <span id="montantTHT_add" class="pull-right text-bold"></span></a></li>
@@ -273,6 +273,7 @@
                                          </div>
                                      </div>
                                  </div>
+
                                  <div class="col-md-6">
                                      <div class="form-group">
                                          <label>Montant pay&eacute;</label>
@@ -285,6 +286,28 @@
                                      </div>
                                  </div>
                              </div>
+                             <!-- Pay all checkbox -->
+                                 <div class="col-md-6">
+                                    <h5 class="text-bold"><br/>
+                                        <input type="checkbox" id="tout_payer_input" name="tout_payer_input" checked="false" onchange="toutPayer(this)">Tout payer</input>
+                                        <script>
+                                            function toutPayer(checkbox) {
+                                                var montant_payer_input = document.querySelector('#montant_payer_add');
+                                                if (checkbox.checked) {
+                                                    var montant_a_payer = document.querySelector('#montant_a_payer_add').value;
+                                                    // Remplissage du champ du montant payé
+                                                    montant_payer_input.value = montant_a_payer;
+                                                    //alert("Tout payé !"); // ! debug
+                                                } else {
+                                                    // Vidage du champ du montant payé
+                                                    montant_payer_input.value = "0";
+                                                    //alert("Rien payé !"); // ! debug
+                                                }
+                                            }
+                                        </script>
+                                    </h5>
+                                </div>
+                                 <!-- End Pay all checkbox -->
                              <div class="row">
                                  <div class="col-md-6">
                                      <p class="text-bold text-red">Reste d&ucirc; comme monnaie : &nbsp;&nbsp;&nbsp;<span class="text-bold text-red montant_restant_add"></span></p>
@@ -309,7 +332,7 @@
                         </div>
                     </div>
                     <br/>
-                    <div class="row" id="row_regle"> 
+                    <div class="row" id="row_regle">
                         <div class="col-md-6"><br/>
                             <ul class="nav nav-stacked" style="font-size: 15px;">
                                 <li><a class="text-bold">Montant HT <span class="pull-right text-bold montantHT"></span></a></li>
@@ -317,7 +340,7 @@
                                 <li><a class="text-bold">Montant Remise <span class="pull-right text-bold remiseTTC"></span></a></li>
                                 <li><a class="text-bold">Montant TTC<span class="pull-right text-bold text-red montantTTC"></span></a></li>
                             </ul>
-                        </div> 
+                        </div>
                          <div class="col-md-6">
                              <div class="row">
                                  <div class="col-md-6">
@@ -451,7 +474,7 @@
                            </div>
                        </div>
                        <div class="col-md-2"> <br/>
-                           <a class="btn btn-sm btn-warning" id="btnRemiseAdd"><i class="fa fa-lock"></i> Faire une remise</a> 
+                           <a class="btn btn-sm btn-warning" id="btnRemiseAdd"><i class="fa fa-lock"></i> Faire une remise</a>
                        </div>
                    </div>
                 </div>
@@ -544,7 +567,7 @@
                             </div>
                         </div>
                         <!--<span class="pull-right label label-danger">Toutes vos op&eacute;rations financi&egrave;res seront enregistr&eacute;es dans cette caisse.</span>-->
-                    </div>                            
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-sm btn-success"><span class="overlay loader-overlay"> <i class="fa fa-refresh fa-spin"></i> </span> Valider</button>
@@ -614,7 +637,7 @@
                                 </div>
                                 @endif
                                 <label class="text-center text-red">Assurez-vous du montant r&eacute;el de votre caisse. Contacter l'administrateur en cas d'anomalie.</label><br/>
-                            </div> 
+                            </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
@@ -724,7 +747,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                            
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-sm btn-warning"><span class="overlay loader-overlay"> <i class="fa fa-refresh fa-spin"></i> </span> Valider</button>
@@ -784,7 +807,7 @@
     var idTablleBillet =  0;
     var user_role = $("#user_role").val();
     var caisse_id = $("#caisses_id").val()
-    
+
     appSmarty.controller('formAjoutCtrl', function ($scope) {
         $scope.populateForm = function (vente) {
         $scope.vente = vente;
@@ -793,8 +816,8 @@
         ajout = true;
         $scope.vente = {};
         };
-    }); 
-    
+    });
+
     appSmarty.controller('formAjoutArticleCtrl', function ($scope) {
         $scope.populateArticleForm = function (article) {
         $scope.article = article;
@@ -803,8 +826,8 @@
         ajout = true;
         $scope.article = {};
         };
-    }); 
-    
+    });
+
     appSmarty.controller('formSupprimerArticleCtrl', function ($scope) {
         $scope.populateSupArticleForm = function (article) {
         $scope.article = article;
@@ -813,7 +836,7 @@
         $scope.article = {};
         };
     });
-    
+
     appSmarty.controller('formSupprimerCtrl', function ($scope) {
         $scope.populateForm = function (vente) {
         $scope.vente = vente;
@@ -828,19 +851,19 @@
         $scope.vente = vente;
         };
     });
-    
+
     $(function () {
         $table.on('load-success.bs.table', function (e, data) {
-            rows = data.rows; 
+            rows = data.rows;
             $("#total_caisse_caissier").html($.number(data.totalCaisse));
         });
-       
+
         if(user_role=="Caissier"){
             $table.bootstrapTable('refreshOptions', {url: "{{url('boutique', ['action' => 'liste-ventes-caisse'])}}"});
         }else{
             $table.bootstrapTable('refreshOptions', {url: '../boutique/liste-ventes-by-caisse/' + caisse_id});
         }
-        
+
         $tableArticle.on('load-success.bs.table', function (e, data) {
             rowsArticle = data.rows;
             $("#montantTHT_add").html($.number(data.montantTHT_add));
@@ -882,8 +905,8 @@
                $("#montant_billet").val("");
            }
         });
-        
-       
+
+
         $("#searchByTicket").keyup(function (e) {
             var numero_ticke = $("#searchByTicket").val();
             $("#searchByDate").val("");
@@ -902,14 +925,14 @@
                $table.bootstrapTable('refreshOptions', {url: '../boutique/liste-vente-by-caisse-date-vente/' + caisse_id + '/' + date});
             }
         });
-       
-        
+
+
         $("#btnOuvrirCaisse").on("click", function () {
             if(user_role=="Caissier"){
                 var depot = $('#depot_id').val();
                 $.getJSON("../parametre/liste-caisses-fermees-by-depot/" + depot, function (reponse) {
                     $('#caisse_id').html("<option value=''>-- Selectionner la caisse --</option>");
-                    $.each(reponse.rows, function (index, caisse) { 
+                    $.each(reponse.rows, function (index, caisse) {
                         $('#caisse_id').append('<option value=' + caisse.id + '>' + caisse.libelle_caisse + '</option>')
                     });
                 });
@@ -917,40 +940,40 @@
             if(user_role!="Caissier"){
                 $.getJSON("../parametre/find-caisse-by-id/" + caisse_id, function (reponse) {
                     $('#caisse_id').html("<option value=''>-- Selectionner la caisse --</option>");
-                    $.each(reponse.rows, function (index, caisse) { 
+                    $.each(reponse.rows, function (index, caisse) {
                         $('#caisse_id').append('<option selected value=' + caisse.id + '>' + caisse.libelle_caisse + '</option>')
                     });
                 });
             }
            $(".bs-modal-ouverture-caisse").modal("show");
         });
-        
+
         $("#btnFermerCaisse").on("click", function () {
             if(user_role=="Caissier"){
                 $.getJSON("../boutique/get-one-caisse-ouverte-by-caisse/" + caisse_id, function (reponse) {
-                    $.each(reponse.rows, function (index, caisse_ouverte) { 
+                    $.each(reponse.rows, function (index, caisse_ouverte) {
                         var solde_fermeture = caisse_ouverte.sommeTotale+caisse_ouverte.montant_ouverture + caisse_ouverte.entree - caisse_ouverte.sortie;
                         $("#montant_ouverture").html($.number(caisse_ouverte.montant_ouverture));
                         $("#total_entree").html($.number(caisse_ouverte.sommeTotale+caisse_ouverte.entree));
                         $("#total_sortie").html($.number(caisse_ouverte.sortie));
                         $("#solde_caisse").html($.number(solde_fermeture));
                         $("#solde_fermeture_aff").html($.number(solde_fermeture));
-                        $("#solde_fermeture").val(solde_fermeture); 
+                        $("#solde_fermeture").val(solde_fermeture);
                     });
-                }); 
+                });
             }
             if(user_role!="Caissier"){
                 $.getJSON("../boutique/get-one-caisse-ouverte-by-caisse/" + caisse_id, function (reponse) {
-                    $.each(reponse.rows, function (index, caisse_ouverte) { 
+                    $.each(reponse.rows, function (index, caisse_ouverte) {
                          var solde_fermeture = caisse_ouverte.sommeTotale+caisse_ouverte.montant_ouverture + caisse_ouverte.entree - caisse_ouverte.sortie;
                         $("#montant_ouverture").html($.number(caisse_ouverte.montant_ouverture));
                         $("#total_entree").html($.number(caisse_ouverte.sommeTotale+caisse_ouverte.entree));
                         $("#total_sortie").html($.number(caisse_ouverte.sortie));
                         $("#solde_caisse").html($.number(solde_fermeture));
                         $("#solde_fermeture_aff").html($.number(solde_fermeture));
-                        $("#solde_fermeture").val(solde_fermeture); 
+                        $("#solde_fermeture").val(solde_fermeture);
                     });
-                }); 
+                });
             }
            $(".bs-modal-fermeture-caisse").modal("show");
         });
@@ -971,7 +994,7 @@
             $("#vente").val(vente);
             $(".bs-modal-add-article").modal("show");
         });
-       
+
         $("#btnModalAjout").on("click", function () {
             ajout = true;
             document.getElementById("code_barre").focus();
@@ -1010,11 +1033,11 @@
             var depot_id = $("#depot_id").val();
             $.getJSON("../boutique/liste-article-by-unite-in-depot-by-code/" + code_barre, function (reponse) {
                 if(reponse.total>0){
-                    $.each(reponse.rows, function (index, retour) { 
+                    $.each(reponse.rows, function (index, retour) {
                         $("#article").select2("val",retour.article.id);
                         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + retour.article.id , function (reponse) {
                             $('#unite').html("<option value=''>-- Carré --</option>");
-                            $.each(reponse.rows, function (index, colis) { 
+                            $.each(reponse.rows, function (index, colis) {
                                 $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                             });
                         })
@@ -1037,11 +1060,11 @@
             var depot_id = $("#depot_id").val();
             $.getJSON("../boutique/liste-article-by-unite-in-depot-by-code/" + code_barre, function (reponse) {
                 if(reponse.total>0){
-                    $.each(reponse.rows, function (index, retour) { 
+                    $.each(reponse.rows, function (index, retour) {
                          $("#article_add").val(retour.article.id);
                         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + retour.article.id , function (reponse) {
                             $('#unite_add').html("<option value=''>-- Carré --</option>");
-                            $.each(reponse.rows, function (index, colis) { 
+                            $.each(reponse.rows, function (index, colis) {
                                 $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                             });
                         })
@@ -1062,13 +1085,13 @@
             var article_id = $("#article").val();
             var depot_id = $("#depot_id").val();
             $.getJSON("../parametre/find-article/" + article_id , function (reponse) {
-                $.each(reponse.rows, function (index, articles_trouver) { 
+                $.each(reponse.rows, function (index, articles_trouver) {
                     $("#code_barre").val(articles_trouver.code_barre);
                 });
             })
             $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + article_id , function (reponse) {
                 $('#unite').html("<option value=''>-- Carré --</option>");
-                $.each(reponse.rows, function (index, colis) { 
+                $.each(reponse.rows, function (index, colis) {
                     $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
             })
@@ -1083,13 +1106,13 @@
             var article_id = $("#article_add").val();
             var depot_id = $("#depot_id").val();
             $.getJSON("../parametre/find-article/" + article_id , function (reponse) {
-                $.each(reponse.rows, function (index, articles_trouver) { 
+                $.each(reponse.rows, function (index, articles_trouver) {
                     $("#code_barre_add").val(articles_trouver.code_barre);
                 });
             })
             $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + article_id , function (reponse) {
                 $('#unite_add').html("<option value=''>-- Carré --</option>");
-                $.each(reponse.rows, function (index, colis) { 
+                $.each(reponse.rows, function (index, colis) {
                     $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
             })
@@ -1100,13 +1123,13 @@
             var depot_id = $("#depot_id").val();
             var unite_id = $("#unite").val();
             $.getJSON("../boutique/find-article-in-depot-by-unite-caisse/" + article_id + "/" + depot_id + "/" +  unite_id, function (reponse) {
-                $.each(reponse.rows, function (index, article) { 
+                $.each(reponse.rows, function (index, article) {
                     $("#prixTTC").val(article.prix_ventes);
                     //Calcul du prix HT
                     var tva = 0;
                    if(article.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + article.article.param_tva_id, function (reponse) {
-                            $.each(reponse.rows, function (index, tvas_infos) { 
+                            $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
                                 var prix_ht_article = (article.prix_ventes/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
@@ -1130,7 +1153,7 @@
             var depot_id = $("#depot_id").val();
             var unite_id = $("#unite_add").val();
             $.getJSON("../boutique/find-article-in-depot-by-unite-caisse/" + article_id + "/" + depot_id + "/" +  unite_id, function (reponse) {
-                $.each(reponse.rows, function (index, article) { 
+                $.each(reponse.rows, function (index, article) {
                     if(article.article.stockable==0){
                           $("#en_stock_add").val(1000);
                     }else{
@@ -1141,7 +1164,7 @@
                     var tva = 0;
                    if(article.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + article.article.param_tva_id, function (reponse) {
-                            $.each(reponse.rows, function (index, tvas_infos) { 
+                            $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
                                 var prix_ht_article = (article.prix_ventes/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
@@ -1151,32 +1174,32 @@
                    }else{
                        $("#prixHT_add").val(article.prix_ventes);
                    }
-                
+
                 });
             })
         });
-        
-        $("#quantite").change(function (e) { 
+
+        $("#quantite").change(function (e) {
           var quantite = $("#quantite").val();
           var prix = $("#prixTTC").val();
           $("#montantTC").val(quantite*prix);
         });
-        $("#quantite").keyup(function (e) { 
+        $("#quantite").keyup(function (e) {
           var quantite = $("#quantite").val();
           var prix = $("#prixTTC").val();
           $("#montantTC").val(quantite*prix);
         });
-        $("#quantite_add").change(function (e) { 
+        $("#quantite_add").change(function (e) {
           var quantite = $("#quantite_add").val();
           var prix = $("#prixTTC_add").val();
           $("#montantTC_add").val(quantite*prix);
         });
-        $("#quantite_add").keyup(function (e) { 
+        $("#quantite_add").keyup(function (e) {
           var quantite = $("#quantite_add").val();
           var prix = $("#prixTTC_add").val();
           $("#montantTC_add").val(quantite*prix);
         });
-        
+
         //Add row on table
         $(".add-row").click(function () {
             if($("#article").val() != '' && $("#quantite").val() != '' && $("#unite").val() != '' && $("#quantite").val()!=0) {
@@ -1190,7 +1213,7 @@
                 var prixTTC = $("#prixTTC").val();
                 var prixHT = $("#prixHT").val();
                 var remise_sur_ligne = $("#remise_sur_ligne").val()!=0?$("#remise_sur_ligne").val():0;
-                
+
                 if(parseInt(quantite) > parseInt(stock)){
                     $.gritter.add({
                         title: "SMART-SFV",
@@ -1207,7 +1230,7 @@
                         //Si la ligne existe on recupere l'ancienne quantité et l'id de la ligne
                         oldQte = articleTrouver.quantites;
                         idElementLigne = articleTrouver.id;
-                       
+
                         //Si la somme des deux quantités depasse la quantité à ajouter en stock alors on block
                         var sommeDeuxQtes = parseInt(oldQte) + parseInt(quantite);
                         if(parseInt(sommeDeuxQtes)> parseInt(stock)){
@@ -1234,7 +1257,7 @@
                             });
                             articleTrouver.quantites = sommeDeuxQtes;
                             articleTrouver.remises = remise_sur_ligne;
-                            
+
                             montantHT = montantHT + (sommeDeuxQtes*prixHT);
                             montantTTC = parseInt(montantTTC) + parseInt(sommeDeuxQtes*prixTTC);
                             remiseTTC = parseInt(remiseTTC) + parseInt(remise_sur_ligne);
@@ -1258,7 +1281,7 @@
                             return;
                         }
                     }
-                    idTablle++; 
+                    idTablle++;
                     $tableAddRowArticle.bootstrapTable('insertRow',{
                         index: idTablle,
                         row: {
@@ -1316,7 +1339,7 @@
                 return;
             }
         })
-        // Find and remove selected table rows  
+        // Find and remove selected table rows
         $(".delete-row").click(function () {
            var selecteds = $tableAddRowArticle.bootstrapTable('getSelections');
            var ids = $.map($tableAddRowArticle.bootstrapTable('getSelections'), function (row) {
@@ -1324,10 +1347,10 @@
                     })
                 $tableAddRowArticle.bootstrapTable('remove', {
                     field: 'id',
-                    values: ids 
+                    values: ids
                 })
-              
-                $.each(selecteds, function (index, value) { 
+
+                $.each(selecteds, function (index, value) {
                     var articleTrouver = _.findWhere(monPanier, {id: value.id})
                     montantHT = parseInt(montantHT) - (articleTrouver.quantites*articleTrouver.prix_ht);
                     montantTTC = parseInt(montantTTC) - parseInt(articleTrouver.quantites*articleTrouver.prix);
@@ -1336,7 +1359,7 @@
                         return article.id == value.id;
                     });
                 });
-              
+
                     $(".montantHT").html("<b>"+ $.number(montantHT)+"</b>");
                     $(".montantTVA").html("<b>" + $.number(montantTTC-montantHT) + "</b>");
                     $(".remiseTTC").html("<b>" + $.number(remiseTTC) +"</b>");
@@ -1360,21 +1383,21 @@
                     idTablle = 0;
                 }
         });
-        
-        
+
+
         //Add billet row on table
         $(".add-billetage-row").click(function () {
             if($("#billet").val() != '' && $("#quantite_billet").val() != '' && $("#quantite_billet").val()!=0) {
                 var billet = $("#billet").val();
                 var quantite_billet = $("#quantite_billet").val();
-               
+
                 //Vérification Si la ligne existe déja dans le tableau
                 var ligneBilletTrouver = _.findWhere(panierBillet, {billets: billet})
                 if(ligneBilletTrouver!=null) {
                         //Si la ligne existe on recupere l'ancienne quantité et l'id de la ligne
                         oldQte = ligneBilletTrouver.quantite_billets;
                         idElementLigne = ligneBilletTrouver.id;
-                       
+
                         //Si la somme des deux quantités depasse la quantité à ajouter en stock alors on block
                         var sommeDeuxQtes = parseInt(oldQte) + parseInt(quantite_billet);
                             //MAJ de la ligne
@@ -1386,13 +1409,13 @@
                                 }
                             });
                             ligneBilletTrouver.quantite_billets = sommeDeuxQtes;
-                          
+
                             $("#quantite_billet").val("");
                             $("#billet").val("");
                             $("#montant_billet").val("");
                             return;
                     }
-                    idTablleBillet++; 
+                    idTablleBillet++;
                     $tableBilletage.bootstrapTable('insertRow',{
                         index: idTablleBillet,
                         row: {
@@ -1402,11 +1425,11 @@
                           montant_billet: $.number(quantite_billet*billet)
                         }
                     })
-                  
+
                     //Creation de l'article dans le tableau virtuel (panier)
                     var DataBillet= {'id':idTablleBillet, 'billets':billet, 'quantite_billets':quantite_billet};
                     panierBillet.push(DataBillet);
-                 
+
                     $("#quantite_billet").val("");
                     $("#billet").val("");
                     $("#montant_billet").val("");
@@ -1415,7 +1438,7 @@
                     }else{
                         $(".delete-billetage-row").hide();
                     }
-                
+
             }else{
                 $.gritter.add({
                     title: "SMART-SFV",
@@ -1426,7 +1449,7 @@
                 return;
             }
         })
-        // Find and remove selected table rows  
+        // Find and remove selected table rows
         $(".delete-billetage-row").click(function () {
            var selecteds = $tableBilletage.bootstrapTable('getSelections');
            var ids = $.map($tableBilletage.bootstrapTable('getSelections'), function (row) {
@@ -1434,27 +1457,27 @@
                     })
                 $tableBilletage.bootstrapTable('remove', {
                     field: 'id',
-                    values: ids 
+                    values: ids
                 })
-              
-                $.each(selecteds, function (index, value) { 
+
+                $.each(selecteds, function (index, value) {
                     var ligneTrouver = _.findWhere(panierBillet, {id: value.id})
                     panierBillet = _.reject(panierBillet, function (article) {
                         return article.id == value.id;
                     });
                 });
-               
+
                 if(panierBillet.length==0){
                     $(".delete-billetage-row").hide();
                     idTablleBillet = 0;
                 }
         });
-        
+
         $("#montant_payer").keyup(function(){
            var montant_payer = $("#montant_payer").val();
            var montant_a_payer = $("#montant_a_payer").val();
            var reste = parseInt(montant_payer) - parseInt(montant_a_payer);
-           $(".montant_restant").html("<b>" + $.number(reste) +"</b>"); 
+           $(".montant_restant").html("<b>" + $.number(reste) +"</b>");
         });
         $("#montant_payer").focusout(function(){
            var montant_payer = $("#montant_payer").val();
@@ -1464,14 +1487,14 @@
                $(".montant_restant").html("");
                alert('Veillez vérifier le montant saisie pour le payement SVP');
            }else{
-              $(".montant_restant").html("<b>" + $.number(reste) +"</b>"); 
+              $(".montant_restant").html("<b>" + $.number(reste) +"</b>");
            }
        });
         $("#montant_payer_add").keyup(function(){
            var montant_payer_add = $("#montant_payer_add").val();
            var montant_a_payer_add = $("#montant_a_payer_add").val();
            var reste = parseInt(montant_payer_add) - parseInt(montant_a_payer_add);
-           $(".montant_restant_add").html("<b>" + $.number(reste) +"</b>"); 
+           $(".montant_restant_add").html("<b>" + $.number(reste) +"</b>");
        });
         $("#montant_payer_add").focusout(function(){
            var montant_payer_add = $("#montant_payer_add").val();
@@ -1481,13 +1504,13 @@
                $(".montant_restant_add").html("");
                alert('Veillez vérifier le montant saisie pour le payement SVP');
            }else{
-              $(".montant_restant_add").html("<b>" + $.number(reste) +"</b>"); 
+              $(".montant_restant_add").html("<b>" + $.number(reste) +"</b>");
            }
        });
-        
+
         // Submit the add form
-        $("#sendButton").click(function(){  
-            $("#formAjout").submit(); 
+        $("#sendButton").click(function(){
+            $("#formAjout").submit();
             $("#sendButton").prop("disabled", true);
         });
         $("#formAjout").submit(function (e) {
@@ -1498,7 +1521,7 @@
                 return false;
             }
             var $ajaxLoader = $("#formAjout .loader-overlay");
-           
+
             if (ajout==true) {
                 var methode = 'POST';
                 var url = "{{route('boutique.ventes.store')}}";
@@ -1558,7 +1581,7 @@
             createFormData(formData, 'panierBillet', panierBillet);
             fermetureCaisseAction(methode, url, $(this), formData, $ajaxLoader);
         });
-        
+
         $("#formSupprimer").submit(function (e) {
             e.preventDefault();
             var id = $("#idVenteSupprimer").val();
@@ -1606,14 +1629,14 @@
         });
         $("#idVenteModifier").val(vente.id);
         $("#montant_payer_add").val(vente.montant_payer);
-        vente.attente == 1 ? $("#attente").attr("checked", true) : $("#attente").attr("checked", false); 
+        vente.attente == 1 ? $("#attente").attr("checked", true) : $("#attente").attr("checked", false);
         $tableArticle.bootstrapTable('refreshOptions', {url: "../boutique/liste-articles-vente/" + idVente});
         $(".remise_add_row").hide();
         $("#div_enregistrement").hide();
         $("#div_update").show();
         $(".bs-modal-ajout").modal("show");
     }
-    
+
     function deleteRow(idVente){
         var $scope = angular.element($("#formSupprimer")).scope();
         var vente =_.findWhere(rows, {id: idVente});
@@ -1622,7 +1645,7 @@
         });
         $(".bs-modal-suppression").modal("show");
     }
-    
+
     function updateArticleRow(idArticle){
         ajoutArticle = false;
         var $scope = angular.element($("#formAjoutArticle")).scope();
@@ -1635,29 +1658,29 @@
         var depot = $("#depot_id").val();
         $("#remise_sur_ligne_add").prop('readonly',true);
         $("#quantite_add").val(article.quantite);
-      
+
         $("#article_add").val(article.article_id);
         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot + "/" + article.article_id , function (reponse) {
                 $('#unite_add').html("<option value=''>-- Colis --</option>");
-                $.each(reponse.rows, function (index, colis) { 
+                $.each(reponse.rows, function (index, colis) {
                     $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
                 $("#unite_add").val(article.unite_id);
         })
         $.getJSON("../parametre/find-article/" + article.article_id , function (reponse) {
-                $.each(reponse.rows, function (index, articles_trouver) { 
+                $.each(reponse.rows, function (index, articles_trouver) {
                     $("#code_barre_add").val(articles_trouver.code_barre);
                 });
         })
         $.getJSON("../boutique/find-article-in-depot-by-unite/" + article.article_id + "/" + depot + "/" +  article.unite_id, function (reponse) {
-                $.each(reponse.rows, function (index, articles) { 
+                $.each(reponse.rows, function (index, articles) {
                     $("#en_stock_add").val(articles.quantite_disponible);
-                   
+
                     //Calcul du prix HT
                     var tva = 0;
                    if(articles.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + articles.article.param_tva_id, function (reponse) {
-                            $.each(reponse.rows, function (index, tvas_infos) { 
+                            $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
                                 var prix_ht_article = (article.prix/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
@@ -1673,7 +1696,7 @@
         $("#montantTC_add").val(article.prix*article.quantite);
         $(".bs-modal-add-article").modal("show");
     }
-    
+
     function deleteArticleRow(idArticle){
         var $scope = angular.element($("#formSupprimerArticle")).scope();
         var article =_.findWhere(rowsArticle, {id: idArticle});
@@ -1736,16 +1759,16 @@
     function montantFormatter(montant){
         return '<span class="text-bold">' + $.number(montant)+ '</span>';
     }
-    function optionFormatter(id, row) { 
+    function optionFormatter(id, row) {
         return '<button type="button" class="btn btn-xs btn-warning" data-placement="left" data-toggle="tooltip" title="Panier" onClick="javascript:listeArticleRow(' + id + ');"><i class="fa fa-cart-arrow-down"></i></button>\n\
                 <button class="btn btn-xs btn-primary" data-placement="left" data-toggle="tooltip" title="Modifier" onClick="javascript:updateRow(' + id + ');"><i class="fa fa-edit"></i></button>\n\
                     <button type="button" class="btn btn-xs btn-danger" data-placement="left" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteRow(' + id + ');"><i class="fa fa-trash"></i></button>';
     }
-    function optionAArticleFormatter(id, row) { 
+    function optionAArticleFormatter(id, row) {
             return '<button type="button" class="btn btn-xs btn-primary" data-placement="left" data-toggle="tooltip" title="Modifier" onClick="javascript:updateArticleRow(' + id + ');"><i class="fa fa-edit"></i></button>\n\
                     <button type="button" class="btn btn-xs btn-danger" data-placement="left" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteArticleRow(' + id + ');"><i class="fa fa-trash"></i></button>';
     }
-    
+
    function listeArticleFormatter(id, row){
         return '<button type="button" class="btn btn-xs btn-warning" data-placement="left" data-toggle="tooltip" title="Panier" onClick="javascript:listeArticleRow(' + id + ');"><i class="fa fa-cart-arrow-down"></i></button>';
     }
@@ -1795,7 +1818,7 @@
                 }
                 $("#row_regle").hide();
                 if(reponse.data.attente!=1){
-                  window.open("ticket-vente-pdf/" + reponse.data.id ,'_blank')  
+                  window.open("ticket-vente-pdf/" + reponse.data.id ,'_blank')
                 }
                 location.reload();
                 $formObject.trigger('eventAjouter', [reponse.data]);
@@ -1815,7 +1838,7 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-            
+
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -1837,7 +1860,7 @@
         },
     });
 	};
-   
+
     function editerVentesArticlesAction(methode, url, $formObject, formData, $ajoutLoader, $table,$tableVente, ajoutArticle = true) {
     jQuery.ajax({
         type: methode,
@@ -1879,7 +1902,7 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-            
+
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -1900,7 +1923,7 @@
         },
     });
 };
-  
+
    function ouvertureCaisseAction(methode, url, $formObject, formData, $ajoutLoader) {
     jQuery.ajax({
         type: methode,
@@ -1924,7 +1947,7 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-            
+
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -1971,7 +1994,7 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-            
+
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -2020,7 +2043,7 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-            
+
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -2041,8 +2064,8 @@
         },
     });
     };
-    
-    //Supprimer un article 
+
+    //Supprimer un article
     function supprimerArticleAction(url, formData, $question, $ajaxLoader, $table, $tableVente) {
     jQuery.ajax({
         type: 'DELETE',
