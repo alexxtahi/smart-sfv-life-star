@@ -128,12 +128,13 @@
                     <hr/>
                     <div id="div_enregistrement">
                         <div class="row">
+                            <!--
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Code Barre</label>
-                                    <input type="text" class="form-control" id="code_barre" autofocus>
-                                </div>
-                            </div>
+                                    <label>Code Barresssss</label>-->
+                                    <input type="hidden" class="form-control" id="code_barre">
+                                <!--</div>
+                            </div>-->
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Article *</label>
@@ -153,12 +154,15 @@
                                     </select>
                                 </div>
                             </div>
+                            <!--
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Prix HT</label>
-                                    <input type="text" class="form-control" id="prixHT" placeholder="Prix HT" readonly>
+                                -->
+                                    <input type="hidden" class="form-control" id="prixHT" placeholder="Prix HT" readonly>
+                            <!--
                                 </div>
-                            </div>
+                            </div>-->
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Prix TTC</label>
@@ -281,13 +285,21 @@
                                              <div class="input-group-addon">
                                                  <i class="fa fa-money"></i>
                                              </div>
-                                             <input type="text" pattern="[0-9]*" class="form-control" min="0" id="montant_payer_add" name="montant_payer_add" placeholder="Montant payé">
+                                             <input type="text" pattern="[0-9]*" class="form-control" min="0" id="montant_payer_add" name="montant_payer_add" onchange="checkToutPayer(this)" placeholder="Montant payé">
+                                             <script>
+                                                 function checkToutPayer(champ) {
+                                                    var montant_a_payer = document.querySelector('#montant_a_payer_add').value;
+
+                                                    var checkbox = document.querySelector("#tout_payer_input");
+                                                    checkbox.checked = (champ.value == montant_a_payer) ? false : true;
+                                                 }
+                                             </script>
                                          </div>
                                      </div>
                                  </div>
                              </div>
                              <!-- Pay all checkbox -->
-                                 <div class="col-md-6">
+                                    <div class="col-md-6">
                                     <h5 class="text-bold"><br/>
                                         <input type="checkbox" id="tout_payer_input" name="tout_payer_input" checked="false" onchange="toutPayer(this)">Tout payer</input>
                                         <script>
@@ -412,12 +424,13 @@
                    <input type="text" class="hidden" id="idArticleModifier"  ng-model="article.id"/>
                    <input type="text" class="hidden" id="vente"  name="vente_id"/>
                    <div class="row">
+                       <!--
                        <div class="col-md-2">
                            <div class="form-group">
-                               <label>Code Barre</label>
-                               <input type="text" class="form-control" id="code_barre_add" autofocus>
-                           </div>
-                       </div>
+                               <label>Code Barre</label>-->
+                               <input type="hidden" class="form-control" id="code_barre_add" autofocus>
+                           <!--</div>
+                       </div>-->
                        <div class="col-md-4">
                            <div class="form-group">
                                <label>Article *</label>
@@ -431,18 +444,18 @@
                        </div>
                        <div class="col-md-2">
                            <div class="form-group">
-                               <label>Colis *</label>
+                               <label>Carré *</label>
                                <select name="unite_id" class="form-control" id="unite_add" required>
-                                   <option value="">-- Colis--</option>
+                                   <option value="">-- Carré --</option>
                                </select>
                            </div>
                        </div>
-                       <div class="col-md-2">
+                       <!--<div class="col-md-2">
                            <div class="form-group">
-                               <label>Prix HT</label>
-                               <input type="text" class="form-control" id="prixHT_add" placeholder="Prix HT" readonly>
-                           </div>
-                       </div>
+                               <label>Prix HT</label>-->
+                               <input type="hidden" class="form-control" id="prixHT_add" placeholder="Prix HT" readonly>
+                           <!--</div>
+                       </div>-->
                        <div class="col-md-2">
                            <div class="form-group">
                                <label>Prix TTC</label>
@@ -1276,7 +1289,8 @@
                             $(".remiseTTC").html("<b>" + $.number(remiseTTC) +"</b>");
                             $(".montantTTC").html("<b>" + $.number(montantTTC-remiseTTC) +"</b>");
                             $("#montant_a_payer").val(montantTTC-remiseTTC);
-                            $("#montant_payer").val("");
+                            $("#montant_payer").val(montantTTC-remiseTTC); // ! Insérer le montant payé directement
+                            //$("#montant_payer").val("");
                             $(".montant_restant").html("");
                             return;
                         }
@@ -1319,7 +1333,8 @@
                     $(".remiseTTC").html("<b>" + $.number(remiseTTC) +"</b>");
                     $(".montantTTC").html("<b>" + $.number(montantTTC-remiseTTC) +"</b>");
                     $("#montant_a_payer").val(montantTTC-remiseTTC);
-                    $("#montant_payer").val("");
+                    $("#montant_payer").val(montantTTC-remiseTTC); // ! Insérer le montant payé directement
+                    //$("#montant_payer").val("");
                     $(".montant_restant").html("");
                     if(idTablle>0){
                         $("#row_regle").show();
@@ -1494,6 +1509,7 @@
            var montant_payer_add = $("#montant_payer_add").val();
            var montant_a_payer_add = $("#montant_a_payer_add").val();
            var reste = parseInt(montant_payer_add) - parseInt(montant_a_payer_add);
+
            $(".montant_restant_add").html("<b>" + $.number(reste) +"</b>");
        });
         $("#montant_payer_add").focusout(function(){
