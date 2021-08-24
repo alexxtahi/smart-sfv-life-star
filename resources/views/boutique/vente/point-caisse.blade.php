@@ -383,13 +383,31 @@
                                         <div class="input-group-addon">
                                             <i class="fa fa-cog"></i>
                                         </div>
-                                        <select name="ticket_entree_add" id="ticket_entree_add"  class="form-control">
+                                        <select name="ticket_entree_add" id="ticket_entree_add" onchange="choisirPassEntree(this)" class="form-control">
                                             <option value="">-- Pass d'entrée --</option>
                                             <!-- Chargement des tickets d'entrée -->
                                             @foreach($ticketsEntree as $ticketEntree)
-                                            <option  {{$ticketEntree->id}} value="{{$ticketEntree->id}}">{{$ticketEntree->numero_ticket}}</option>
+                                            <option  {{$ticketEntree->id}} value="{{$ticketEntree->prix}}">{{$ticketEntree->numero_ticket}}</option>
                                             @endforeach
                                         </select>
+                                        <!-- script de sélection du pass d'entrée -->
+                                        <script>
+                                            function choisirPassEntree(list) {
+                                                var montant_a_payer_input = document.querySelector('#montant_a_payer_add'); // Récupération du champ
+                                                var passValue = parseInt(list.options[list.selectedIndex].value); // ? Sélection du prix du pass
+                                                var montant_a_payer = parseInt(document.querySelector('#montant_a_payer_add').value);
+                                                //alert("pass value: " + passValue); // ! debug
+                                                // Comparaison avec le montant à payer
+                                                if (passValue >= montant_a_payer) {
+                                                    montant_a_payer_input.value = 0;
+                                                } else {
+                                                    alert("Ce pass d'entrée ne vous permet pas de faire cet achat");
+                                                    list.options[0].selected = true;
+                                                }
+
+
+                                            }
+                                        </script>
                                     </div>
                                 </div>
                             </div>

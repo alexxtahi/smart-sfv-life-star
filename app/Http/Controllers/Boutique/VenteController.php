@@ -105,8 +105,8 @@ class VenteController extends Controller
             ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', null], ['article_ventes.retourne', 0]])
             ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
             ->select('ventes.id', 'ventes.numero_ticket', 'article_ventes.prix')
-            ->Where([['ventes.deleted_at', null], ['articles.description_article', "pass entree"]]) // ! Selectionner uniquement les pass d'entrée
-            //->Where([['ventes.deleted_at', null]])
+            //->Where([['ventes.deleted_at', null], ['articles.description_article', "pass entree"]]) // ! Selectionner uniquement les pass d'entrée
+            ->Where([['ventes.deleted_at', null]])
             ->get();
         // Fin récup ticket d'entrée
         $articles = DepotArticle::with('unite', 'depot', 'article')
