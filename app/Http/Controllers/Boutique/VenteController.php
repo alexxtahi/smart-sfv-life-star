@@ -75,7 +75,7 @@ class VenteController extends Controller
         $caisse = null;
         $caisse_ouverte = null;
         $auth_user = Auth::user();
-        //Recupértion de la caisse dans la session
+        //Recupération de la caisse dans la session
         if ($request->session()->has('session_caisse_ouverte')) {
             $caisse_ouverte_id = $request->session()->get('session_caisse_ouverte');
             $caisse_ouverte = CaisseOuverte::where([['id', $caisse_ouverte_id], ['date_fermeture', null]])->first();
@@ -95,6 +95,20 @@ class VenteController extends Controller
 
         $depot = Depot::find($auth_user->depot_id);
         $moyenReglements = DB::table('moyen_reglements')->Where('deleted_at', NULL)->orderBy('libelle_moyen_reglement', 'asc')->get();
+        // Récupération des tickets d'entrée
+        $ticketsEntree = Vente::with('depot', 'caisse_ouverte')
+            ->join('caisse_ouvertes', 'caisse_ouvertes.id', '=', 'ventes.caisse_ouverte_id')
+            ->join('caisses', 'caisses.id', '=', 'caisse_ouvertes.caisse_id')
+            ->join('reglements', 'reglements.vente_id', '=', 'ventes.id') // ! A corriger
+            ->join('moyen_reglements', 'moyen_reglements.id', '=', 'reglements.moyen_reglement_id')
+            ->join('users', 'users.id', '=', 'ventes.created_by')
+            ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', null], ['article_ventes.retourne', 0]])
+            ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
+            ->select('ventes.id', 'ventes.numero_ticket', 'article_ventes.prix')
+            ->Where([['ventes.deleted_at', null], ['articles.description_article', "pass entree"]]) // ! Selectionner uniquement les pass d'entrée
+            //->Where([['ventes.deleted_at', null]])
+            ->get();
+        // Fin récup ticket d'entrée
         $articles = DepotArticle::with('unite', 'depot', 'article')
             ->join('articles', 'articles.id', '=', 'depot_articles.article_id')
             ->where('depot_articles.depot_id', $auth_user->depot_id)
@@ -104,7 +118,7 @@ class VenteController extends Controller
         $menuPrincipal = "Boutique";
         $titleControlleur = "Point de caisse";
         $btnModalAjout = $caisse_ouverte != null ? "TRUE" : "FALSE";
-        return view('boutique.vente.point-caisse', compact('articles', 'depot', 'auth_user', 'caisse_ouverte', 'caisse', 'moyenReglements', 'menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+        return view('boutique.vente.point-caisse', compact('articles', 'depot', 'auth_user', 'caisse_ouverte', 'caisse', 'moyenReglements', 'ticketsEntree', 'menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
 
     public function pointCaisseAdmin()
@@ -129,6 +143,20 @@ class VenteController extends Controller
         $caisse = Caisse::find($request->caisse_id);
         $depot = Depot::find($caisse->depot_id);
         $moyenReglements = DB::table('moyen_reglements')->Where('deleted_at', NULL)->orderBy('libelle_moyen_reglement', 'asc')->get();
+        // Récupération des tickets d'entrée
+        $ticketsEntree = Vente::with('depot', 'caisse_ouverte')
+            ->join('caisse_ouvertes', 'caisse_ouvertes.id', '=', 'ventes.caisse_ouverte_id')
+            ->join('caisses', 'caisses.id', '=', 'caisse_ouvertes.caisse_id')
+            ->join('reglements', 'reglements.vente_id', '=', 'ventes.id') // ! A corriger
+            ->join('moyen_reglements', 'moyen_reglements.id', '=', 'reglements.moyen_reglement_id')
+            ->join('users', 'users.id', '=', 'ventes.created_by')
+            ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', null], ['article_ventes.retourne', 0]])
+            ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
+            ->select('ventes.id', 'ventes.numero_ticket', 'article_ventes.prix')
+            ->Where([['ventes.deleted_at', null], ['articles.description_article', "pass entree"]]) // ! Selectionner uniquement les pass d'entrée
+            //->Where([['ventes.deleted_at', null]])
+            ->get();
+        // Fin récup ticket d'entrée
         $articles = DepotArticle::with('unite', 'depot', 'article')
             ->join('articles', 'articles.id', '=', 'depot_articles.article_id')
             ->where('depot_articles.depot_id', $caisse->depot_id)
@@ -138,7 +166,7 @@ class VenteController extends Controller
         $menuPrincipal = "Boutique";
         $titleControlleur = "Point de caisse du dépôt " . $depot->libelle_depot;
         $btnModalAjout = $caisse_ouverte != null ? "TRUE" : "FALSE";
-        return view('boutique.vente.point-caisse', compact('articles', 'depot', 'auth_user', 'caisse_ouverte', 'caisse', 'moyenReglements', 'menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+        return view('boutique.vente.point-caisse', compact('articles', 'depot', 'auth_user', 'caisse_ouverte', 'caisse', 'moyenReglements', 'ticketsEntree', 'menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
 
     public function vueVenteDivers()

@@ -280,7 +280,9 @@
                                              <input type="text" pattern="[0-9]*" class="form-control" min="0" id="montant_a_payer_add" name="montant_a_payer_add" placeholder="Montant à payer" readonly>
                                          </div>
                                      </div>
-                                 </div>
+                                </div>
+
+
 
                                  <div class="col-md-6">
                                      <div class="form-group">
@@ -326,11 +328,11 @@
                                  <!-- End Pay all checkbox -->
                              <div class="row">
                                  <div class="col-md-6">
-                                     <p class="text-bold text-red">Reste d&ucirc; comme monnaie : &nbsp;&nbsp;&nbsp;<span class="text-bold text-red montant_restant_add"></span></p>
+                                     <p class="text-bold text-red">Montant d&ucirc; : &nbsp;&nbsp;&nbsp;<span class="text-bold text-red montant_restant_add"></span></p>
                                  </div>
                                  <div class="col-md-6">
                                      <div class="form-group">
-                                         <label for="moyen_reglement_id">Moyen de payement *</label>
+                                         <label for="moyen_reglement_id">Moyen de payement *</label> <!-- Faux -->
                                          <div class="input-group">
                                              <div class="input-group-addon">
                                                  <i class="fa fa-cog"></i>
@@ -343,6 +345,9 @@
                                          </div>
                                      </div>
                                  </div>
+
+
+
                              </div>
                             </div>
                         </div>
@@ -370,6 +375,25 @@
                                          </div>
                                      </div>
                                  </div>
+                                 <!-- Ticket d'entrée -->
+                                 <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="ticket_entree">Ticket d'entrée</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-cog"></i>
+                                        </div>
+                                        <select name="ticket_entree_add" id="ticket_entree_add"  class="form-control">
+                                            <option value="">-- Pass d'entrée --</option>
+                                            <!-- Chargement des tickets d'entrée -->
+                                            @foreach($ticketsEntree as $ticketEntree)
+                                            <option  {{$ticketEntree->id}} value="{{$ticketEntree->id}}">{{$ticketEntree->numero_ticket}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Fin Ticket d'entrée -->
                                  <div class="col-md-6">
                                      <div class="form-group">
                                          <label>Montant pay&eacute;</label>
@@ -381,14 +405,9 @@
                                          </div>
                                      </div>
                                  </div>
-                             </div>
-                             <div class="row">
-                                 <div class="col-md-6">
-                                     <p class="text-bold text-red">Reste d&ucirc; comme monnaie : &nbsp;&nbsp;&nbsp;<span class="text-bold text-red montant_restant"></span></p>
-                                 </div>
                                  <div class="col-md-6">
                                      <div class="form-group">
-                                         <label for="moyen_reglement_id">Moyen de payement *</label>
+                                         <label for="moyen_reglement_id">Moyen de payement *</label> <!-- Vrai -->
                                          <div class="input-group">
                                              <div class="input-group-addon">
                                                  <i class="fa fa-cog"></i>
@@ -402,6 +421,16 @@
                                          </div>
                                      </div>
                                  </div>
+                             </div>
+
+
+
+
+                             <div class="row">
+                                 <div class="col-md-6">
+                                     <p class="text-bold text-red">Montant d&ucirc; : &nbsp;&nbsp;&nbsp;<span class="text-bold text-red montant_restant"></span></p>
+                                 </div>
+
                              </div>
                          </div>
                     </div>
@@ -660,7 +689,7 @@
                                         <div class="form-group">
                                             <label>Billet *</label>
                                             <select class="form-control" id="billet">
-                                                <option value="">-- Selcetionner un element --</option>
+                                                <option value="">-- Selectionner un element --</option>
                                                 <option value="10000"> 10000</option>
                                                 <option value="5000"> 5000</option>
                                                 <option value="2000"> 2000</option>
