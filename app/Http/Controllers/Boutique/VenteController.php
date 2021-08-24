@@ -1047,7 +1047,7 @@ class VenteController extends Controller
             ->Where([['article_ventes.deleted_at', null], ['article_ventes.vente_id', $vente]])
             ->get();
         $userEdit = User::where('id', $vente_info['updated_by'])->first();
-        //var_dump($userEdit->full_name);
+        //var_dump($userEdit->full_name); // ! debug
         //echo "<script> alert(" . $userEdit->full_name . "); <script>"; // ! debug
 
 
@@ -1101,9 +1101,11 @@ class VenteController extends Controller
                    <p align="right" style="font-size:27px;"><b>Espèce rendu : &nbsp;&nbsp;' . number_format($vente_info['montant_payer'] - $montantApayer, 0, ',', ' ') . '  FCFA</b></p><hr/>
                    <p align="center" style="font-size:24px;"><b>Merci de votre visite. Repassez nous voir.</b></p>
                    <p align="center"><img src="data:image/png;base64,' . base64_encode($generator->getBarcode(123456789, $generator::TYPE_CODE_128)) . '"></p>
-                    <p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Fait le ' . date('d-m-Y') . ' à ' . date("H:i:s") . '</i></p>
-                    <p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Editer le ' . $vente_info['date_edit'] . ' par ' . $userEdit->full_name . '</i></p>
-                </div>';
+                    <p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Fait le ' . date('d-m-Y') . ' à ' . date("H:i:s") . '</i></p>';
+        if ($userEdit != null) {
+            $content .= '<p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Editer le ' . $vente_info['date_edit'] . ' par ' . $userEdit->full_name . '</i></p>';
+        }
+        $content .= '</div>';
         return $content;
     }
 

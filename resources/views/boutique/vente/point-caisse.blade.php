@@ -1053,8 +1053,9 @@
                     $.each(reponse.rows, function (index, retour) {
                         $("#article").select2("val",retour.article.id);
                         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + retour.article.id , function (reponse) {
-                            $('#unite').html("<option value=''>-- Carré --</option>");
+                            //$('#unite').html("<option value=''>-- Carré --</option>");
                             $.each(reponse.rows, function (index, colis) {
+                                alert('index: ' + index);
                                 $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                             });
                         })
@@ -1080,7 +1081,7 @@
                     $.each(reponse.rows, function (index, retour) {
                          $("#article_add").val(retour.article.id);
                         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + retour.article.id , function (reponse) {
-                            $('#unite_add').html("<option value=''>-- Carré --</option>");
+                            //$('#unite_add').html("<option value=''>-- Carré --</option>");
                             $.each(reponse.rows, function (index, colis) {
                                 $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                             });
@@ -1107,10 +1108,44 @@
                 });
             })
             $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + article_id , function (reponse) {
-                $('#unite').html("<option value=''>-- Carré --</option>");
+                //$('#unite').html("<option value=''>-- Zaza --</option>"); // Modification sur le carré
+                $('#unite').html("<option value=''>-- Zaza --</option>"); // Modification sur le carré
                 $.each(reponse.rows, function (index, colis) {
-                    $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
+                    //alert("Index: " + index); // ! debug
+                    if (index == 0) // Choisir automatiquement le carré salle
+                        $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + ' selected>' + colis.unite.libelle_unite + '</option>')
+                    else
+                        $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
+                // Placer le prix TTC automatiquement
+                $("#quantite").val("");
+            var article_id = $("#article").val();
+            var depot_id = $("#depot_id").val();
+            var unite_id = $("#unite").val();
+            $.getJSON("../boutique/find-article-in-depot-by-unite-caisse/" + article_id + "/" + depot_id + "/" +  unite_id, function (reponse) {
+                $.each(reponse.rows, function (index, article) {
+                    $("#prixTTC").val(article.prix_ventes);
+                    //Calcul du prix HT
+                    var tva = 0;
+                   if(article.article.param_tva_id!=null){
+                       $.getJSON("../parametre/find-param-tva/" + article.article.param_tva_id, function (reponse) {
+                            $.each(reponse.rows, function (index, tvas_infos) {
+                                tva = tvas_infos.montant_tva;
+                                var prix_ht_article = (article.prix_ventes/(tva + 1));
+                                var prix = Math.round(prix_ht_article);
+                                $("#prixHT").val(prix);
+                            });
+                        })
+                   }else{
+                       $("#prixHT").val(article.prix_ventes);
+                   }
+                    if(article.article.stockable==0){
+                          $("#en_stock").val(1000);
+                    }else{
+                          $("#en_stock").val(article.quantite_disponible);
+                    }
+                });
+            })
             })
         });
         $('#article_add').change(function(){
