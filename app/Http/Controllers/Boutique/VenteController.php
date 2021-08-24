@@ -755,6 +755,7 @@ class VenteController extends Controller
                         if ($reglement != null && $caisse_ouverte != null) {
                             $reglement->montant_reglement = $data['montant_a_payer_add'];
                             $reglement->moyen_reglement_id = $data['moyen_reglement_id_add'];
+                            $reglement->caisse_ouverte_id = $vente->caisse_ouverte_id;
                             $reglement->updated_by = Auth::user()->id;
                             $reglement->save();
 
@@ -763,6 +764,7 @@ class VenteController extends Controller
                             $newReglement->montant_reglement = $data['montant_a_payer_add'];
                             $newReglement->moyen_reglement_id = $data['moyen_reglement_id_add'];
                             $newReglement->vente_id = $vente->id; // ! A rajouter pour corriger le bug de suppression
+                            $newReglement->caisse_ouverte_id = $vente->caisse_ouverte_id; // ! A rajouter
                             $newReglement->updated_by = Auth::user()->id;
                             $newReglement->save();
 
@@ -945,13 +947,15 @@ class VenteController extends Controller
         $info_en_tete = Vente::with('depot','caisse_ouverte')
                         ->join('caisse_ouvertes','caisse_ouvertes.id','=','ventes.caisse_ouverte_id')
                         ->join('caisses','caisses.id','=','caisse_ouvertes.caisse_id')    
-                        ->join('reglements','reglements.id','=','reglements.caisse_ouverte_id')
+                        ->join('reglements','reglements.vente_id','=','ventes.id')
                         ->join('moyen_reglements','moyen_reglements.id','=','reglements.moyen_reglement_id')
                         ->join('users','users.id','=','ventes.created_by')
                         ->join('article_ventes','article_ventes.vente_id','=','ventes.id')->Where([['article_ventes.deleted_at', NULL],['article_ventes.retourne',0]])
                         ->select('ventes.*','moyen_reglements.libelle_moyen_reglement','caisses.libelle_caisse','users.full_name',DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y à %H:%i:%s") as date_ventes'))
                         ->Where([['ventes.deleted_at', NULL],['ventes.client_id', NULL],['ventes.id',$vente]])
                         ->first();
+        //var_dump($info_en_tete);
+        //echo "<script> alert(" . $info_en_tete . "); <script>";
         $vente_info = Vente::with('depot','caisse_ouverte')
                         ->join('caisse_ouvertes','caisse_ouvertes.id','=','ventes.caisse_ouverte_id')
                         ->join('reglements','reglements.id','=','reglements.caisse_ouverte_id')
@@ -963,6 +967,8 @@ class VenteController extends Controller
                         ->Where([['ventes.deleted_at', NULL],['ventes.client_id', NULL],['ventes.id',$vente]])
                         ->groupBy('article_ventes.vente_id')
                         ->first();
+                        
+            
         $header = "<html>
                         <head>
                             <meta charset='utf-8'>
@@ -989,8 +995,8 @@ class VenteController extends Controller
                     <hr/>
                 </p>
                 <p style='line-height:1.6; font-size:27px;'>
-                   Ticket : <b style='line-height:1.6; font-size:32px;'>".str_replace('TICKET2021000', '', $vente_info['numero_ticket'])."</b><br/>
-                   Du <b>".$info_en_tete['date_ventes']."</b> au <b>".$info_en_tete['depot']['libelle_depot']."</b><br/>
+                   "//Ticket : <b style='line-height:1.6; font-size:32px;'>".str_replace('TICKET2021000', '', $vente_info['numero_ticket'])."</b><br/>
+                   ."Du <b>".$info_en_tete['date_ventes']."</b> au <b>".$info_en_tete['depot']['libelle_depot']."</b><br/>
                    Caisse : <b>".$info_en_tete['libelle_caisse']."</b><br/>
                    Caissier(e) : <b>".$info_en_tete['full_name']."</b><br/>
                    Règlement : <b>".$info_en_tete['libelle_moyen_reglement']."</b>

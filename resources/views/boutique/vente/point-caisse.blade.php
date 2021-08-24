@@ -356,7 +356,8 @@
                                              </div>
                                              <select name="moyen_reglement_id" id="moyen_reglement_id" class="form-control" required>
                                                  @foreach($moyenReglements as $moyenReglement)
-                                                 <option  {{$moyenReglement->id}} value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>
+                                                 <!--<option  {{$moyenReglement->id}} value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>-->
+                                                 <option value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>
                                                  @endforeach
                                              </select>
                                          </div>
