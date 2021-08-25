@@ -73,17 +73,18 @@
                     <table class="table no-margin">
                         <thead>
                             <tr>
-                            @if(Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Administrateur')
+                            @if(Auth::user()->role == 'Gerant' or Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Administrateur')
                                 <th>D&eacute;p&ocirc;t</th>
-                            @endif
                                 <th>Caisse</th>
                                 <th>Date d'ouverture</th>
                                 <th>Ouverte par</th>
                                 <th>Solde d'ouverture</th>
                                 <th>Solde actuel</th>
+                            @endif
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
+                            <!---->
                             @foreach($caisse_ouvertes as $caisse_ouverte)
                             <tr>
                                 <td>{{$caisse_ouverte->libelle_depot}}</td>
@@ -94,6 +95,7 @@
                                 <td>{{number_format($caisse_ouverte->sommeTotale+$caisse_ouverte->entree+$caisse_ouverte->montant_ouverture-$caisse_ouverte->sortie, 0, ',', ' ')}}</td>
                             </tr>
                             @endforeach
+                            <!---->
                         </tbody>
                     </table>
                 </div>
@@ -106,7 +108,7 @@
             <!-- /.box-footer -->
         </div>
     </div>
-   
+
 </div>
 @endif
 @if(Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Gerant' or Auth::user()->role == 'Comptable' or Auth::user()->role == 'Logistic')
@@ -132,13 +134,13 @@
                                 <th>Sera parim&eacute; dans</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             @foreach($article_envoie_peremptions as $article)
-                                <?php 
+                                <?php
                                     $now = date("Y-m-d");
-                                    $diff = strtotime($article->date_peremption) - strtotime($now); 
+                                    $diff = strtotime($article->date_peremption) - strtotime($now);
                                     $nbJour = $diff/86400;
-                                    if($nbJour > 61){ 
+                                    if($nbJour > 61){
                                         continue;
                                     }
                                 ?>
@@ -147,13 +149,13 @@
                                 <td>{{$article->description_article}}</td>
                                 <td>{{$article->libelle_unite}}</td>
                                 <td>{{$article->date_peremptions}}</td>
-                            @if($nbJour>30 && $nbJour<60)   
+                            @if($nbJour>30 && $nbJour<60)
                                  <td><span class="text-bold text-warning">{{$nbJour}} jour(s)</span></td>
                             @endif
-                            @if($nbJour<30)   
+                            @if($nbJour<30)
                                  <td><span class="text-bold text-red">{{$nbJour}} jour(s)</span></td>
                             @endif
-                            @if($nbJour>60)   
+                            @if($nbJour>60)
                                  <td>{{$nbJour}} jour(s)</td>
                             @endif
                             </tr>
@@ -193,7 +195,7 @@
                                 <th>D&eacute;p&ocirc;t</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             @foreach($articleRupture as $article)
                             <tr>
                                 <td>{{$article->description_article}}</td>
@@ -238,7 +240,7 @@
                                 <th>Chiffre d'affaires</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             @foreach($tenBesteClients as $client)
                             <tr>
                                 <td>{{$client->full_name_client}}</td>
@@ -257,7 +259,7 @@
             </div>
             <!-- /.box-footer -->
         </div>
-    </div> 
+    </div>
     <div class="col-md-6">
         <div class="box box-info">
             <div class="box-header with-border">
@@ -277,7 +279,7 @@
                                 <th>Chiffre d'affaires</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             @foreach($tenBadClients as $client)
                             <tr>
                                 <td>{{$client->full_name_client}}</td>
@@ -296,7 +298,7 @@
             </div>
             <!-- /.box-footer -->
         </div>
-    </div> 
+    </div>
      @endif
     <div class="col-md-6">
         <div class="box box-info">
@@ -317,7 +319,7 @@
                                 <th>Montant</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             @foreach($articlesPlusVendus as $article)
                             <tr>
                                 <td>{{$article->description_article}}</td>
@@ -336,7 +338,7 @@
             </div>
             <!-- /.box-footer -->
         </div>
-    </div> 
+    </div>
     <div class="col-md-6">
         <div class="box box-info">
             <div class="box-header with-border">
@@ -356,7 +358,7 @@
                                 <th>Montant</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             @foreach($articlesMoinsVendus as $article)
                             <tr>
                                 <td>{{$article->description_article}}</td>
@@ -375,8 +377,8 @@
             </div>
             <!-- /.box-footer -->
         </div>
-    </div> 
-   
+    </div>
+
     @if(Auth::user()->role != 'Logistic')
     <div class="col-md-12">
         <div class="box box-info">
@@ -398,7 +400,7 @@
                                 <th>Montant</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             @foreach($clientsPlusEndettes as $client)
                             <tr>
                                 <td>{{$client->full_name_client}}</td>
@@ -418,7 +420,7 @@
             </div>
             <!-- /.box-footer -->
         </div>
-    </div> 
+    </div>
     @endif
     <div class="col-md-12">
         <div class="box box-info">
@@ -440,7 +442,7 @@
                                 <th>Montant</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             @foreach($commande_encours as $commande)
                             <tr>
                                 <td>{{$commande->date_bon_commandes}}</td>
@@ -460,7 +462,7 @@
             </div>
             <!-- /.box-footer -->
         </div>
-    </div> 
+    </div>
 </div>
 @endif
 @if(Auth::user()->role == 'Caissier')

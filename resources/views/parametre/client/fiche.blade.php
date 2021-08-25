@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-@if(Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Comptable')
+@if(Auth::user()->role == 'Gerant' or Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Comptable')
 <script src="{{asset('assets/js/bootstrap-table.min.js')}}"></script>
 <script src="{{asset('assets/js/underscore-min.js')}}"></script>
 <script src="{{asset('assets/plugins/bootstrap-table/locale/bootstrap-table-fr-FR.js')}}"></script>
@@ -33,10 +33,10 @@
         <li class="">
             <a href="#article_achat_info" data-toggle="tab" aria-expanded="true">Articles les plus achet&eacute;s</a>
         </li>
-    </ul> 
-    <div class="tab-content">  
+    </ul>
+    <div class="tab-content">
         <div class="tab-pane active" id="achat_info">
-          
+
                     <div class="box-header">
                         <div class="col-md-2">
                             <h3 class="box-title pull-left">Liste des achats</h3>
@@ -63,7 +63,7 @@
                     <div class="box-body">
                         <table id="table" class="table table-warning table-striped"
                                data-pagination="true"
-                               data-search="false" 
+                               data-search="false"
                                data-toggle="table"
                                data-unique-id="id"
                                data-show-toggle="false"
@@ -119,10 +119,10 @@
                             </div>
                         </div>
                     </div>
-              
+
         </div>
         <div class="tab-pane" id="reglement_info">
-         
+
                     <div class="box-header">
                         <div class="col-md-3">
                             <h3 class="box-title pull-left">Liste des r&egrave;glements</h3>
@@ -144,7 +144,7 @@
                     <div class="box-body">
                         <table id="tableReglement" class="table table-warning table-striped"
                                data-pagination="true"
-                               data-search="false" 
+                               data-search="false"
                                data-toggle="table"
                                data-unique-id="id"
                                data-show-toggle="false"
@@ -162,7 +162,7 @@
                             </thead>
                         </table>
                     </div>
-             
+
         </div>
         <div class="tab-pane" id="article_achat_info">
             <div class="box-header">
@@ -176,7 +176,7 @@
             <div class="box-body">
                 <table id="tableArticleAchetes" class="table table-warning table-striped"
                        data-pagination="true"
-                       data-search="false" 
+                       data-search="false"
                        data-toggle="table"
                        data-unique-id="id"
                        data-show-toggle="false"
@@ -272,20 +272,20 @@
         };
     });
     $(function () {
-        var client = $("#client").val(); 
+        var client = $("#client").val();
         $table.bootstrapTable('refreshOptions', {url: '../liste-achats-client/' + client});
         $tableReglement.bootstrapTable('refreshOptions', {url: '../liste-reglements-client/' + client});
         $tableArticleAchetes.bootstrapTable('refreshOptions', {url: '../liste-articles-plus-achetes/' + client});
-        
-        
+
+
         $table.on('load-success.bs.table', function (e, data) {
-            rows = data.rows; 
+            rows = data.rows;
             $("#total_achat").html($.number(data.totalAchat));
             $("#total_acompte").html($.number(data.totalAcompte));
             $("#total_remise").html($.number(data.totalRemise));
             $("#total_reste").html($.number(data.totalAchat-data.totalAcompte));
         });
-        
+
         $('#dateDebut,#dateFin,#dateDebutRgl,#dateFinRgl').datetimepicker({
             timepicker: false,
             formatDate: 'd-m-Y',
@@ -293,12 +293,12 @@
             local : 'fr',
             maxDate : new Date()
         });
-        
-        $("#dateDebut,#dateFin").change(function (e) { 
+
+        $("#dateDebut,#dateFin").change(function (e) {
             var dateDebut = $("#dateDebut").val();
             var dateFin = $("#dateFin").val();
             $("#searchByFacture").val("");
-         
+
             if(dateDebut == "" && dateFin == ""){
                 $table.bootstrapTable('refreshOptions', {url: '../liste-achats-client/' + client});
             }
@@ -306,8 +306,8 @@
                $table.bootstrapTable('refreshOptions', {url: '../liste-achats-client-by-periode/' + dateDebut + "/" + dateFin + "/" + client});
             }
         });
-        
-        $("#searchByFacture").keyup(function (e) { 
+
+        $("#searchByFacture").keyup(function (e) {
             $("#dateDebut").val("");
             $("#dateFin").val("");
             var facture = $("#searchByFacture").val();
@@ -318,11 +318,11 @@
                $table.bootstrapTable('refreshOptions', {url: '../liste-achats-client-by-facture/' + facture + "/" + client});
             }
         });
-        
-        $("#dateDebutRgl,#dateFinRgl").change(function (e) { 
+
+        $("#dateDebutRgl,#dateFinRgl").change(function (e) {
             var dateDebutRgl = $("#dateDebutRgl").val();
             var dateFinRgl = $("#dateFinRgl").val();
-         
+
             if(dateDebutRgl == "" && dateFinRgl == ""){
                 $tableReglement.bootstrapTable('refreshOptions', {url: '../liste-reglements-client/' + client});
             }
@@ -330,7 +330,7 @@
                $tableReglement.bootstrapTable('refreshOptions', {url: '../liste-reglements-client-by-periode/' + dateDebutRgl + "/" + dateFinRgl + "/" + client});
             }
         });
-        
+
     });
     function listeArticleRow(idVente){
         var $scope = angular.element($("#panierArticle")).scope();
@@ -341,7 +341,7 @@
         $tablePanierArticle.bootstrapTable('refreshOptions', {url: basePath + "/boutique/liste-articles-vente/" + idVente});
         $(".bs-modal-panier").modal("show");
     }
-    
+
     function listeArticleDiversRow(idVente){
         var $scope = angular.element($("#panierArticleDivers")).scope();
         var vente =_.findWhere(rows, {id: idVente});
@@ -351,7 +351,7 @@
         $tablePanierArticleDivers.bootstrapTable('refreshOptions', {url: basePath + "/boutique/liste-articles-vente-divers/" + idVente});
         $(".bs-modal-panier-article-divers").modal("show");
     }
-    
+
     function imprimePdf(){
         var dateDebut = $("#dateDebut").val();
         var dateFin = $("#dateFin").val();
@@ -361,23 +361,23 @@
             window.open("../liste-achats-client-pdf/" + client,'_blank');
         }
         if(dateDebut!='' && dateFin!=''){
-            window.open("../liste-achats-client-by-periode-pdf/" + dateDebut + '/' + dateFin + '/' + client,'_blank');  
+            window.open("../liste-achats-client-by-periode-pdf/" + dateDebut + '/' + dateFin + '/' + client,'_blank');
         }
     }
-    
+
     function imprimeRglPdf(){
         var dateDebutRgl = $("#dateDebutRgl").val();
         var dateFinRgl = $("#dateFinRgl").val();
         var client = $("#client").val();
-        
+
         if(dateDebutRgl=='' && dateFinRgl==''){
             window.open("../liste-reglements-client-pdf/" + client,'_blank');
         }
         if(dateDebutRgl!='' && dateFinRgl!=''){
-            window.open("../liste-reglements-client-by-periode-pdf/" + dateDebutRgl + '/' + dateFinRgl + '/' + client,'_blank');  
+            window.open("../liste-reglements-client-by-periode-pdf/" + dateDebutRgl + '/' + dateFinRgl + '/' + client,'_blank');
         }
     }
-    
+
     function imprimeAchgtPdf(){
         var client = $("#client").val();
         window.open("../liste-articles-plus-achetes-pdf/" + client,'_blank');
@@ -437,14 +437,14 @@
             return '<button type="button" class="btn btn-xs btn-info" data-placement="left" data-toggle="tooltip" title="Facture" onClick="javascript:factureVenteDiversPrintRow(' + row.id + ');"><i class="fa fa-file-pdf-o"></i></button>';
         }
     }
-    function optionFormatter(id, row) { 
+    function optionFormatter(id, row) {
         if(row.depot_id!=null){
             return '<button type="button" class="btn btn-xs btn-warning" data-placement="left" data-toggle="tooltip" title="Panier" onClick="javascript:listeArticleRow(' + id + ');"><i class="fa fa-cart-arrow-down"></i></button>';
         }else{
             return '<button type="button" class="btn btn-xs btn-warning" data-placement="left" data-toggle="tooltip" title="Panier" onClick="javascript:listeArticleDiversRow(' + id + ');"><i class="fa fa-cart-arrow-down"></i></button>';
         }
     }
-    function imageFormatter(id, row) { 
+    function imageFormatter(id, row) {
           return row.scan_cheque ? "<a target='_blank' href='" + basePath + '/' + row.scan_cheque + "'>Voir le chèque</a>" : "";
     }
 </script>
