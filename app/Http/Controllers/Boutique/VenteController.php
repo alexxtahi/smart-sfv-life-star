@@ -108,9 +108,10 @@ class VenteController extends Controller
             ->join('users', 'users.id', '=', 'ventes.created_by')
             ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', null], ['article_ventes.retourne', 0]])
             ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
+            ->join('categories', 'categories.id', '=', 'articles.categorie_id')
             ->select('ventes.id', 'ventes.numero_ticket', 'article_ventes.prix')
-            //->Where([['ventes.deleted_at', null], ['articles.description_article', "pass entree"]]) // ! Selectionner uniquement les pass d'entrée
-            ->Where([['ventes.deleted_at', null]])
+            ->Where([['ventes.deleted_at', null], ['categories.libelle_categorie', 'Conso']]) // ! Selectionner uniquement les pass d'entrée
+            //->Where([['ventes.deleted_at', null]])
             ->get();
         // Fin récup ticket d'entrée
         $articles = DepotArticle::with('unite', 'depot', 'article')
@@ -156,8 +157,9 @@ class VenteController extends Controller
             ->join('users', 'users.id', '=', 'ventes.created_by')
             ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', null], ['article_ventes.retourne', 0]])
             ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
+            ->join('categories', 'categories.id', '=', 'articles.categorie_id')
             ->select('ventes.id', 'ventes.numero_ticket', 'article_ventes.prix')
-            ->Where([['ventes.deleted_at', null], ['articles.description_article', "pass entree"]]) // ! Selectionner uniquement les pass d'entrée
+            ->Where([['ventes.deleted_at', null], ['categories.libelle_categorie', 'Conso']]) // ! Selectionner uniquement les pass d'entrée
             //->Where([['ventes.deleted_at', null]])
             ->get();
         // Fin récup ticket d'entrée
@@ -542,6 +544,12 @@ class VenteController extends Controller
 
                     $vente = new Vente;
                     $vente->numero_ticket = "TICKET" . $annee . $numero_id;
+                    // ? Association avec le pass d'entrée s'il y'en a un
+                    //var_dump($request); // ! debug
+                    //echo "<script> alert(" . $request . "); <script>"; // ! debug
+
+                    if ($data['pass_entree'] != null) $vente->pass_entree_id = $data['pass_entree'];
+                    //if ($data['pass_entree'] != null) $vente->pass_entree_id = explode('-', $data['pass_entree']);
                     $vente->depot_id = $data["depot_id"];
                     $vente->caisse_ouverte_id = $caisse_ouverte->id;
                     $vente->montant_payer = isset($data['montant_payer']) && !empty($data['montant_payer']) ? $data['montant_payer'] : 0;
@@ -1079,8 +1087,21 @@ class VenteController extends Controller
             ->Where([['article_ventes.deleted_at', null], ['article_ventes.vente_id', $vente]])
             ->get();
         $userEdit = User::where('id', $vente_info['updated_by'])->first();
-        //var_dump($userEdit->full_name); // ! debug
-        //echo "<script> alert(" . $userEdit->full_name . "); <script>"; // ! debug
+        // ? Récupérer les données du ticket d'entrée associé s'il y'en a un
+        $ticketEntree = Vente::with('depot', 'caisse_ouverte')
+            ->join('caisse_ouvertes', 'caisse_ouvertes.id', '=', 'ventes.caisse_ouverte_id')
+            ->join('reglements', 'reglements.vente_id', '=', 'ventes.id')
+            ->join('moyen_reglements', 'moyen_reglements.id', '=', 'reglements.moyen_reglement_id')
+            ->join('caisses', 'caisses.id', '=', 'caisse_ouvertes.caisse_id')
+            ->join('users', 'users.id', '=', 'caisse_ouvertes.user_id')
+            ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', NULL], ['article_ventes.retourne', 0]])
+            ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
+            ->join('categories', 'categories.id', '=', 'articles.categorie_id')
+            ->select('ventes.*', 'articles.prix_vente_ttc_base as prix_pass', 'moyen_reglements.libelle_moyen_reglement', 'caisses.libelle_caisse', 'users.full_name', DB::raw('sum(article_ventes.quantite*article_ventes.prix-article_ventes.remise_sur_ligne) as sommeTotale'), DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'), DB::raw('DATE_FORMAT(ventes.updated_at, "%d-%m-%Y à %H:%i:%s") as date_edit'))
+            ->Where([['categories.libelle_categorie', 'Conso'], ['ventes.id', $vente_info['pass_entree_id']], ['ventes.deleted_at', null], ['ventes.client_id', null]])
+            ->first();
+        //var_dump($ticketEntree); // ! debug
+        //echo "<script> alert(" . $ticketEntree . "); <script>"; // ! debug
 
 
         foreach ($articlesVentes as $article) {
@@ -1125,15 +1146,24 @@ class VenteController extends Controller
         }
         $content .= '</table><hr/>';
         $content .= '<p style="font-size:21px;">Total articles : ' . $articlesTotal . '</p>';
-        $content .= //'<p align="right"  style="font-size:16px;">Total HT &nbsp;&nbsp;'.number_format($montantTHT_add, 0, ',', ' ').'</p>
-            //<p align="right"  style="font-size:16px;">Montant TVA &nbsp;&nbsp;'.number_format($montantTTTC_add-$montantTHT_add, 0, ',', ' ').'</p>
-            '<p align="right"  style="font-size:27px;">Remise &nbsp;&nbsp;' . number_format($remise, 0, ',', ' ') . ' FCFA</p>
-                   <p align="right" style="font-size:27px;"><b>NET A PAYER &nbsp;&nbsp;' . number_format($montantTTTC_add - $remise, 0, ',', ' ') . ' FCFA</b></p>
-                   <p align="right" style="font-size:27px;"><b>Espèce reçu :&nbsp;&nbsp;' . number_format($vente_info['montant_payer'], 0, ',', ' ') . ' FCFA</b></p>
-                   <p align="right" style="font-size:27px;"><b>Espèce rendu : &nbsp;&nbsp;' . number_format($vente_info['montant_payer'] - $montantApayer, 0, ',', ' ') . '  FCFA</b></p><hr/>
-                   <p align="center" style="font-size:24px;"><b>Merci de votre visite. Repassez nous voir.</b></p>
-                   <p align="center"><img src="data:image/png;base64,' . base64_encode($generator->getBarcode(123456789, $generator::TYPE_CODE_128)) . '"></p>
+        // ? Contrôle pour voir si le client à payer avec un pass d'entrée
+        if ($ticketEntree['numero_ticket'] == null) { // Pour les tickets payés avec pass d'entrée
+            $content .= '<p align="right"  style="font-size:27px;">Remise &nbsp;&nbsp;' . number_format($remise, 0, ',', ' ') . ' FCFA</p>
+                    <p align="right" style="font-size:27px;"><b>NET A PAYER &nbsp;&nbsp;' . number_format($montantTTTC_add - $remise, 0, ',', ' ') . ' FCFA</b></p>
+                    <p align="right" style="font-size:27px;"><b>Espèce reçu :&nbsp;&nbsp;' . number_format($vente_info['montant_payer'], 0, ',', ' ') . ' FCFA</b></p>
+                    <p align="right" style="font-size:27px;"><b>Espèce rendu : &nbsp;&nbsp;' . number_format($vente_info['montant_payer'] - $montantApayer, 0, ',', ' ') . '  FCFA</b></p><hr/>
+                    <p align="center" style="font-size:24px;"><b>Merci de votre visite. Repassez nous voir.</b></p>
+                    <p align="center"><img src="data:image/png;base64,' . base64_encode($generator->getBarcode(123456789, $generator::TYPE_CODE_128)) . '"></p>
                     <p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Fait le ' . date('d-m-Y') . ' à ' . date("H:i:s") . '</i></p>';
+        } else { // Pour les tickets payés sans pass d'entrée
+            $content .= '<p align="right"  style="font-size:27px;">Ticket payé par pass dentrée</p>
+                    <p align="right" style="font-size:27px;"><b>Pass dentrée :&nbsp;&nbsp;' . $ticketEntree['numero_ticket'] . '</b></p>
+                    <p align="right" style="font-size:27px;"><b>Valeur du pass :&nbsp;&nbsp;' . number_format($ticketEntree['prix_pass'], 0, ',', ' ') . ' FCFA</b></p>
+                    <p align="center" style="font-size:24px;"><b>Merci de votre visite. Repassez nous voir.</b></p>
+                    <p align="center"><img src="data:image/png;base64,' . base64_encode($generator->getBarcode(123456789, $generator::TYPE_CODE_128)) . '"></p>
+                    <p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Fait le ' . date('d-m-Y') . ' à ' . date("H:i:s") . '</i></p>';
+        }
+        // ? Ajout de l'éditeur du ticket au cas ou celui ci a été modifié
         if ($userEdit != null) {
             $content .= '<p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Editer le ' . $vente_info['date_edit'] . ' par ' . $userEdit->full_name . '</i></p>';
         }

@@ -30,8 +30,9 @@ class UserController extends Controller
         $btnModalAjout = "TRUE";
         return view('auth.user.index', compact('depots', 'btnModalAjout', 'menuPrincipal', 'titleControlleur'));
     }
-    
-    public function userAgenceCanal(){
+
+    public function userAgenceCanal()
+    {
         $agences = DB::table('agences')->Where('deleted_at', NULL)->orderBy('libelle_agence', 'asc')->get();
         $menuPrincipal = "Auth";
         $titleControlleur = "Gestion des utilisateurs des agences";
@@ -39,85 +40,91 @@ class UserController extends Controller
         return view('auth.user.user-agence', compact('agences', 'btnModalAjout', 'menuPrincipal', 'titleControlleur'));
     }
 
-    public function listeUser() {
+    public function listeUser()
+    {
         $users = User::with('depot')
-                ->select(DB::raw('DATE_FORMAT(users.last_login_at, "%d-%m-%Y à %H:%i:%s") as last_login'),'users.*')
-                ->orderBy('users.full_name', 'ASC')
-                ->where([['users.deleted_at', NULL],['users.id','!=' ,1]])
-                ->get();
-       $jsonData["rows"] = $users->toArray();
-       $jsonData["total"] = $users->count();
-        return response()->json($jsonData);
-    }
-    
-    public function listeUserAgence(){
-        $users = User::with('agence')
-                ->select(DB::raw('DATE_FORMAT(users.last_login_at, "%d-%m-%Y à %H:%i:%s") as last_login'),'users.*')
-                ->orderBy('users.full_name', 'ASC')
-                ->where([['users.deleted_at', NULL],['users.id','!=' ,1],['users.role','agence']])
-                ->get();
+            ->select(DB::raw('DATE_FORMAT(users.last_login_at, "%d-%m-%Y à %H:%i:%s") as last_login'), 'users.*')
+            ->orderBy('users.full_name', 'ASC')
+            ->where([['users.deleted_at', NULL], ['users.id', '!=', 1]])
+            ->get();
         $jsonData["rows"] = $users->toArray();
         $jsonData["total"] = $users->count();
         return response()->json($jsonData);
     }
 
-        public function profil() {
+    public function listeUserAgence()
+    {
+        $users = User::with('agence')
+            ->select(DB::raw('DATE_FORMAT(users.last_login_at, "%d-%m-%Y à %H:%i:%s") as last_login'), 'users.*')
+            ->orderBy('users.full_name', 'ASC')
+            ->where([['users.deleted_at', NULL], ['users.id', '!=', 1], ['users.role', 'agence']])
+            ->get();
+        $jsonData["rows"] = $users->toArray();
+        $jsonData["total"] = $users->count();
+        return response()->json($jsonData);
+    }
+
+    public function profil()
+    {
         $user = User::with('depot')
-                ->select('users.*',DB::raw('DATE_FORMAT(users.last_login_at, "%d-%m-%Y à %H:%i:%s") as last_login'),DB::raw('DATE_FORMAT(users.created_at, "%d-%m-%Y à %H:%i:%s") as created'))
-                ->where('users.id', Auth::user()->id)
-                ->first();
+            ->select('users.*', DB::raw('DATE_FORMAT(users.last_login_at, "%d-%m-%Y à %H:%i:%s") as last_login'), DB::raw('DATE_FORMAT(users.created_at, "%d-%m-%Y à %H:%i:%s") as created'))
+            ->where('users.id', Auth::user()->id)
+            ->first();
 
         $menuPrincipal = "Auth";
         $titleControlleur = "Profil utilisateur";
         $btnModalAjout = "FALSE";
-        return view('auth.user.profil', compact('user','btnModalAjout', 'menuPrincipal', 'titleControlleur'));
+        return view('auth.user.profil', compact('user', 'btnModalAjout', 'menuPrincipal', 'titleControlleur'));
     }
-    
-    public function infosProfiTolUpdate(){
-         $user = User::with('depot')
-                ->select('users.*')
-                ->where('users.id', Auth::user()->id)
-                ->first();
+
+    public function infosProfiTolUpdate()
+    {
+        $user = User::with('depot')
+            ->select('users.*')
+            ->where('users.id', Auth::user()->id)
+            ->first();
         $menuPrincipal = "Auth";
         $titleControlleur = "Informations du profil à modifier";
         $btnModalAjout = "FALSE";
-        return view('auth.user.infos-profil-to-update', compact('user','btnModalAjout', 'menuPrincipal', 'titleControlleur'));
+        return view('auth.user.infos-profil-to-update', compact('user', 'btnModalAjout', 'menuPrincipal', 'titleControlleur'));
     }
-    
-    public function updatePasswordPage(){
-         $user = DB::table('users')
-                ->select('users.*')
-                ->where('users.id', Auth::user()->id)
-                ->first();
+
+    public function updatePasswordPage()
+    {
+        $user = DB::table('users')
+            ->select('users.*')
+            ->where('users.id', Auth::user()->id)
+            ->first();
         $menuPrincipal = "Auth";
         $titleControlleur = "Modification du mot de passe";
         $btnModalAjout = "FALSE";
-        return view('auth.user.update-password', compact('user','btnModalAjout', 'menuPrincipal', 'titleControlleur'));
+        return view('auth.user.update-password', compact('user', 'btnModalAjout', 'menuPrincipal', 'titleControlleur'));
     }
 
-    public function updateProfil(Request $request, $id){
+    public function updateProfil(Request $request, $id)
+    {
         $jsonData = ["code" => 1, "msg" => "Modification effectué avec succès."];
         $user = User::find($id);
-        
+
         if ($user) {
             $data = $request->all();
-            
+
             try {
-               
-                $UserEmail = User::where([['login', $data['login']],['id','!=', $user->id]])->first();
-                if($UserEmail!=null){
+
+                $UserEmail = User::where([['login', $data['login']], ['id', '!=', $user->id]])->first();
+                if ($UserEmail != null) {
                     return response()->json(["code" => 0, "msg" => "Ce login ou adresse mail existe déjà", "data" => NULL]);
                 }
                 $user->full_name = $data['full_name'];
                 $user->contact = $data['contact'];
                 $user->email = isset($data['email']) && !empty($data['email']) ? $data['email'] : null;
                 $user->login = isset($data['login']) && !empty($data['login']) ? $data['login'] : null;
-                if(isset($data['email']) && !empty($data['email'])){
-                   $user->login =  $data['email'];
+                if (isset($data['email']) && !empty($data['email'])) {
+                    $user->login =  $data['email'];
                 }
                 $user->updated_by = Auth::user()->id;
                 $user->save();
-                    
+
                 $jsonData["data"] = json_decode($user);
                 return response()->json($jsonData);
             } catch (Exception $exc) {
@@ -142,15 +149,15 @@ class UserController extends Controller
         if ($request->isMethod('post') && $request->input('full_name')) {
 
             $data = $request->all();
-          
+
             $user = User::where('login', $data['login'])->first();
-            if($user){
+            if ($user) {
                 return response()->json(["code" => 0, "msg" => "Ce compte existe déjà. Vérifier l'adresse mail ou le login", "data" => NULL]);
-            }else{
+            } else {
                 try {
-                    if(empty($data['login']) && empty($data['email'])){
+                    if (empty($data['login']) && empty($data['email'])) {
                         return response()->json(["code" => 0, "msg" => "Veillez definir un email ou un login svp", "data" => NULL]);
-                     }
+                    }
                     $users = new User;
                     $users->full_name = $data['full_name'];
                     $users->role = $data['role'];
@@ -158,21 +165,21 @@ class UserController extends Controller
                     $users->contact = $data['contact'];
                     $users->email = isset($data['email']) && !empty($data['email']) ? $data['email'] : null;
 
-                    if(empty($data['password']) && empty($data['login'])){
-                        $users->login = $data['email']; 
-                        $users->password = bcrypt(Str::random(10)); 
-                        $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16))); 
+                    if (empty($data['password']) && empty($data['login'])) {
+                        $users->login = $data['login'];
+                        $users->password = bcrypt(Str::random(10));
+                        $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16)));
                         $users->created_by = Auth::user()->id;
                         $users->save();
-                        $users->notify(new RegistredUserNotification()); 
-                    }else{
-                        $userLogin = User::where('login',$data['login'])->first();
-                        if($userLogin){
+                        $users->notify(new RegistredUserNotification());
+                    } else {
+                        $userLogin = User::where('login', $data['login'])->first();
+                        if ($userLogin) {
                             return response()->json(["code" => 0, "msg" => "Ce login existe déjà", "data" => NULL]);
                         }
                         $users->login = $data['login'];
-                        $users->password = bcrypt($data['password']); 
-                        $users->confirmation_token = null; 
+                        $users->password = bcrypt($data['password']);
+                        $users->confirmation_token = null;
                         $users->created_by = Auth::user()->id;
                         $users->save();
                     }
@@ -185,7 +192,7 @@ class UserController extends Controller
                     $jsonData["data"] = NULL;
                     $jsonData["msg"] = $exc->getMessage();
                     return response()->json($jsonData);
-                } 
+                }
             }
         }
         return response()->json(["code" => 0, "msg" => "Saisie invalide", "data" => NULL]);
@@ -203,7 +210,6 @@ class UserController extends Controller
         $menuPrincipal = "Auth";
         $titleControlleur = "Modifier mes informations";
         return view('auth.user.profil_update', compact('user', 'menuPrincipal', 'titleControlleur'));
-  
     }
 
     /**
@@ -218,58 +224,58 @@ class UserController extends Controller
         $jsonData = ["code" => 1, "msg" => "Modification effectuée avec succès."];
 
         $user = User::find($id);
-        
+
         if ($user) {
             $data = $request->all();
-            
+
             try {
-              
-                if(($user->login == $data['login']) or ($user->email == $data['email'])){
+
+                if (($user->login == $data['login']) or ($user->email == $data['email'])) {
                     $user->full_name = $data['full_name'];
                     $user->login = isset($data['login']) && !empty($data['login']) ? $data['login'] : null;
-                    if(isset($data['email']) && !empty($data['email'])){
+                    if (isset($data['email']) && !empty($data['email'])) {
                         $user->login = $data['email'];
                     }
-                    if(isset($data['password']) && !empty($data['password'])){
-                    $user->password = bcrypt($data['password']); 
+                    if (isset($data['password']) && !empty($data['password'])) {
+                        $user->password = bcrypt($data['password']);
                     }
                     $user->role = $data['role'];
                     $user->depot_id = isset($data['depot_id']) && !empty($data['depot_id']) ? $data['depot_id'] : null;
-                    $user->contact = $data['contact']; 
+                    $user->contact = $data['contact'];
                     $user->updated_by = Auth::user()->id;
                     $user->save();
-                }else{
+                } else {
                     $userMail = User::where('login', $data['login'])->first();
-                    if($userMail){
+                    if ($userMail) {
                         return response()->json(["code" => 0, "msg" => "Ce compte existe déjà. Vérifier l'adresse mail ou le login", "data" => NULL]);
                     }
-                   
+
                     $user->full_name = $data['full_name'];
                     $user->role = $data['role'];
                     $user->contact = $data['contact'];
                     $user->email = isset($data['email']) && !empty($data['email']) ? $data['email'] : null;
                     $user->login = isset($data['login']) && !empty($data['login']) ? $data['login'] : null;
                     $user->depot_id = isset($data['depot_id']) && !empty($data['depot_id']) ? $data['depot_id'] : null;
-                     if(empty($data['password']) && empty($data['login'])){
-                        $users->login = $data['email']; 
-                        $users->password = bcrypt(Str::random(10)); 
-                        $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16))); 
+                    if (empty($data['password']) && empty($data['login'])) {
+                        $users->login = $data['login'];
+                        $users->password = bcrypt(Str::random(10));
+                        $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16)));
                         $users->created_by = Auth::user()->id;
                         $users->save();
-                        $users->notify(new RegistredUserNotification()); 
-                    }else{
-                        $userLogin = User::where('login',$data['login'])->first();
-                        if($userLogin){
+                        $users->notify(new RegistredUserNotification());
+                    } else {
+                        $userLogin = User::where('login', $data['login'])->first();
+                        if ($userLogin) {
                             return response()->json(["code" => 0, "msg" => "Ce login existe déjà", "data" => NULL]);
                         }
                         $users->login = $data['login'];
-                        $users->password = bcrypt($data['password']); 
-                        $users->confirmation_token = null; 
+                        $users->password = bcrypt($data['password']);
+                        $users->confirmation_token = null;
                         $users->created_by = Auth::user()->id;
                         $users->save();
                     }
                 }
-                    
+
                 $jsonData["data"] = json_decode($user);
                 return response()->json($jsonData);
             } catch (Exception $exc) {
@@ -293,15 +299,15 @@ class UserController extends Controller
         $jsonData = ["code" => 1, "msg" => " Opération effectuée avec succès."];
 
         try {
-                $user = User::find($id);
-                if($user->statut_compte == 1){
-                      $user->statut_compte = FALSE;
-                }else{
-                       $user->statut_compte = TRUE; 
-                }
-                $user->save();
-                $jsonData["data"] = json_decode($user);
-                return response()->json($jsonData);
+            $user = User::find($id);
+            if ($user->statut_compte == 1) {
+                $user->statut_compte = FALSE;
+            } else {
+                $user->statut_compte = TRUE;
+            }
+            $user->save();
+            $jsonData["data"] = json_decode($user);
+            return response()->json($jsonData);
         } catch (Exception $exc) {
             $jsonData["code"] = -1;
             $jsonData["data"] = NULL;
@@ -309,214 +315,218 @@ class UserController extends Controller
             return response()->json($jsonData);
         }
     }
-    
+
     //Vérification du droit d'accés sur la vente en caisse
-    public function verificationAccess(Request $request){
+    public function verificationAccess(Request $request)
+    {
         $jsonData = ["code" => 1, "msg" => "Succèss."];
         if ($request->isMethod('post') && $request->input('email')) {
 
             $data = $request->all();
-            $user = User::where([['login', $data['email']],['statut_compte',1]])->first();
-            if(!$user){
+            $user = User::where([['login', $data['email']], ['statut_compte', 1]])->first();
+            if (!$user) {
                 return response()->json(["code" => 0, "msg" => "Ce compte n'existe pas ou a été fermé", "data" => NULL]);
             }
-            if(!Hash::check($data['password'], $user->password)) {
+            if (!Hash::check($data['password'], $user->password)) {
                 return response()->json(["code" => 0, "msg" => "Vous avez fourni des mauvais identifiants", "data" => NULL]);
             }
-            
+
             try {
-                  if(($user->depot_id==null && $user->role!="Administrateur") or ($user->depot_id!=null && $user->role!="Gerant") or ($user->depot_id!=null && $user->role=="Gerant" && $user->depot_id!=$data['depot_gerant'])){
+                if (($user->depot_id == null && $user->role != "Administrateur") or ($user->depot_id != null && $user->role != "Gerant") or ($user->depot_id != null && $user->role == "Gerant" && $user->depot_id != $data['depot_gerant'])) {
                     return response()->json(["code" => 0, "msg" => "Vous n'avez pas ce droit", "data" => NULL]);
-                  }
-                  $jsonData["data"] = json_decode($user);
-                  return response()->json($jsonData);
-                } 
-                catch (Exception $exc) {
-                    $jsonData["code"] = -1;
-                    $jsonData["data"] = NULL;
-                    $jsonData["msg"] = $exc->getMessage();
-                    return response()->json($jsonData);
-                } 
+                }
+                $jsonData["data"] = json_decode($user);
+                return response()->json($jsonData);
+            } catch (Exception $exc) {
+                $jsonData["code"] = -1;
+                $jsonData["data"] = NULL;
+                $jsonData["msg"] = $exc->getMessage();
+                return response()->json($jsonData);
+            }
         }
         return response()->json(["code" => 0, "msg" => "Saisie invalide", "data" => NULL]);
     }
-    
+
     //Ajout d'utilisateur agence
-    public function addUserAgence(Request $request){
+    public function addUserAgence(Request $request)
+    {
         $jsonData = ["code" => 1, "msg" => "Enregistrement effectué avec succès."];
         if ($request->isMethod('post') && $request->input('full_name') && $request->input('agence_id')) {
 
             $data = $request->all();
-          
-//            $userLog = User::where('login', $data['login'])->first();
-            $userEmail = User::where([['email', $data['email']],['email','!=',null]])->first();
-//            if($userLog){
-//                return response()->json(["code" => 0, "msg" => "Ce compte existe déjà. Vérifier le login", "data" => NULL]);
-//            }
-            if($userEmail){
+
+            //            $userLog = User::where('login', $data['login'])->first();
+            $userEmail = User::where([['email', $data['email']], ['email', '!=', null]])->first();
+            //            if($userLog){
+            //                return response()->json(["code" => 0, "msg" => "Ce compte existe déjà. Vérifier le login", "data" => NULL]);
+            //            }
+            if ($userEmail) {
                 return response()->json(["code" => 0, "msg" => "Ce compte existe déjà. Vérifier l'adresse mail", "data" => NULL]);
             }
-            
+
             try {
-//                    if(empty($data['login']) && empty($data['email'])){
-//                        return response()->json(["code" => 0, "msg" => "Veillez definir un email ou un login svp", "data" => NULL]);
-//                    }
-                    
-                    $agence = Agence::find($data['agence_id']);
-                    $users = new User;
-                    $users->full_name = $data['full_name'];
-                    $users->role = 'Agence';
-                    $users->agence_id = $data['agence_id'];
-                    $users->contact = $data['contact'];
-                    $users->localite_id = $agence->localite_id;
-                    $users->email = $data['email'];
-                    $users->login = $data['email'];
-                    $users->password = bcrypt(Str::random(10)); 
-                    $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16)));
-                    
-//                    $users->email = isset($data['email']) && !empty($data['email']) ? $data['email'] : null;
-                   
-//                    if(isset($data['password']) && !empty($data['password'])){
-//                        $users->password = bcrypt($data['password']); 
-//                        $users->confirmation_token = null; 
-//                    }else{
-//                        $users->password = bcrypt(Str::random(10)); 
-//                        $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16)));  
-//                    }
-//                    $users->login = isset($data['login']) && !empty($data['login']) ? $data['login'] : null;
-//                    if(isset($data['email']) && !empty($data['email'])) {
-//                        $users->login = $data['email'];
-//                    }
-                    $users->created_by = Auth::user()->id;
-                    $users->save();
-                    $users->notify(new RegistredUserNotification()); 
+                //                    if(empty($data['login']) && empty($data['email'])){
+                //                        return response()->json(["code" => 0, "msg" => "Veillez definir un email ou un login svp", "data" => NULL]);
+                //                    }
 
-                    $jsonData["data"] = json_decode($users);
+                $agence = Agence::find($data['agence_id']);
+                $users = new User;
+                $users->full_name = $data['full_name'];
+                $users->role = 'Agence';
+                $users->agence_id = $data['agence_id'];
+                $users->contact = $data['contact'];
+                $users->localite_id = $agence->localite_id;
+                $users->email = $data['email'];
+                $users->login = $data['login'];
+                $users->password = bcrypt(Str::random(10));
+                $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16)));
 
-                    return response()->json($jsonData);
-                }catch(Exception $exc) {
-                    $jsonData["code"] = -1;
-                    $jsonData["data"] = NULL;
-                    $jsonData["msg"] = $exc->getMessage();
-                    return response()->json($jsonData);
-                } 
+                //                    $users->email = isset($data['email']) && !empty($data['email']) ? $data['email'] : null;
+
+                //                    if(isset($data['password']) && !empty($data['password'])){
+                //                        $users->password = bcrypt($data['password']);
+                //                        $users->confirmation_token = null;
+                //                    }else{
+                //                        $users->password = bcrypt(Str::random(10));
+                //                        $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16)));
+                //                    }
+                //                    $users->login = isset($data['login']) && !empty($data['login']) ? $data['login'] : null;
+                //                    if(isset($data['email']) && !empty($data['email'])) {
+                //                        $users->login = $data['login'];
+                //                    }
+                $users->created_by = Auth::user()->id;
+                $users->save();
+                $users->notify(new RegistredUserNotification());
+
+                $jsonData["data"] = json_decode($users);
+
+                return response()->json($jsonData);
+            } catch (Exception $exc) {
+                $jsonData["code"] = -1;
+                $jsonData["data"] = NULL;
+                $jsonData["msg"] = $exc->getMessage();
+                return response()->json($jsonData);
             }
+        }
         return response()->json(["code" => 0, "msg" => "Saisie invalide", "data" => NULL]);
     }
 
-      //Modification d'utilisateur agence
-    public function updateUserAgence(Request $request, $id){
+    //Modification d'utilisateur agence
+    public function updateUserAgence(Request $request, $id)
+    {
         $users = User::find($id);
         $jsonData = ["code" => 1, "msg" => "Enregistrement effectué avec succès."];
-        if($users) {
+        if ($users) {
 
             $data = $request->all();
-          
-//            $userLog = User::where('login', $data['login'])->first();
-//            $userEmail = User::where([['email', $data['email']],['email','!=',null]])->first();
-//            if($userLog){
-//                return response()->json(["code" => 0, "msg" => "Ce compte existe déjà. Vérifier le login", "data" => NULL]);
-//            }
-//            if($userEmail){
-//                return response()->json(["code" => 0, "msg" => "Ce compte existe déjà. Vérifier l'adresse mail", "data" => NULL]);
-//            }
-//            
+
+            //            $userLog = User::where('login', $data['login'])->first();
+            //            $userEmail = User::where([['email', $data['email']],['email','!=',null]])->first();
+            //            if($userLog){
+            //                return response()->json(["code" => 0, "msg" => "Ce compte existe déjà. Vérifier le login", "data" => NULL]);
+            //            }
+            //            if($userEmail){
+            //                return response()->json(["code" => 0, "msg" => "Ce compte existe déjà. Vérifier l'adresse mail", "data" => NULL]);
+            //            }
+            //
             try {
-//                    if(empty($data['login']) && empty($data['email'])){
-//                        return response()->json(["code" => 0, "msg" => "Veillez definir un email ou un login svp", "data" => NULL]);
-//                    }
-                    
+                //                    if(empty($data['login']) && empty($data['email'])){
+                //                        return response()->json(["code" => 0, "msg" => "Veillez definir un email ou un login svp", "data" => NULL]);
+                //                    }
+
                 $agence = Agence::find($data['agence_id']);
-                    
-                if($users->email!=$data['email']){    
+
+                if ($users->email != $data['email']) {
                     $users->full_name = $data['full_name'];
                     $users->role = 'agence';
                     $users->agence_id = $data['agence_id'];
                     $users->contact = $data['contact'];
                     $users->localite_id = $agence->localite_id;
                     $users->email = $data['email'];
-                    $users->login = $data['email'];
-                    $users->password = bcrypt(Str::random(10)); 
-                    $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16))); 
-                    $users->notify(new RegistredUserNotification()); 
-                }else{
+                    $users->login = $data['login'];
+                    $users->password = bcrypt(Str::random(10));
+                    $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16)));
+                    $users->notify(new RegistredUserNotification());
+                } else {
                     $users->full_name = $data['full_name'];
                     $users->agence_id = $data['agence_id'];
                     $users->contact = $data['contact'];
                     $users->localite_id = $agence->localite_id;
-                }   
-//                    $users->email = isset($data['email']) && !empty($data['email']) ? $data['email'] : null;
-//                    if(isset($data['password']) && !empty($data['password'])){
-//                        $users->password = bcrypt($data['password']); 
-//                        $users->confirmation_token = null; 
-//                    }else{
-//                        $users->password = bcrypt(Str::random(10)); 
-//                        $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16)));  
-//                    }
-//                    $users->login = isset($data['login']) && !empty($data['login']) ? $data['login'] : null;
-//                    if(isset($data['email']) && !empty($data['email'])) {
-//                        $users->login = $data['email'];
-//                    }
-                    
-                    $users->updated_by = Auth::user()->id;
-                    $users->save();
+                }
+                //                    $users->email = isset($data['email']) && !empty($data['email']) ? $data['email'] : null;
+                //                    if(isset($data['password']) && !empty($data['password'])){
+                //                        $users->password = bcrypt($data['password']);
+                //                        $users->confirmation_token = null;
+                //                    }else{
+                //                        $users->password = bcrypt(Str::random(10));
+                //                        $users->confirmation_token = str_replace('/', '', bcrypt(Str::random(16)));
+                //                    }
+                //                    $users->login = isset($data['login']) && !empty($data['login']) ? $data['login'] : null;
+                //                    if(isset($data['email']) && !empty($data['email'])) {
+                //                        $users->login = $data['login'];
+                //                    }
 
-                    $jsonData["data"] = json_decode($users);
+                $users->updated_by = Auth::user()->id;
+                $users->save();
 
-                    return response()->json($jsonData);
-                }catch(Exception $exc) {
-                    $jsonData["code"] = -1;
-                    $jsonData["data"] = NULL;
-                    $jsonData["msg"] = $exc->getMessage();
-                    return response()->json($jsonData);
-                } 
+                $jsonData["data"] = json_decode($users);
+
+                return response()->json($jsonData);
+            } catch (Exception $exc) {
+                $jsonData["code"] = -1;
+                $jsonData["data"] = NULL;
+                $jsonData["msg"] = $exc->getMessage();
+                return response()->json($jsonData);
             }
+        }
         return response()->json(["code" => 0, "msg" => "Saisie invalide", "data" => NULL]);
     }
 
-//Réinitialisation du mot de passe par l'administrateur
-    public function resetPasswordManualy($id){
-         $jsonData = ["code" => 1, "msg" => " Opération effectuée avec succès"];
-             
-            $user = User::find($id);
-            $password = "";
-            if($user && $user->statut_compte != 0){ 
-                try {
-                    $password = 'P@s$worD12345%';
-                    $user->password = bcrypt($password);
-                    $user->updated_by = $user->id;
-                    $user->save();
-                    $to_name = $user->full_name;
-                    $to_email = $user->email;
-                    $data = array("name"=>$user->full_name, "body" => "Vous avez démandé à rénitialiser votre mot de passe. Votre nouveau mot de passse est : ".$password." Votre login reste le même : ".$user->email);
-  
-                    Mail::send('auth/user/mail', $data, function($message) use ($to_name, $to_email) {
+    //Réinitialisation du mot de passe par l'administrateur
+    public function resetPasswordManualy($id)
+    {
+        $jsonData = ["code" => 1, "msg" => " Opération effectuée avec succès"];
+
+        $user = User::find($id);
+        $password = "";
+        if ($user && $user->statut_compte != 0) {
+            try {
+                $password = 'P@s$worD12345%';
+                $user->password = bcrypt($password);
+                $user->updated_by = $user->id;
+                $user->save();
+                $to_name = $user->full_name;
+                $to_email = $user->email;
+                $data = array("name" => $user->full_name, "body" => "Vous avez démandé à rénitialiser votre mot de passe. Votre nouveau mot de passse est : " . $password . " Votre login reste le même : " . $user->email);
+
+                Mail::send('auth/user/mail', $data, function ($message) use ($to_name, $to_email) {
                     $message->to($to_email, $to_name)
-                    ->subject('Rénitialisation de votre mot de passe SMART-SFV');
-                    $message->from('tranxpert@smartyacademy.com','SMART-SFV');
-                    });
-                    $jsonData["data"] = json_decode($user);
-                    return response()->json($jsonData);
-                } catch (Exception $exc) {
-                   $jsonData["code"] = -1;
-                   $jsonData["data"] = NULL;
-                   $jsonData["msg"] = $exc->getMessage();
-                   return response()->json($jsonData); 
-                }
+                        ->subject('Rénitialisation de votre mot de passe SMART-SFV');
+                    $message->from('tranxpert@smartyacademy.com', 'SMART-SFV');
+                });
+                $jsonData["data"] = json_decode($user);
+                return response()->json($jsonData);
+            } catch (Exception $exc) {
+                $jsonData["code"] = -1;
+                $jsonData["data"] = NULL;
+                $jsonData["msg"] = $exc->getMessage();
+                return response()->json($jsonData);
             }
-            return response()->json(["code" => 0, "msg" => "Ce compte n'existe pas ou a été fermé !", "data" => NULL]);
+        }
+        return response()->json(["code" => 0, "msg" => "Ce compte n'existe pas ou a été fermé !", "data" => NULL]);
     }
 
-//Modification du mot de passe par l'utilisateur
-    public function updatePasswordProfil(Request $request){
-         $data = $request->all();
+    //Modification du mot de passe par l'utilisateur
+    public function updatePasswordProfil(Request $request)
+    {
+        $data = $request->all();
         $user = User::find($data['idUser']);
         if ($user) {
             $credentials = request(['login', 'password']);
-            if(!Auth::attempt($credentials)){
-               return redirect()->back()->with('error', 'Votre ancien mot de passe est incorrect.');
+            if (!Auth::attempt($credentials)) {
+                return redirect()->back()->with('error', 'Votre ancien mot de passe est incorrect.');
             }
-          
+
             $request->validate([
                 'new_password' => 'required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$@%]).*$/|',
             ]);

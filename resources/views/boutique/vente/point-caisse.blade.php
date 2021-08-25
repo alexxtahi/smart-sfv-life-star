@@ -377,20 +377,20 @@
                                          </div>
                                      </div>
                                  </div>
-                                 <!-- Ticket d'entrée -->
+                                 <!-- Pass d'entrée -->
                                  <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="ticket_entree">Ticket d'entrée</label>
+                                    <label for="pass_entree">Pass d'entrée</label>
                                     <div class="input-group">
                                         <div class="input-group-addon">
                                             <i class="fa fa-cog"></i>
                                         </div>
-                                        <!--<select name="ticket_entree_add" id="ticket_entree_add" onchange="choisirPassEntree(this)" class="form-control">-->
-                                        <select name="ticket_entree_add" id="ticket_entree_add" class="form-control">
+                                        <!--<select name="pass_entree" id="pass_entree" onchange="choisirPassEntree(this)" class="form-control">-->
+                                        <select name="pass_entree" id="pass_entree" class="form-control">
                                             <option value="">-- Pass d'entrée --</option>
                                             <!-- Chargement des tickets d'entrée -->
                                             @foreach($ticketsEntree as $ticketEntree)
-                                            <option  {{$ticketEntree->id}} value="{{$ticketEntree->prix}}">{{$ticketEntree->numero_ticket}}</option>
+                                            <option {{$ticketEntree->id}} value="{{$ticketEntree->prix}}-{{ $ticketEntree->id }}" >{{$ticketEntree->numero_ticket}}</option>
                                             @endforeach
                                         </select>
                                         <!-- script de sélection du pass d'entrée -->
@@ -413,7 +413,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Fin Ticket d'entrée -->
+                            <!-- Fin Pass d'entrée -->
                                  <div class="col-md-6">
                                      <div class="form-group">
                                          <label>Montant pay&eacute;</label>
@@ -434,8 +434,8 @@
                                              </div>
                                              <select name="moyen_reglement_id" id="moyen_reglement_id" class="form-control" required>
                                                  @foreach($moyenReglements as $moyenReglement)
-                                                 <!--<option  {{$moyenReglement->id}} value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>-->
-                                                 <option value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>
+                                                 <option {{$moyenReglement->id}} value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>
+                                                 <!--<option value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>-->
                                                  @endforeach
                                              </select>
                                          </div>
@@ -1301,11 +1301,12 @@
           $("#montantTC_add").val(quantite*prix);
         });
         // Lors de la sélection du pass d'entrée
-        $("#ticket_entree_add").change(function () {
-            var passValue = parseInt($("#ticket_entree_add").val()); // récupérer la valeur du pass d'entrée
+        $("#pass_entree").change(function () {
+            //alert("pass value : " + $("#pass_entree").val()); // ! debug
+            var passValue = parseInt($("#pass_entree").val().split("-")[0]); // récupérer la valeur du pass d'entrée
             var montant_a_payer = parseInt($("#montant_a_payer").val()); // récupérer le montant à payer
             var montant_a_payer_add = parseInt($("#montant_a_payer_add").val()); // récupérer le montant à payer sauvegardé
-            alert("montant a payer: " + montant_a_payer); // ! debug
+            //alert("montant a payer: " + montant_a_payer); // ! debug
             if (montant_a_payer <= 0) {
                 montant_a_payer = montant_a_payer_add;
             } else {
@@ -1324,7 +1325,7 @@
                 $(".montantTVA").html("<b>0</b>");
                 $(".remiseTTC").html("<b>0</b>");
                 $(".montantTTC").html("<b>0</b>");
-                alert("Utilisation d'un pass de " + passValue + " FCFA");
+                //alert("Utilisation d'un pass de " + passValue + " FCFA");
             } else if (passValue = montant_a_payer) {
                 // Coté droit
                 $("#montant_a_payer").val("0");
@@ -1335,10 +1336,10 @@
                 $(".montantTVA").html("<b>0</b>");
                 $(".remiseTTC").html("<b>0</b>");
                 $(".montantTTC").html("<b>0</b>");
-                alert("Utilisation totale d'un pass de " + passValue + " FCFA");
+                //alert("Utilisation totale d'un pass de " + passValue + " FCFA");
             } else {
                 alert("Ce pass d'entrée de " + passValue + " FCFA ne vous permet pas de faire cet achat");
-                $("#ticket_entree_add").options[0].selected = true;
+                $("#pass_entree").options[0].selected = true;
             }
         });
 
