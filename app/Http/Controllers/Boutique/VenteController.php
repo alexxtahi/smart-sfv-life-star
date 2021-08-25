@@ -110,7 +110,7 @@ class VenteController extends Controller
             ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
             ->join('categories', 'categories.id', '=', 'articles.categorie_id')
             ->select('ventes.id', 'ventes.numero_ticket', 'article_ventes.prix')
-            ->Where([['ventes.deleted_at', null], ['categories.libelle_categorie', 'Conso']]) // ! Selectionner uniquement les pass d'entrée
+            ->Where([['ventes.deleted_at', null], ['categories.libelle_categorie', 'Conso'], ['ventes.pass_utiliser', 0]]) // ! Selectionner uniquement les pass d'entrée
             //->Where([['ventes.deleted_at', null]])
             ->get();
         // Fin récup ticket d'entrée
@@ -159,7 +159,7 @@ class VenteController extends Controller
             ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
             ->join('categories', 'categories.id', '=', 'articles.categorie_id')
             ->select('ventes.id', 'ventes.numero_ticket', 'article_ventes.prix')
-            ->Where([['ventes.deleted_at', null], ['categories.libelle_categorie', 'Conso']]) // ! Selectionner uniquement les pass d'entrée
+            ->Where([['ventes.deleted_at', null], ['categories.libelle_categorie', 'Conso'], ['ventes.pass_utiliser', 0]]) // ! Selectionner uniquement les pass d'entrée
             //->Where([['ventes.deleted_at', null]])
             ->get();
         // Fin récup ticket d'entrée
@@ -548,8 +548,12 @@ class VenteController extends Controller
                     //var_dump($request); // ! debug
                     //echo "<script> alert(" . $request . "); <script>"; // ! debug
 
-                    if ($data['pass_entree'] != null) $vente->pass_entree_id = $data['pass_entree'];
-                    //if ($data['pass_entree'] != null) $vente->pass_entree_id = explode('-', $data['pass_entree']);
+                    if ($data['pass_entree'] != null) {
+                        $vente->pass_entree_id = $data['pass_entree'];
+                        //$vente->pass_entree_id = explode('-', $data['pass_entree']);
+                        // Modification des tickets d'entrée
+                        DB::update('update ventes set pass_utiliser = 1 where id = ?', [$data['pass_entree']]);
+                    }
                     $vente->depot_id = $data["depot_id"];
                     $vente->caisse_ouverte_id = $caisse_ouverte->id;
                     $vente->montant_payer = isset($data['montant_payer']) && !empty($data['montant_payer']) ? $data['montant_payer'] : 0;

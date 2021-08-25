@@ -390,8 +390,10 @@
                                             <option value="">-- Pass d'entrée --</option>
                                             <!-- Chargement des tickets d'entrée -->
                                             @foreach($ticketsEntree as $ticketEntree)
-                                            <option {{$ticketEntree->id}} value="{{$ticketEntree->prix}}-{{ $ticketEntree->id }}" >{{$ticketEntree->numero_ticket}}</option>
+                                            <!--<option {{$ticketEntree->id}} value="{{ $ticketEntree->prix . '-' . $ticketEntree->id }}" >{{$ticketEntree->numero_ticket}}</option>-->
+                                            <option {{$ticketEntree->id}} value="{{ $ticketEntree->id }}" >{{$ticketEntree->numero_ticket}}</option>
                                             @endforeach
+
                                         </select>
                                         <!-- script de sélection du pass d'entrée -->
                                         <script>
@@ -413,6 +415,9 @@
                                     </div>
                                 </div>
                             </div>
+                            @foreach($ticketsEntree as $ticketEntree)
+                                            <input id="prix_pass_{{$ticketEntree->id}}" type="hidden" value="{{ $ticketEntree->prix }}">
+                                            @endforeach
                             <!-- Fin Pass d'entrée -->
                                  <div class="col-md-6">
                                      <div class="form-group">
@@ -1302,10 +1307,10 @@
         });
         // Lors de la sélection du pass d'entrée
         $("#pass_entree").change(function () {
-            //alert("pass value : " + $("#pass_entree").val()); // ! debug
-            var passValue = parseInt($("#pass_entree").val().split("-")[0]); // récupérer la valeur du pass d'entrée
+            var passValue = parseInt($("#prix_pass_" + $("#pass_entree").val()).val()); // récupérer la valeur du pass d'entrée
             var montant_a_payer = parseInt($("#montant_a_payer").val()); // récupérer le montant à payer
             var montant_a_payer_add = parseInt($("#montant_a_payer_add").val()); // récupérer le montant à payer sauvegardé
+            alert("pass value : " + passValue); // ! debug
             //alert("montant a payer: " + montant_a_payer); // ! debug
             if (montant_a_payer <= 0) {
                 montant_a_payer = montant_a_payer_add;
