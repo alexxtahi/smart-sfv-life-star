@@ -72,6 +72,10 @@ class VenteController extends Controller
 
     public function vuPointVente(Request $request)
     {
+        /*
+         * Poit de caisse du caissier
+        */
+
         $caisse = null;
         $caisse_ouverte = null;
         $auth_user = Auth::user();

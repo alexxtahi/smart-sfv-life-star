@@ -152,9 +152,9 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Colis *</label>
+                                    <label>Carré *</label>
                                     <select class="form-control" id="unite">
-                                        <option value="">-- Colis--</option>
+                                        <option value="">-- Carré--</option>
                                     </select>
                                 </div>
                             </div>
@@ -218,7 +218,7 @@
                                             <th data-field="id">ID</th>
                                             <th data-field="code_barre">Code barre</th>
                                             <th data-field="libelle_article">Article</th>
-                                            <th data-field="libelle_unite">Colis</th>
+                                            <th data-field="libelle_unite">Carré</th> <!--- Colonne carré du tableau -->
                                             <th data-field="prix_ht">Prix HT</th>
                                             <th data-field="prix_ttc">Prix TTC</th>
                                             <th data-field="quantite">Qt&eacute;</th>
@@ -247,7 +247,7 @@
                             <thead>
                                 <tr>
                                     <th data-field="article.description_article">Article</th>
-                                    <th data-field="unite.libelle_unite">Colis</th>
+                                    <th data-field="unite.libelle_unite">Carré</th> <!--- Faux -->
                                     <th data-formatter="montantHTFormatter">Prix HT</th>
                                     <th data-field="prix" data-formatter="montantFormatter">Prix TTC</th>
                                     <th data-field="quantite" data-align="center">Quantit&eacute; </th>
@@ -277,6 +277,7 @@
                                              <div class="input-group-addon">
                                                  <i class="fa fa-money"></i>
                                              </div>
+                                             <!-- faux -->
                                              <input type="text" pattern="[0-9]*" class="form-control" min="0" id="montant_a_payer_add" name="montant_a_payer_add" placeholder="Montant à payer" readonly>
                                          </div>
                                      </div>
@@ -371,6 +372,7 @@
                                              <div class="input-group-addon">
                                                  <i class="fa fa-money"></i>
                                              </div>
+                                             <!-- vrai -->
                                              <input type="text" pattern="[0-9]*" class="form-control" min="0" id="montant_a_payer" name="montant_a_payer" placeholder="Montant à payer" readonly>
                                          </div>
                                      </div>
@@ -383,7 +385,8 @@
                                         <div class="input-group-addon">
                                             <i class="fa fa-cog"></i>
                                         </div>
-                                        <select name="ticket_entree_add" id="ticket_entree_add" onchange="choisirPassEntree(this)" class="form-control">
+                                        <!--<select name="ticket_entree_add" id="ticket_entree_add" onchange="choisirPassEntree(this)" class="form-control">-->
+                                        <select name="ticket_entree_add" id="ticket_entree_add" class="form-control">
                                             <option value="">-- Pass d'entrée --</option>
                                             <!-- Chargement des tickets d'entrée -->
                                             @foreach($ticketsEntree as $ticketEntree)
@@ -393,19 +396,18 @@
                                         <!-- script de sélection du pass d'entrée -->
                                         <script>
                                             function choisirPassEntree(list) {
-                                                var montant_a_payer_input = document.querySelector('#montant_a_payer_add'); // Récupération du champ
+                                                var montant_a_payer_input = document.querySelector('#montant_a_payer'); // Récupération du champ montant à payer
+                                                var montant_a_payer_input_temp = document.querySelector('#montant_a_payer_add'); // Récupération du champ montant à payer
                                                 var passValue = parseInt(list.options[list.selectedIndex].value); // ? Sélection du prix du pass
-                                                var montant_a_payer = parseInt(document.querySelector('#montant_a_payer_add').value);
-                                                //alert("pass value: " + passValue); // ! debug
+                                                var montant_a_payer = parseInt(montant_a_payer_input.value);
+                                                //alert("montant a payer: " + montant_a_payer); // ! debug
                                                 // Comparaison avec le montant à payer
                                                 if (passValue >= montant_a_payer) {
-                                                    montant_a_payer_input.value = 0;
+                                                    montant_a_payer_input.value = passValue - montant_a_payer;
                                                 } else {
-                                                    alert("Ce pass d'entrée ne vous permet pas de faire cet achat");
+                                                    alert("Ce pass d'entrée de " + passValue + " FCFA ne vous permet pas de faire cet achat");
                                                     list.options[0].selected = true;
                                                 }
-
-
                                             }
                                         </script>
                                     </div>
@@ -840,7 +842,7 @@
                             <thead>
                                 <tr>
                                     <th data-field="article.description_article">Article</th>
-                                    <th data-field="unite.libelle_unite">Colis</th>
+                                    <th data-field="unite.libelle_unite">Carré</th> <!--- Faux -->
                                     <th data-formatter="montantHTFormatter">Prix HT</th>
                                     <th data-field="prix" data-formatter="montantFormatter">Prix TTC</th>
                                     <th data-field="quantite" data-align="center">Quantit&eacute; </th>
@@ -1155,8 +1157,8 @@
                 });
             })
             $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + article_id , function (reponse) {
-                //$('#unite').html("<option value=''>-- Zaza --</option>"); // Modification sur le carré
-                $('#unite').html("<option value=''>-- Zaza --</option>"); // Modification sur le carré
+                //$('#unite').html("<option value=''>-- Zaza --</option>"); // ! debug
+                $('#unite').html("<option value=''>-- Carré --</option>"); // Modification sur le carré
                 $.each(reponse.rows, function (index, colis) {
                     //alert("Index: " + index); // ! debug
                     if (index == 0) // Choisir automatiquement le carré salle
@@ -1298,6 +1300,47 @@
           var prix = $("#prixTTC_add").val();
           $("#montantTC_add").val(quantite*prix);
         });
+        // Lors de la sélection du pass d'entrée
+        $("#ticket_entree_add").change(function () {
+            var passValue = parseInt($("#ticket_entree_add").val()); // récupérer la valeur du pass d'entrée
+            var montant_a_payer = parseInt($("#montant_a_payer").val()); // récupérer le montant à payer
+            var montant_a_payer_add = parseInt($("#montant_a_payer_add").val()); // récupérer le montant à payer sauvegardé
+            alert("montant a payer: " + montant_a_payer); // ! debug
+            if (montant_a_payer <= 0) {
+                montant_a_payer = montant_a_payer_add;
+            } else {
+                $("#montant_a_payer_add").val(montant_a_payer); // sauvegarde du montant à payer
+            }
+
+            // Comparaison avec le montant à payer
+            if (passValue > montant_a_payer) {
+                // Coté droit
+                var reste = passValue - montant_a_payer;
+                $("#montant_a_payer").val("-" + reste);
+                $("#montant_payer").val(passValue);
+                $(".montant_restant").html("<b>" + $.number(reste) +"</b>");
+                // Coté gauche
+                $(".montantHT").html("<b>0</b>");
+                $(".montantTVA").html("<b>0</b>");
+                $(".remiseTTC").html("<b>0</b>");
+                $(".montantTTC").html("<b>0</b>");
+                alert("Utilisation d'un pass de " + passValue + " FCFA");
+            } else if (passValue = montant_a_payer) {
+                // Coté droit
+                $("#montant_a_payer").val("0");
+                $("#montant_payer").val(passValue);
+                $(".montant_restant").html("<b>0</b>");
+                // Coté gauche
+                $(".montantHT").html("<b>0</b>");
+                $(".montantTVA").html("<b>0</b>");
+                $(".remiseTTC").html("<b>0</b>");
+                $(".montantTTC").html("<b>0</b>");
+                alert("Utilisation totale d'un pass de " + passValue + " FCFA");
+            } else {
+                alert("Ce pass d'entrée de " + passValue + " FCFA ne vous permet pas de faire cet achat");
+                $("#ticket_entree_add").options[0].selected = true;
+            }
+        });
 
         //Add row on table
         $(".add-row").click(function () {
@@ -1390,7 +1433,7 @@
                           libelle_article: libelle_article,
                           libelle_unite: libelle_unite,
                           prix_ht: $.number(prixHT),
-                          prix_ttc: $.number(prixTTC),
+                          prix_ttc: $.number(prixTTC), // ! Ajout dans la colonne prix TTC
                           quantite: quantite,
                           article: articleId,
                           unite: uniteId,
@@ -1433,7 +1476,7 @@
             }else{
                 $.gritter.add({
                     title: "SMART-SFV",
-                    text: "Les champs article, colis et quantité ne doivent pas être vides et la quantité minimum à vendre doit être 1.",
+                    text: "Les champs article, carré et quantité ne doivent pas être vides et la quantité minimum à vendre doit être 1.",
                     sticky: false,
                     image: basePath + "/assets/img/gritter/confirm.png",
                 });
@@ -1763,7 +1806,7 @@
 
         $("#article_add").val(article.article_id);
         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot + "/" + article.article_id , function (reponse) {
-                $('#unite_add').html("<option value=''>-- Colis --</option>");
+                $('#unite_add').html("<option value=''>-- Carré --</option>");
                 $.each(reponse.rows, function (index, colis) {
                     $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
