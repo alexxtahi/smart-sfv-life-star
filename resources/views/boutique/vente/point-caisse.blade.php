@@ -884,7 +884,7 @@
                                     <div class="input-group-addon">
                                         <i class="fa fa-calendar"></i>
                                     </div>
-                                    <input type="text"  class="form-control" ng-model="retourArticle.date_retours" id="date_retour" name="date_retour" value="<?= date('d-m-Y'); ?>" required>
+                                    <input type="text" class="form-control" ng-model="retourArticle.date_retours" id="date_retour" name="date_retour" value="<?= date('d-m-Y'); ?>" required>
                                 </div>
                             </div>
                         </div>
@@ -926,7 +926,7 @@
                                     <div class="input-group-addon">
                                         <i class="fa fa-calendar"></i>
                                     </div>
-                                    <input type="text"  class="form-control" id="date_achat" readonly>
+                                    <input type="text" class="form-control" id="date_achat" readonly>
                                 </div>
                             </div>
                         </div>
@@ -937,11 +937,12 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Client *</label>
+                                    <input type="hidden" id="type_retour" name="type_retour" value="facture_impaye">
                                     <div class="input-group">
                                         <div class="input-group-addon">
                                             <i class="fa fa-list"></i>
                                         </div>
-                                        <select id="client_impaye" class="form-control">
+                                        <select id="clients_impaye" name="clients_impaye" class="form-control">
                                             <option value="">-- Client --</option>
                                             @foreach($clients_impaye as $client_impaye)
                                                 <option value="{{$client_impaye->id}}"> {{$client_impaye->full_name_client}}</option>
@@ -950,81 +951,11 @@
                                     </div>
                                 </div>
                             </div>
-                                    <input type="hidden" class="form-control" id="unite">
-                                    <input type="hidden" id="unite_value">
-                            <!--<div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Retour *</label>
-                                    <input type="number" min="1" class="form-control" id="qte_retour" placeholder="Qté">
-                                </div>
-                            </div>-->
-                            <div class="col-md-2">
-                                <div class="form-group"><br/>
-                                    <button type="button" class="btn btn-success btn-sm  add-row"><i class="fa fa-plus">Ajouter</i></button>
-                                </div>
-                            </div>
                         </div>
-                        <button type="button" class="btn btn-danger btn-xs delete-row">Supprimer ligne</button><br/><br/>
-                        <!--
-                        <div class="row">
-                            <div class="col-md-12">
-                                <table id="tableAddRowArticle" class="table table-success table-striped box box-success"
-                                       data-toggle="table"
-                                       data-id-field="id"
-                                       data-unique-id="id"
-                                       data-click-to-select="true"
-                                       data-show-footer="false">
-                                    <thead>
-                                        <tr>
-                                            <th data-field="state" data-checkbox="true"></th>
-                                            <th data-field="id">Id</th>
-                                            <th data-field="code_barre">Code barre</th>
-                                            <th data-field="libelle_article">Article</th>
-                                            <th data-field="libelle_unite">Colis</th>
-                                            <th data-field="prix">Prix</th>
-                                            <th data-field="quantite_vendue">Qt&eacute; vendue</th>
-                                            <th data-field="quantite_retournee">Qt&eacute; retourn&eacute;e</th>
-                                            <th data-field="montant">Montant</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                        </div>
-                        -->
                     </div>
-                    <!--
-                     <div id="div_update">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <button type="button" id="btnModalAjoutArticle" class="btn btn-primary btn-xs pull-right"><i class="fa fa-plus">Ajouter un article</i></button>
-                                </div>
-                            </div>
-                        </div><br/>
-                        <table id="tableArticle" class="table table-success table-striped box box-success"
-                               data-pagination="true"
-                               data-search="false"
-                               data-toggle="table"
-                               data-unique-id="id"
-                               data-show-toggle="false">
-                            <thead>
-                                <tr>
-                                    <th data-field="article.code_barre">Code</th>
-                                    <th data-field="article.description_article">Article</th>
-                                    <th data-field="unite.libelle_unite">Colis</th>
-                                    <th data-field="prix_unitaire">Prix</th>
-                                    <th data-field="quantite_vendue">Qt&eacute; vendue</th>
-                                    <th data-field="quantite" data-align="center">Qt&eacute; retourn&eacute;e </th>
-                                    <th data-formatter="montantRetourFormatter" data-align="center">Montant</th>
-                                    <th data-field="id" data-formatter="optionAArticleFormatter" data-width="100px" data-align="center"><i class="fa fa-wrench"></i></th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="sendButton" class="btn btn-primary btn-send"><span class="overlay loader-overlay"> <i class="fa fa-refresh fa-spin"></i> </span>Valider</button>
+                    <button type="button" id="sendImpayeButton" class="btn btn-primary btn-send"><span class="overlay loader-overlay"> <i class="fa fa-refresh fa-spin"></i> </span>Valider</button>
                 </div>
             </div>
         </form>
@@ -1164,20 +1095,8 @@
                 $tableAddRowArticle.bootstrapTable('removeAll');
                 lotArticle = [];
                 idTablle = 0;
-                $(".delete-row").hide();
-                $('#code_barre').val('');
-                $('#unite').val('');
-                $('#unite_value').val('');
-                $('#qte_retour').val('');
-                $('#qte_vendu').val('');
                 $('#libelle_depot').val('');
-                $('#prix').val('');
-                $.getJSON("../boutique/liste-articles-vente/" + vente , function (reponse) {
-                        $('#article').html('<option value="">-- Article --</option>');
-                        $.each(reponse.rows, function (index, article_vente) {
-                            $('#article').append('<option data-libellearticle= "' + article_vente.article.description_article + '"  value=' + article_vente.article.id + '>' + article_vente.article.description_article + ' -- ' + article_vente.unite.libelle_unite +  '</option>')
-                        });
-                });
+                // Chargement de la date d'achat et du libelle du dépôt
                 $.getJSON("../boutique/find-one-vente/" + vente , function (reponse) {
                     $('#date_achat').val(''); $('#depot').val('');
                     $.each(reponse.rows, function (index, vente_trouver) {
@@ -1186,14 +1105,7 @@
                     });
                 });
             }else{
-                $("#article").select2("val", "");
-                $('#code_barre').val('');
-                $('#unite').val('');
-                $('#unite_value').val('');
-                $('#qte_retour').val('');
-                $('#qte_vendu').val('');
                 $('#libelle_depot').val('');
-                $('#article').html("<option value=''>-- Article --</option>");
             }
         });
 
@@ -1316,20 +1228,12 @@
         $('#btnModalImpaye').click(function(){
             $("#article").select2("val", "");
             $("#vente_id").select2("val","");
-            $('#code_barre').val('');
-            $('#unite').val('');
-            $('#unite_value').val('');
-            $('#qte_retour').val('');
-            $('#qte_vendu').val('');
-            $('#prix').val('');
             $('#libelle_depot').val('');
             $('#clients_impaye').html("<option value=''>-- Client --</option>");
             $tableAddRowArticle.bootstrapTable('removeAll');
             lotArticle = [];
             idTablle = 0;
             $("#div_enregistrement_impaye").show();
-            $("#div_update_impaye").hide();
-            $(".delete-row-impaye").hide();
         });
 
         $('#code_barre').keyup(function(e){
@@ -1904,6 +1808,35 @@
            }
        });
 
+       // ! Envoyer le formulaire d'impayé
+        $("#sendImpayeButton").click(function(){
+            $("#formImpaye").submit();
+            $("#sendImpayeButton").prop("disabled", true);
+        });
+        $("#formImpaye").submit(function (e) {
+            e.preventDefault();
+            var $valid = $(this).valid();
+            if (!$valid) {
+                $validator.focusInvalid();
+                return false;
+            }
+            var $ajaxLoader = $("#formImpaye .loader-overlay");
+
+             if (impaye==true) {
+                 alert("Création d'un nouvel impayé");
+                var methode = 'POST';
+                var formData = new FormData($(this)[0]);
+                createFormData(formData, 'lotArticle', lotArticle);
+                var url = "{{route('boutique.save-facture-impaye')}}";
+             }else{
+                 alert("modif d'un impayé");
+                /*var methode = 'POST';
+                var url = "{{route('boutique.update-retour-article')}}";
+                var formData = new FormData($(this)[0]);*/
+             }
+            editerImpaye(methode, url, $(this), formData, $ajaxLoader, $table, ajout);
+        });
+
         // Submit the add form
         $("#sendButton").click(function(){
             $("#formAjout").submit();
@@ -2173,6 +2106,82 @@
 
    function listeArticleFormatter(id, row){
         return '<button type="button" class="btn btn-xs btn-warning" data-placement="left" data-toggle="tooltip" title="Panier" onClick="javascript:listeArticleRow(' + id + ');"><i class="fa fa-cart-arrow-down"></i></button>';
+    }
+
+    function editerImpaye(methode, url, $formObject, formData, $ajoutLoader, $table, impaye = true) {
+        alert("edition de l'impayé");
+        jQuery.ajax({
+            type: methode,
+            url: url,
+            cache: false,
+            data: formData,
+            contentType: false,
+            processData: false,
+            success:function (reponse, textStatus, xhr){
+                if (reponse.code === 1) {
+                    alert("Sauvegarde de l'impayé");
+                    var $scope = angular.element($formObject).scope();
+                    $scope.$apply(function () {
+                        $scope.initForm();
+                    });
+                    if (impaye) { //creation
+                        $table.bootstrapTable('refresh');
+                        $("#vente_id").select2("val","");
+                        $("#clients_impaye").select2("val","");
+                        $('#date_achat').val("");
+                        $("#div_enregistrement_impaye").show();
+                        lotArticle = [];
+                        idTablle =  0;
+                        alert("Ajout réussi");
+                    } else {
+                        alert("impaye = false");
+                    }
+                    if(reponse.data.attente!=1){
+                    window.open("facture-impaye-pdf/" + reponse.data.id ,'_blank')
+                    }
+                    location.reload();
+                    $formObject.trigger('eventAjouter', [reponse.data]);
+                    //$(".bs-modal-impaye").modal("hide");
+                    $("#sendImpayeButton").prop("disabled", false);
+                }else{
+                    $("#sendImpayeButton").prop("disabled", false);
+                    alert("Erreur de sauvegarde de l'impayé");
+                }
+                $.gritter.add({
+                    // heading of the notification
+                    title: "SMART-SFV",
+                    // the text inside the notification
+                    text: reponse.msg,
+                    //text: "Erreur au niveau du [success]",
+                    sticky: false,
+                    image: basePath + "/assets/img/gritter/confirm.png",
+                });
+            },
+            error: function (err) {
+                var res = eval('('+err.responseText+')');
+                var messageErreur = res.message;
+                alert("Erreur d'envoi");
+                $("#sendImpayeButton").prop("disabled", false);
+                $.gritter.add({
+                    // heading of the notification
+                    title: "SMART-SFV",
+                    // the text inside the notification
+                    //text: messageErreur,
+                    text: "Erreur au niveau du [error]",
+                    sticky: false,
+                    image: basePath + "/assets/img/gritter/confirm.png",
+                });
+                $formObject.removeAttr("disabled");
+                $ajoutLoader.hide();
+            },
+            beforeSend: function () {
+                $formObject.attr("disabled", true);
+                $ajoutLoader.show();
+            },
+            complete: function () {
+                $ajoutLoader.hide();
+            },
+        });
     }
    function editerVenteAction(methode, url, $formObject, formData, $ajoutLoader, $table, ajout = true) {
     jQuery.ajax({

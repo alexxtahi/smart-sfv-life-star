@@ -30,7 +30,7 @@
 </div>
 <table id="table" class="table table-primary table-striped box box-primary"
                data-pagination="true"
-               data-search="false" 
+               data-search="false"
                data-toggle="table"
                data-url="{{url('boutique',['action'=>'liste-retour-articles'])}}"
                data-unique-id="id"
@@ -82,6 +82,7 @@
                                     <div class="input-group-addon">
                                         <i class="fa fa-bank"></i>
                                     </div>
+                                    <input type="hidden" id="type_retour" name="type_retour" value="retour_article">
                                     <select name="vente_id" id="vente_id" class="form-control" required>
                                         <option value="" ng-show="false">-- Selectionner --</option>
                                         @foreach($ventes as $vente)
@@ -119,7 +120,7 @@
                         </div>
                     </div>
                     <hr/>
-                    <div id="div_enregistrement"> 
+                    <div id="div_enregistrement">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
@@ -203,7 +204,7 @@
                                 <div class="form-group">
                                     <button type="button" id="btnModalAjoutArticle" class="btn btn-primary btn-xs pull-right"><i class="fa fa-plus">Ajouter un article</i></button>
                                 </div>
-                            </div> 
+                            </div>
                         </div><br/>
                         <table id="tableArticle" class="table table-success table-striped box box-success"
                                data-pagination="true"
@@ -385,7 +386,7 @@
     var $table = jQuery("#table"), rows = [],$tableArticle = jQuery("#tableArticle"), rowsArticle = [], $tableAddRowArticle = jQuery("#tableAddRowArticle"), $tableListeDetailRetour = jQuery("#tableListeDetailRetour");
     var lotArticle = [];
     var idTablle =  0;
-    
+
     appSmarty.controller('formAjoutCtrl', function ($scope) {
         $scope.populateForm = function (retourArticle) {
             $scope.retourArticle = retourArticle;
@@ -416,8 +417,8 @@
         ajout = true;
         $scope.article = {};
         };
-    }); 
-    
+    });
+
     appSmarty.controller('formSupprimerArticleCtrl', function ($scope) {
         $scope.populateSupArticleForm = function (article) {
         $scope.article = article;
@@ -428,13 +429,13 @@
     });
     $(function () {
         $table.on('load-success.bs.table', function (e, data) {
-            rows = data.rows; 
+            rows = data.rows;
         });
         $tableArticle.on('load-success.bs.table', function (e, data) {
             rowsArticle = data.rows;
         });
         $("#article, #article_add, #vente_id, #searchByVente").select2({width: '100%', allowClear: true});
-        
+
         $('#searchByDate,#date_retour').datetimepicker({
             timepicker: false,
             formatDate: 'd-m-Y',
@@ -442,7 +443,7 @@
             local : 'fr',
             maxDate : new Date()
         });
-        
+
         $("#searchByDate").change(function (e) {
             var date = $("#searchByDate").val();
             if(date == ''){
@@ -450,7 +451,7 @@
             }else{
               $table.bootstrapTable('refreshOptions', {url: '../boutique/liste-retour-article-by-date/' + date});
             }
-        }); 
+        });
         $("#searchByVente").change(function (e) {
             var vente = $("#searchByVente").val();
             if(vente== 0){
@@ -459,11 +460,11 @@
               $table.bootstrapTable('refreshOptions', {url: '../boutique/liste-retour-article-by-vente/' + vente});
             }
         });
-        
+
         $("#div_enregistrement").show();
         $("#div_update").hide();
         $(".delete-row").hide();
-        
+
         $('#btnModalAjout').click(function(){
             $("#article").select2("val", "");
             $("#vente_id").select2("val","");
@@ -482,7 +483,7 @@
             $("#div_update").hide();
             $(".delete-row").hide();
         });
-        
+
         $("#btnModalAjoutArticle").on("click", function () {
             ajoutArticle = true;
             var retourArticle = $("#idRetourArticleModifier").val();
@@ -495,13 +496,13 @@
             $("#article_add").select2("val", "");
             $.getJSON("../boutique/liste-articles-vente/" + vente , function (reponse) {
                 $('#article_add').html('<option value="">-- Article --</option>');
-                $.each(reponse.rows, function (index, article_vente) { 
+                $.each(reponse.rows, function (index, article_vente) {
                     $('#article_add').append('<option data-libellearticle= "' + article_vente.article.description_article + '"  value=' + article_vente.article.id + '>' + article_vente.article.description_article + ' --- ' + article_vente.unite.libelle_unite + '</option>')
                 });
             });
             $(".bs-modal-add-article").modal("show");
         });
-        
+
         $('#vente_id').change(function(){
             var vente = $("#vente_id").val();
             if(vente!=""){
@@ -518,13 +519,13 @@
                 $('#prix').val('');
                 $.getJSON("../boutique/liste-articles-vente/" + vente , function (reponse) {
                         $('#article').html('<option value="">-- Article --</option>');
-                        $.each(reponse.rows, function (index, article_vente) { 
+                        $.each(reponse.rows, function (index, article_vente) {
                             $('#article').append('<option data-libellearticle= "' + article_vente.article.description_article + '"  value=' + article_vente.article.id + '>' + article_vente.article.description_article + ' -- ' + article_vente.unite.libelle_unite +  '</option>')
                         });
                 });
                 $.getJSON("../boutique/find-one-vente/" + vente , function (reponse) {
                     $('#date_achat').val(''); $('#depot').val('');
-                    $.each(reponse.rows, function (index, vente_trouver) { 
+                    $.each(reponse.rows, function (index, vente_trouver) {
                         $('#date_achat').val(vente_trouver.date_ventes);
                         $('#libelle_depot').val(vente_trouver.depot.libelle_depot);
                     });
@@ -540,7 +541,7 @@
                 $('#article').html("<option value=''>-- Article --</option>");
             }
         });
-        
+
         $('#code_barre').keyup(function(e){
             if($("#vente_id").val()==""){
                 alert('Selctionner un numéro de ticket ou de facture  SVP!');
@@ -551,7 +552,7 @@
                 var code_barre = $('#code_barre').val();
                 var vente = $("#vente_id").val();
                 $.getJSON("../boutique/find-article-sur-vente-by-code-barre/" + code_barre + "/" + vente , function (reponse) {
-                    $.each(reponse.rows, function (index, retour) { 
+                    $.each(reponse.rows, function (index, retour) {
                         $("#article").select2("val", retour.article_id);
                         $('#unite').val(retour.libelle_unite);
                         $('#unite_value').val(retour.id_unite);
@@ -561,34 +562,34 @@
                 })
                 e.preventDefault();
                 e.stopPropagation();
-            } 
+            }
         });
-        
+
         $('#code_barre_add').keyup(function(e){
                 var code_barre = $('#code_barre_add').val();
                 var vente = $("#vente_id").val();
                 $.getJSON("../boutique/find-article-sur-vente-by-code-barre/" + code_barre + "/" + vente , function (reponse) {
-                    $.each(reponse.rows, function (index, retour) { 
+                    $.each(reponse.rows, function (index, retour) {
                         $("#article_add").select2("val", retour.article_id);
                         $('#unite_value_add').val(retour.id_unite);
                         $('#qte_vendu_add').val(retour.quantite);
                         $('#prix_add').val(retour.prix);
                     });
                 })
-               
+
         });
-        
+
         $('#article').change(function(){
             var article_id = $("#article").val();
             var vente = $("#vente_id").val();
             $('#code_barre').val("");
             $.getJSON("../parametre/find-article/" + article_id , function (reponse) {
-                $.each(reponse.rows, function (index, articles_trouver) { 
+                $.each(reponse.rows, function (index, articles_trouver) {
                     $("#code_barre").val(articles_trouver.code_barre);
                 });
             })
             $.getJSON("../boutique/find-one-article-on-vente/" + vente + "/" + article_id , function (reponse) {
-                $.each(reponse.rows, function (index, retour) { 
+                $.each(reponse.rows, function (index, retour) {
                         $('#unite').val(retour.libelle_unite);
                         $('#unite_value').val(retour.id_unite);
                         $('#qte_vendu').val(retour.quantite);
@@ -596,18 +597,18 @@
                 });
             })
         });
-        
+
         $('#article_add').change(function(){
             var article_id = $("#article_add").val();
             var vente = $("#vente_id").val();
             $('#code_barre_add').val("");
             $.getJSON("../parametre/find-article/" + article_id , function (reponse) {
-                $.each(reponse.rows, function (index, articles_trouver) { 
+                $.each(reponse.rows, function (index, articles_trouver) {
                     $("#code_barre_add").val(articles_trouver.code_barre);
                 });
             })
             $.getJSON("../boutique/find-one-article-on-vente/" + vente + "/" + article_id , function (reponse) {
-                $.each(reponse.rows, function (index, retour) { 
+                $.each(reponse.rows, function (index, retour) {
                         $('#unite_value_add').val(retour.id_unite);
                         $('#qte_vendu_add').val(retour.quantite);
                         $('#prix_add').val(retour.prix);
@@ -672,14 +673,14 @@
                             var vente = $('#vente_id').val();
                             $.getJSON("../boutique/liste-articles-vente/" + vente , function (reponse) {
                                 $('#article').html('<option value="">-- Article --</option>');
-                                $.each(reponse.rows, function (index, article_vente) { 
+                                $.each(reponse.rows, function (index, article_vente) {
                                     $('#article').append('<option data-libellearticle= "' + article_vente.article.description_article + '"  value=' + article_vente.article.id + '>' + article_vente.article.description_article + '</option>')
                                 });
                             });
                             return;
                         }
                     }
-                    idTablle++; 
+                    idTablle++;
                     $tableAddRowArticle.bootstrapTable('insertRow',{
                         index: idTablle,
                         row: {
@@ -695,7 +696,7 @@
                           montant : $.number(prix*qte_retour),
                         }
                     })
-                  
+
                     //Creation de l'article dans le tableau virtuel (lot de transfert)
                     var DataArticle = {'id':idTablle, 'articles':articleId, 'unites':uniteId,'quantites':qte_retour,'quantite_vendues':qte_vendue,'prix':prix};
                     lotArticle.push(DataArticle);
@@ -708,7 +709,7 @@
                     var vente = $('#vente_id').val();
                     $.getJSON("../boutique/liste-articles-vente/" + vente , function (reponse) {
                         $('#article').html('<option value="">-- Article --</option>');
-                        $.each(reponse.rows, function (index, article_vente) { 
+                        $.each(reponse.rows, function (index, article_vente) {
                             $('#article').append('<option data-libellearticle= "' + article_vente.article.description_article + '"  value=' + article_vente.article.id + '>' + article_vente.article.description_article + '</option>')
                         });
                     });
@@ -727,7 +728,7 @@
                 return;
             }
         })
-         // Find and remove selected table rows  
+         // Find and remove selected table rows
         $(".delete-row").click(function () {
            var selecteds = $tableAddRowArticle.bootstrapTable('getSelections');
            var ids = $.map($tableAddRowArticle.bootstrapTable('getSelections'), function (row) {
@@ -735,10 +736,10 @@
                     })
                 $tableAddRowArticle.bootstrapTable('remove', {
                     field: 'id',
-                    values: ids 
+                    values: ids
                 })
-              
-                $.each(selecteds, function (index, value) { 
+
+                $.each(selecteds, function (index, value) {
                     var articleTrouver = _.findWhere(lotArticle, {id: value.id})
                     lotArticle = _.reject(lotArticle, function (article) {
                         return article.id == value.id;
@@ -750,9 +751,9 @@
                     idTablle = 0;
                 }
         });
-        // Submit the add form  
-        $("#sendButton").click(function(){  
-            $("#formAjout").submit(); 
+        // Submit the add form
+        $("#sendButton").click(function(){
+            $("#formAjout").submit();
             $("#sendButton").prop("disabled", true);
         });
         $("#formAjout").submit(function (e) {
@@ -763,7 +764,7 @@
                 return false;
             }
             var $ajaxLoader = $("#formAjout .loader-overlay");
-             
+
              if (ajout==true) {
                 var methode = 'POST';
                 var formData = new FormData($(this)[0]);
@@ -776,7 +777,7 @@
              }
             editerRetourArticleAction(methode, url, $(this), formData, $ajaxLoader, $table, ajout);
         });
-        
+
         $("#formAjoutArticle").submit(function (e) {
             e.preventDefault();
             var $valid = $(this).valid();
@@ -846,26 +847,26 @@
         $('#code_barre_add').val("");
         $.getJSON("../boutique/liste-articles-retournes/" + retourArticle , function (reponse) {
             $('#article_add').html('<option value="">-- Article --</option>');
-            $.each(reponse.rows, function (index, article_vente) { 
+            $.each(reponse.rows, function (index, article_vente) {
                 $('#article_add').append('<option data-libellearticle= "' + article_vente.article.description_article + '"  value=' + article_vente.article.id + '>' + article_vente.article.description_article + ' -- ' + article_vente.unite.libelle_unite + '</option>')
            });
            $("#article_add").select2("val", article.article_id);
         });
-        
+
         $.getJSON("../parametre/find-article/" + article.article_id , function (reponse) {
-            $.each(reponse.rows, function (index, articles_trouver) { 
+            $.each(reponse.rows, function (index, articles_trouver) {
                 $("#code_barre_add").val(articles_trouver.code_barre);
             });
         })
           $.getJSON("../boutique/find-one-article-on-vente/" + vente + "/" + article.article_id , function (reponse) {
-                $.each(reponse.rows, function (index, retour) { 
+                $.each(reponse.rows, function (index, retour) {
                         $('#unite').val(retour.libelle_unite);
                         $('#unite_value').val(retour.id_unite);
                        // $('#qte_vendu').val(retour.quantite);
                         $('#prix').val(retour.prix);
                 });
             })
-      
+
         $scope.$apply(function () {
             $scope.populateArticleForm(article);
         });
@@ -896,11 +897,11 @@
         $tableListeDetailRetour.bootstrapTable('refreshOptions', {url: "../boutique/liste-articles-retournes/" + idRetourArticle});
         $(".bs-modal-liste-detail-retour").modal("show");
     }
-    
+
     function printRow(idRetourArticle){
         window.open("../boutique/fiche-retour-article-pdf/" + idRetourArticle,'_blank');
     }
-    
+
     function ticketFormatter(id,row){
         return row.numero_facture!=null ? '<span class="text-bold"> FACT' + row.numero_facture+ '</span>' : '<span class="text-bold">' + row.numero_ticket+ '</span>';
     }
@@ -913,12 +914,12 @@
     function ficheFormatter(id, row){
         return '<button type="button" class="btn btn-xs btn-default" data-placement="left" data-toggle="tooltip" title="Fiche" onClick="javascript:printRow(' + row.id_ligne + ');"><i class="fa fa-print"></i></button>';
     }
-    function optionFormatter(id, row) { 
+    function optionFormatter(id, row) {
             return '<button type="button" class="btn btn-xs btn-primary" data-placement="left" data-toggle="tooltip" title="Modifier" onClick="javascript:updateRow(' + id + ');"><i class="fa fa-edit"></i></button>\n\
                     <button type="button" class="btn btn-xs btn-warning" data-placement="left" data-toggle="tooltip" title="Détails inventaire" onClick="javascript:articleRetourneRow(' + id + ');"><i class="fa fa-list"></i></button>\n\
                     <button class="btn btn-xs btn-danger" data-placement="left" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteRow(' + id + ');"><i class="fa fa-trash"></i></button>';
     }
-    function optionAArticleFormatter(id, row) { 
+    function optionAArticleFormatter(id, row) {
             return '<button type="button" class="btn btn-xs btn-primary" data-placement="left" data-toggle="tooltip" title="Modifier" onClick="javascript:updateArticleRow(' + id + ');"><i class="fa fa-edit"></i></button>\n\
                     <button type="button" class="btn btn-xs btn-danger" data-placement="left" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteArticleRow(' + id + ');"><i class="fa fa-trash"></i></button>';
     }
@@ -946,7 +947,7 @@
                     $tableAddRowArticle.bootstrapTable('removeAll');
                     lotArticle = [];
                     idTablle =  0;
-              
+
                 } else { //Modification
                     $table.bootstrapTable('updateByUniqueId', {
                         id: reponse.data.id,
@@ -1032,7 +1033,7 @@ function editerArticleRetourneAction(methode, url, $formObject, formData, $ajout
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-            
+
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -1054,7 +1055,7 @@ function editerArticleRetourneAction(methode, url, $formObject, formData, $ajout
     });
 };
 
-//Supprimer un article 
+//Supprimer un article
     function supprimerArticleAction(url, formData, $question, $ajaxLoader, $table) {
     jQuery.ajax({
         type: 'DELETE',

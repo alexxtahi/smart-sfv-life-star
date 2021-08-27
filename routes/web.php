@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-   return view('auth.login');
+    return view('auth.login');
 });
 
 Auth::routes();
@@ -26,9 +26,9 @@ Route::post('/configuration/store', 'ConfigurationController@store')->name('conf
 Route::get('/configuration/infos-update', 'ConfigurationController@show')->name('configuration.infos-update')->middleware('auth');
 Route::put('/configuration/update', 'ConfigurationController@update')->name('configuration.update')->middleware('auth');
 
-//les routes du module Parametre 
+//les routes du module Parametre
 Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('parametre')->group(function () {
-    //Route resources 
+    //Route resources
     Route::resource('categories', 'CategorieController');
     Route::resource('nations', 'NationController');
     Route::resource('depots', 'DepotController');
@@ -48,11 +48,11 @@ Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('p
     Route::resource('divers', 'DiversController');
     Route::resource('tailles', 'TailleController');
     Route::resource('categorie-depenses', 'CategorieDepenseController');
-   
-    //Route particulières 
+
+    //Route particulières
     Route::post('update-article', 'ArticleController@updateArticle')->name('update-article');
-    
-    //Route pour les listes dans boostrap table  
+
+    //Route pour les listes dans boostrap table
     Route::get('liste-clients', 'ClientController@listeClient')->name('liste-clients');
     Route::get('liste-fournisseurs', 'FournisseurController@listeFournisseur')->name('liste-fournisseurs');
     Route::get('liste-depots', 'DepotController@listeDepot')->name('liste-depots');
@@ -73,8 +73,8 @@ Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('p
     Route::get('liste-tailles', 'TailleController@listeTaille')->name('liste-tailles');
     Route::get('liste-categorie-depenses', 'CategorieDepenseController@listeCategorieDepense')->name('liste-categorie-depenses');
 
-        
-    //Routes parametrées 
+
+    //Routes parametrées
     Route::get('find-fournisseur-by-commande/{commande}', 'FournisseurController@findFournisseurByCommande');
     Route::get('find-param-tva/{id}', 'ParamTvaController@findParamTva');
     Route::get('find-article/{id}', 'ArticleController@findArticle');
@@ -108,17 +108,17 @@ Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('p
     Route::get('find-caisse-by-id/{id}', 'CaisseController@findCaisseById');
     Route::get('get-all-doit-client/{client}', 'ClientController@getAllDoitClient');
     Route::get('fiche-client/{client}', 'ClientController@ficheClient');
-    
-    //Informations des achats du client 
+
+    //Informations des achats du client
     Route::get('liste-achats-client/{client}', 'ClientController@listeAchatsClient');
     Route::get('liste-articles-plus-achetes/{client}', 'ClientController@listeArticlePlusAchatsClient');
     Route::get('liste-achats-client-by-facture/{facture}/{client}', 'ClientController@listeAchatsClientByFacture');
     Route::get('liste-achats-client-by-periode/{debut}/{fin}/{client}', 'ClientController@listeAchatsClientByPeriode');
-    //règlements 
+    //règlements
     Route::get('liste-reglements-client/{client}', 'ClientController@listeReglementsClient');
     Route::get('liste-reglements-client-by-periode/{debut}/{fin}/{client}', 'ClientController@listeReglementsClientByPeriode');
-     
-    //Etats du fiche client 
+
+    //Etats du fiche client
     Route::get('liste-achats-client-pdf/{client}', 'ClientController@listeAchatsClientPdf');
     Route::get('liste-articles-plus-achetes-pdf/{client}', 'ClientController@listeArticlesPlusAchetesPdf');
     Route::get('liste-achats-client-by-periode-pdf/{debut}/{fin}/{client}', 'ClientController@listeAchatsClientByPeriodePdf');
@@ -128,7 +128,7 @@ Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('p
 
 //les routes du module Boutique
 Route::namespace('Boutique')->middleware('auth')->name('boutique.')->prefix('boutique')->group(function () {
-    //Route resources 
+    //Route resources
     Route::resource('approvisionnements', 'ApprovisionnementController');
     Route::resource('ventes', 'VenteController');
     Route::resource('articles-vente', 'ArticleVenteController');
@@ -152,9 +152,9 @@ Route::namespace('Boutique')->middleware('auth')->name('boutique.')->prefix('bou
     Route::resource('article-retournes', 'ArticleRetourneController');
     Route::resource('depenses', 'DepenseController');
     Route::resource('declarations', 'TvaDeclareeController');
-    
-    
-    //Route pour les listes dans boostrap table 
+
+
+    //Route pour les listes dans boostrap table
     Route::get('liste-approvisionnements', 'ApprovisionnementController@listeApprovisionnement')->name('liste-approvisionnements');
     Route::get('liste-ventes', 'VenteController@listeVente')->name('liste-ventes');
     Route::get('liste-ventes-caisse', 'VenteController@listeVentesCaisse')->name('liste-ventes-caisse');
@@ -174,8 +174,9 @@ Route::namespace('Boutique')->middleware('auth')->name('boutique.')->prefix('bou
     Route::get('liste-depenses', 'DepenseController@listeDepense')->name('liste-depenses');
     Route::get('liste-declarations', 'TvaDeclareeController@listeDeclaration')->name('liste-declarations');
     Route::get('liste-retour-materiel', 'RetourArticleController@listeRetourMateriel');
-    
-    //Route particulières 
+
+    //Route particulières
+    Route::post('save-facture-impaye', 'VenteController@saveFactureImpaye')->name('save-facture-impaye');
     Route::post('update-retour-article', 'RetourArticleController@updateRetourArticle')->name('update-retour-article');
     Route::post('update-approvisionnement', 'ApprovisionnementController@updateApprovisionnement')->name('update-approvisionnement');
     Route::post('update-reglement', 'ReglementController@updateReglement')->name('update-reglement');
@@ -199,9 +200,9 @@ Route::namespace('Boutique')->middleware('auth')->name('boutique.')->prefix('bou
     Route::get('mouvement-stocks-grouper', 'MouvementStockController@vueMouvementStockGrouper')->name('mouvement-stocks-grouper');
     Route::get('ticket-declare', 'TvaDeclareeController@index')->name('ticket-declare');
     Route::get('retour-materiel', 'RetourArticleController@vueRetourMateriel')->name('retour-materiel');
-        
-    
-    //Routes parametrées 
+
+
+    //Routes parametrées
     Route::get('liste-articles-approvisionnes/{approvisionnement}', 'ArticleApprovisionnementController@listeArticlesApprovisionnes');
     Route::get('liste-approvisionnements-by-fournisseur/{fournisseur}', 'ApprovisionnementController@listeApprovisionnementsByBournisseur');
     Route::get('liste-approvisionnements-by-depot/{depot}', 'ApprovisionnementController@listeApprovisionnementsByDepot');
@@ -326,8 +327,8 @@ Route::namespace('Boutique')->middleware('auth')->name('boutique.')->prefix('bou
     Route::get('liste-declaration-depot-periode/{depot}/{debut}/{fin}', 'TvaDeclareeController@listeDeclarationByDepotPeriode');
     Route::get('liste-tickets-declares/{declaration}', 'TicketInTvaController@listeTicketDeclare');
 
-    
-    //Etat  
+
+    //Etat
     Route::get('fiche-bon-commande/{bon_commande_id}', 'BonCommandeController@ficheBonCommandePdf');
     Route::get('fiche-reception-bon-commande/{bon_commande_id}', 'BonCommandeController@ficheReceptionBonCommandePdf');
     Route::get('facture-vente-pdf/{vente}', 'VenteController@factureVentePdf');
@@ -336,16 +337,17 @@ Route::namespace('Boutique')->middleware('auth')->name('boutique.')->prefix('bou
     Route::get('fiche-inventaire-pdf/{inventaire}', 'InventaireController@ficheInventairePdf');
     Route::get('fiche-approvisionnement-pdf/{approvisionnement}', 'ApprovisionnementController@ficheApprovisionnementPdf');
     Route::get('ticket-vente-pdf/{vente}', 'VenteController@ticketVentePdf');
+    Route::get('facture-impaye-pdf/{vente}', 'VenteController@factureImpayePdf');
     Route::get('transfert-stock-pdf/{transfert_stock}', 'TransfertStockController@transfertStockPdf');
     Route::get('destockage-pdf/{destockage_id}', 'DestockageController@destockagePdf');
     Route::get('liste-articles-by-depot-pdf/{depot}', 'DepotArticleController@listeArticleByDepotPdf');
-    
+
     Route::get('liste-articles-by-depot-by-categorie-pdf/{depot}/{categorie}', 'DepotArticleController@listeArticleByDepotByCategoriePdf');
     Route::get('liste-articles-by-depot-by-quantite-pdf/{depot}/{quantite}', 'DepotArticleController@listeArticleByDepotByQuantitePdf');
     Route::get('liste-articles-by-depot-by-categorie-quantite-pdf/{depot}/{categorie}/{quantite}', 'DepotArticleController@listeArticleByDepotByCategorieQuantitePdf');
 
-    
-    
+
+
     Route::get('mouvements-stocks-pdf', 'MouvementStockController@mouvementStockPdf');
     Route::get('mouvements-stocks-article-by-depot-on-periode-pdf/{debut}/{fin}/{article}/{depot}', 'MouvementStockController@mouvementStockArticleByDepotOnPeriodePdf');
     Route::get('mouvements-stocks-by-periode-pdf/{debut}/{fin}', 'MouvementStockController@mouvemenStockByPeriodePdf');
@@ -385,7 +387,7 @@ Route::namespace('Boutique')->middleware('auth')->name('boutique.')->prefix('bou
     Route::get('liste-depenses-by-periode-categorie-pdf/{debut}/{fin}/{categorie}', 'DepenseController@listeDepenseByPeriodeCategoriePdf');
     Route::get('ticket-declares-pdf/{declaration}', 'TicketInTvaController@ticketDeclarePdf');
 
-    //Export excel  
+    //Export excel
     Route::get('export-excel-articl-by-depot/{depot}', 'DepotArticleController@exportExcelArticlByDepot')->name('export-excel-articl-by-depot');
 });
 
@@ -407,23 +409,23 @@ Route::namespace('Etat')->middleware('auth')->name('etat.')->prefix('etat')->gro
     Route::get('solde-fournisseur', 'EtatComptabiliteController@vuSoldeFournisseur')->name('solde-fournisseur');
     Route::get('marge-vente', 'EtatComptabiliteController@vuMargeVente')->name('marge-vente');
     Route::get('timbre-fiscal', 'EtatComptabiliteController@vuTimbreFiscal')->name('timbre-fiscal');
-    
+
     Route::get('declaration-fiscal', 'EtatComptabiliteController@vuDeclarationFiscal')->name('declaration-fiscal');
-    
+
     Route::get('tva-airsi', 'EtatComptabiliteController@vuTvaAirsi')->name('tva-airsi');
     Route::get('articles-vendus-par-quantite', 'EtatController@vuArticleVenduParQuantite')->name('articles-vendus-par-quantite');
     Route::get('articles-recus-par-quantite', 'EtatController@vuArticleRecusParQuantite')->name('articles-recus-par-quantite');
     Route::get('points-caisses-clotures', 'EtatComptabiliteController@vuPointCaisseCloture')->name('points-caisses-clotures');
     Route::get('articles-retournes', 'EtatController@vuArticleRetournees')->name('articles-retournes');
-    
-    //Liste dans boostrap table 
+
+    //Liste dans boostrap table
     Route::get('liste-solde-client', 'EtatComptabiliteController@listeSoldeClient')->name('liste-solde-client');
     Route::get('liste-solde-fournisseurs', 'EtatComptabiliteController@listeSoldeFournisseur')->name('liste-solde-fournisseurs');
     Route::get('liste-timbre-ventes', 'EtatComptabiliteController@listeTimbreVentes')->name('liste-timbre-ventes');
     Route::get('liste-timbre-ventes-periode/{debut}/{fin}', 'EtatComptabiliteController@listeTimbreVentesPeriode');
     Route::get('liste-timbre-ventes-by-depot/{depot}', 'EtatComptabiliteController@listeTimbreVentesByDepot');
     Route::get('liste-timbre-ventes-by-periode-depot/{debut}/{fin}/{depot}', 'EtatComptabiliteController@listeTimbreVentesPeriodeDepot');
-    
+
     Route::get('liste-declaration-ventes', 'EtatComptabiliteController@listeDeclarationVentes');
     Route::get('liste-declaration-ventes-by-periode/{debut}/{fin}', 'EtatComptabiliteController@listeDeclarationVentesByPeriode');
 
@@ -431,24 +433,24 @@ Route::namespace('Etat')->middleware('auth')->name('etat.')->prefix('etat')->gro
     Route::get('liste-point-caisse-clotures-depot/{depot}', 'EtatComptabiliteController@listePointCaisseCloturesJourDepot');
     Route::get('liste-point-caisse-clotures-periode/{debut}/{fin}', 'EtatComptabiliteController@listePointCaisseCloturesPeriode');
     Route::get('liste-point-caisse-clotures-periode-depot/{debut}/{fin}/{depot}', 'EtatComptabiliteController@listePointCaisseCloturesPeriodeDepot');
-    
+
     Route::get('liste-all-ventes-marge', 'EtatComptabiliteController@listeAllVentesMarge')->name('liste-all-ventes-marge');
     Route::get('liste-all-ventes-marge-periode/{debut}/{fin}', 'EtatComptabiliteController@listeAllVentesMargePeriode');
     Route::get('liste-all-ventes-marge-periode-periode-depot/{debut}/{fin}/{depot}', 'EtatComptabiliteController@listeAllVentesMargePeriodeDepot');
     Route::get('liste-all-ventes-marge-depot/{depot}', 'EtatComptabiliteController@listeAllVentesMargeDepot');
-    
-    //Route parametrées 
+
+    //Route parametrées
     Route::get('liste-solde-client-by-client/{client}', 'EtatComptabiliteController@listeSoldeClientByClient');
     Route::get('liste-solde-fournisseur-by-fournisseur/{fournisseur}', 'EtatComptabiliteController@listeSoldeFournisseurByFournisseur');
-            
-    //Fichiers PDF 
-        //Approvisionnement 
+
+    //Fichiers PDF
+    //Approvisionnement
     Route::get('liste-approvisionnements-pdf', 'EtatController@listeApprovisionnementPdf');
     Route::get('liste-approvisionnements-by-periode-pdf/{debut}/{fin}', 'EtatController@listeApprovisionnementByPeriodePdf');
     Route::get('liste-approvisionnements-by-fournisseur-pdf/{fournisseur}', 'EtatController@listeApprovisionnementByFournisseurPdf');
     Route::get('liste-approvisionnements-by-periode-fournisseur-pdf/{debut}/{fin}/{fournisseur}', 'EtatController@listeApprovisionnementByPeriodeFournisseurPdf');
-    
-        //Vente
+
+    //Vente
     Route::get('liste-ventes-pdf', 'EtatController@listeVentePdf');
     Route::get('liste-ventes-by-periode-pdf/{debut}/{fin}', 'EtatController@listeVenteByPeriodePdf');
     Route::get('liste-ventes-by-client-pdf/{client}', 'EtatController@listeVenteByClientPdf');
@@ -460,15 +462,15 @@ Route::namespace('Etat')->middleware('auth')->name('etat.')->prefix('etat')->gro
     Route::get('point-caisse-clotures-depot-pdf/{depot}', 'EtatComptabiliteController@pointCaisseCloturesDepotPdf');
     Route::get('chiffre-affaire-client', 'EtatController@chiffreAffaireClientPdf')->name('chiffre-affaire-client');
     Route::get('liste-vente-by-quantite', 'EtatController@listeArticleVenteByQuantitePdf')->name('liste-vente-by-quantite');
-     
+
     Route::get('timbre-fiscal-pdf', 'EtatComptabiliteController@timbreFiscalPdf');
     Route::get('declaration-tva-pdf', 'EtatComptabiliteController@declarationTvaPdf');
     Route::get('all-ventes-marge-periode-pdf/{debut}/{fin}', 'EtatComptabiliteController@allVenteMargePeriodePdf');
     Route::get('all-ventes-marge-pdf', 'EtatComptabiliteController@allVenteMargePdf');
     Route::get('all-ventes-marge-depot-pdf/{depot}', 'EtatComptabiliteController@allVenteMargeDepotPdf');
     Route::get('all-ventes-marge-periode-depot-pdf/{debut}/{fin}/{depot}', 'EtatComptabiliteController@allVenteMargePeriodeDepotPdf');
-    
-        //Articles 
+
+    //Articles
     Route::get('liste-articles-pdf', 'EtatController@listeArticlePdf');
     Route::get('liste-articles-by-categorie-pdf/{categorie}', 'EtatController@listeArticleByCategoriePdf');
     Route::get('articles-retournes-pdf', 'EtatController@listeRetourArticlePdf');
@@ -476,8 +478,8 @@ Route::namespace('Etat')->middleware('auth')->name('etat.')->prefix('etat')->gro
     Route::get('articles-retournes-periode-depot-pdf/{debut}/{fin}/{depot}', 'EtatController@listeRetourArticlePeriodeDepotPdf');
     Route::get('articles-retournes-by-article-pdf/{article}', 'EtatController@listeRetourArticleByArticlePdf');
     Route::get('articles-retournes-by-depot-pdf/{depot}', 'EtatController@listeRetourArticleByDepotPdf');
-    
-        //Fournisseurs et clients 
+
+    //Fournisseurs et clients
     Route::get('liste-fournisseurs-pdf', 'EtatController@listeFournisseurPdf');
     Route::get('liste-fournisseurs-by-nation-pdf/{nation}', 'EtatController@listeFournisseurByNationPdf');
     Route::get('liste-clients-pdf', 'EtatController@listeClientPdf');
@@ -486,23 +488,23 @@ Route::namespace('Etat')->middleware('auth')->name('etat.')->prefix('etat')->gro
     Route::get('solde-client-by-client-pdf/{client}', 'EtatComptabiliteController@soldeClientByClientPdf');
     Route::get('solde-fournisseur-pdf', 'EtatComptabiliteController@soldeFournisseurPdf');
     Route::get('solde-fournisseur-by-fournisseur-pdf/{fournisseur}', 'EtatComptabiliteController@soldeFournisseurByFournisseurPdf');
-    
-    //Dépôts et inventaires 
+
+    //Dépôts et inventaires
     Route::get('liste-depots-pdf', 'EtatController@listeDepotPdf');
     Route::get('liste-inventaires-pdf', 'EtatController@listeInventairePdf');
     Route::get('liste-inventaires-by-depot-pdf/{depot}', 'EtatController@listeInventaireByDepotPdf');
     Route::get('liste-inventaires-by-periode-pdf/{debut}/{fin}', 'EtatController@listeInventaireByPeriodePdf');
     Route::get('liste-inventaires-by-depot-periode-pdf/{depot}/{debut}/{fin}', 'EtatController@listeInventaireByDepotPeriodePdf');
-    
-    //Transfert stock et déstockage 
+
+    //Transfert stock et déstockage
     Route::get('liste-transferts-stocks-pdf', 'EtatController@listeTransfertStockPdf');
     Route::get('liste-destockages-pdf', 'EtatController@listeDestockagePdf');
     Route::get('liste-transferts-stocks-by-article-pdf/{article}', 'EtatController@listeTransfertStockByArticlePdf');
     Route::get('liste-transferts-stocks-by-periode-pdf/{debut}/{fin}', 'EtatController@listeTransfertStockByPeriodePdf');
     Route::get('liste-destockages-by-periode-pdf/{debut}/{fin}', 'EtatController@listeDestockageByPeriodePdf');
     Route::get('liste-transferts-stocks-by-periode-article-pdf/{debut}/{fin}/{article}', 'EtatController@listeTransfertStockByPeriodeArticlePdf');
-    
-    //Règlement 
+
+    //Règlement
     Route::get('liste-reglements-pdf', 'EtatController@listeReglementPdf');
     Route::get('liste-reglements-by-periode-pdf/{debut}/{fin}', 'EtatController@listeReglementByPeriodePdf');
     Route::get('liste-reglements-by-fournisseur-pdf/{fournisseur}', 'EtatController@listeReglementByFournisseurPdf');
@@ -513,41 +515,41 @@ Route::namespace('Etat')->middleware('auth')->name('etat.')->prefix('etat')->gro
 
 //les routes du module Canal
 Route::namespace('Canal')->middleware('auth')->name('canal.')->prefix('canal')->group(function () {
-    //Route resources 
-   Route::resource('type-abonnements', 'TypeAbonnementController');
-   Route::resource('options-canal', 'OptionCanalController');
-   Route::resource('type-cautions', 'TypeCautionController');
-   Route::resource('materiels', 'MaterielController');
-   Route::resource('agences', 'AgenceController');
-   Route::resource('localites', 'LocaliteController');
-   Route::resource('demande-approv', 'DemandeApproviCanalController');
-   Route::resource('rebis', 'RebiController');
-   Route::resource('caution-agences', 'CautionAgenceController');
-   Route::resource('type-pieces', 'TypePieceController');
-   Route::resource('abonnes', 'AbonneController');
-   Route::resource('abonnements', 'AbonnementController');
-   Route::resource('reabonnements', 'ReabonnementController');
-   Route::resource('vente-materiels', 'VenteMaterielController');
-   Route::resource('materiels-vendues', 'MaterielVendueController');
-    
-    //Route pour les listes dans boostrap table 
+    //Route resources
+    Route::resource('type-abonnements', 'TypeAbonnementController');
+    Route::resource('options-canal', 'OptionCanalController');
+    Route::resource('type-cautions', 'TypeCautionController');
+    Route::resource('materiels', 'MaterielController');
+    Route::resource('agences', 'AgenceController');
+    Route::resource('localites', 'LocaliteController');
+    Route::resource('demande-approv', 'DemandeApproviCanalController');
+    Route::resource('rebis', 'RebiController');
+    Route::resource('caution-agences', 'CautionAgenceController');
+    Route::resource('type-pieces', 'TypePieceController');
+    Route::resource('abonnes', 'AbonneController');
+    Route::resource('abonnements', 'AbonnementController');
+    Route::resource('reabonnements', 'ReabonnementController');
+    Route::resource('vente-materiels', 'VenteMaterielController');
+    Route::resource('materiels-vendues', 'MaterielVendueController');
+
+    //Route pour les listes dans boostrap table
     Route::get('liste-type-abonnements', 'TypeAbonnementController@listeTypeAbonnement')->name('liste-type-abonnements');
     Route::get('liste-options-canal', 'OptionCanalController@listeOptionCanal')->name('liste-options-canal');
     Route::get('liste-type-cautions', 'TypeCautionController@listeTypeCaution')->name('liste-type-cautions');
     Route::get('liste-materiels', 'MaterielController@listeMateriel')->name('liste-materiels');
-    Route::get('liste-agences', 'AgenceController@listeAgence')->name('liste-agences'); 
-    Route::get('liste-localites', 'LocaliteController@listeLocalite')->name('liste-localites'); 
-    Route::get('liste-demande-approv', 'DemandeApproviCanalController@listeDemandeApprov')->name('liste-demande-approv'); 
-    Route::get('liste-rebis', 'RebiController@listeRebi')->name('liste-rebis'); 
-    Route::get('liste-caution-agences', 'CautionAgenceController@listeCautionAgence')->name('liste-caution-agences'); 
-    Route::get('liste-type-pieces', 'TypePieceController@listeTypePiece')->name('liste-type-pieces'); 
-    Route::get('liste-abonnes', 'AbonneController@listeAbonne')->name('liste-abonnes'); 
-    Route::get('liste-abonnements', 'AbonnementController@listeAbonnement')->name('liste-abonnements'); 
-    Route::get('liste-reabonnements', 'ReabonnementController@listeReabonnement')->name('liste-reabonnements'); 
-    Route::get('liste-mouvement-ventes', 'RebiController@listeMouvementVente')->name('liste-mouvement-ventes'); 
-    Route::get('liste-ventes-materiels', 'VenteMaterielController@listeVenteMateriel')->name('liste-ventes-materiels'); 
-    
-    //Route particulières 
+    Route::get('liste-agences', 'AgenceController@listeAgence')->name('liste-agences');
+    Route::get('liste-localites', 'LocaliteController@listeLocalite')->name('liste-localites');
+    Route::get('liste-demande-approv', 'DemandeApproviCanalController@listeDemandeApprov')->name('liste-demande-approv');
+    Route::get('liste-rebis', 'RebiController@listeRebi')->name('liste-rebis');
+    Route::get('liste-caution-agences', 'CautionAgenceController@listeCautionAgence')->name('liste-caution-agences');
+    Route::get('liste-type-pieces', 'TypePieceController@listeTypePiece')->name('liste-type-pieces');
+    Route::get('liste-abonnes', 'AbonneController@listeAbonne')->name('liste-abonnes');
+    Route::get('liste-abonnements', 'AbonnementController@listeAbonnement')->name('liste-abonnements');
+    Route::get('liste-reabonnements', 'ReabonnementController@listeReabonnement')->name('liste-reabonnements');
+    Route::get('liste-mouvement-ventes', 'RebiController@listeMouvementVente')->name('liste-mouvement-ventes');
+    Route::get('liste-ventes-materiels', 'VenteMaterielController@listeVenteMateriel')->name('liste-ventes-materiels');
+
+    //Route particulières
     Route::post('update-materiel', 'MaterielController@updateMateriel')->name('update-materiel');
     Route::post('update-demande-approv', 'DemandeApproviCanalController@updateDemandeApprov')->name('update-demande-approv');
     Route::post('update-caution-agnece', 'CautionAgenceController@updateCautionAgence')->name('update-caution-agnece');
@@ -555,11 +557,11 @@ Route::namespace('Canal')->middleware('auth')->name('canal.')->prefix('canal')->
     Route::get('rebis-agence', 'RebiController@rebisVueAgence')->name('rebis-agence');
     Route::get('mouvement-vente', 'RebiController@vueMouvementVente')->name('mouvement-vente');
     Route::post('update-vente-materiel', 'VenteMaterielController@updateVenteMateriel')->name('update-vente-materiel');
-    
+
     Route::post('demande-caution', 'CautionAgenceController@demandeCaution')->name('demande-caution');
     Route::post('update-demande-caution', 'CautionAgenceController@updateDemandeCaution')->name('update-demande-caution');
     Route::put('caution-agences-confirme/{id}', 'CautionAgenceController@confirmation');
-    
+
     //Routes parametrées  caution-agences-confirme
     Route::get('liste-agences-by-localite/{localite}', 'AgenceController@listeAgenceByLocalite');
     Route::get('liste-demande-approv-by-type-caution/{type_caution}', 'DemandeApproviCanalController@listeDemandeApprovByTypeCaution');
@@ -571,7 +573,7 @@ Route::namespace('Canal')->middleware('auth')->name('canal.')->prefix('canal')->
     Route::get('liste-rebis-by-periode/{debut}/{fin}', 'RebiController@listeRebiByPeriode');
     Route::get('liste-rebis-by-type-caution/{type}', 'RebiController@listeRebiByTypeCaution');
     Route::get('liste-rebis-by-agence/{agence}', 'RebiController@listeRebiByAgence');
-    
+
     Route::get('get-infos-abonne/{id}', 'AbonneController@getInfosAbonne');
     Route::get('liste-abonnes-by-name/{name}', 'AbonneController@listeAbonneByName');
     Route::get('liste-abonnes-by-localite/{localite}', 'AbonneController@listeAbonneByLocalite');
@@ -580,33 +582,33 @@ Route::namespace('Canal')->middleware('auth')->name('canal.')->prefix('canal')->
     Route::get('liste-abonnements-by-agence/{agence}', 'AbonnementController@listeAbonnementByAgence');
     Route::get('liste-abonnements-by-periode/{debut}/{fin}', 'AbonnementController@listeAbonnementByPeriode');
     Route::get('liste-abonnements-by-periode-agence/{debut}/{fin}/{agence}', 'AbonnementController@listeAbonnementByPeriodeAgence');
-    
+
     Route::get('liste-reabonnements-by-numero/{numero}', 'ReabonnementController@listeReabonnementByNumero');
     Route::get('liste-reabonnements-by-agence/{agence}', 'ReabonnementController@listeReabonnementByAgence');
     Route::get('liste-reabonnements-by-periode/{debut}/{fin}', 'ReabonnementController@listeReabonnementByPeriode');
     Route::get('liste-reabonnements-by-periode-agence/{debut}/{fin}/{agence}', 'ReabonnementController@listeReabonnementByPeriodeAgence');
-    
-    Route::get('liste-mouvement-ventes-by-periode/{debut}/{fin}', 'RebiController@listeMouvementVenteByPeriode'); 
-    Route::get('liste-mouvement-ventes-by-agence/{agence}', 'RebiController@listeMouvementVenteByAgence'); 
-    Route::get('liste-mouvement-ventes-by-agence-periode/{agence}/{debut}/{fin}', 'RebiController@listeMouvementVenteByAgencePeriode'); 
-    
-    Route::get('liste-materiel-vendus/{vente}', 'MaterielVendueController@listeMaterielVendu'); 
-    Route::get('liste-vente-materiel-by-facture/{facture}', 'VenteMaterielController@listeVenteMaterielByFacture'); 
-    Route::get('liste-vente-materiel-by-date/{date}', 'VenteMaterielController@listeVenteMaterielByDate'); 
-    Route::get('liste-vente-materiel-by-agence/{agence}', 'VenteMaterielController@listeVenteMaterielByAgence'); 
 
-    //Etat  
-    //*** Agence **// 
+    Route::get('liste-mouvement-ventes-by-periode/{debut}/{fin}', 'RebiController@listeMouvementVenteByPeriode');
+    Route::get('liste-mouvement-ventes-by-agence/{agence}', 'RebiController@listeMouvementVenteByAgence');
+    Route::get('liste-mouvement-ventes-by-agence-periode/{agence}/{debut}/{fin}', 'RebiController@listeMouvementVenteByAgencePeriode');
+
+    Route::get('liste-materiel-vendus/{vente}', 'MaterielVendueController@listeMaterielVendu');
+    Route::get('liste-vente-materiel-by-facture/{facture}', 'VenteMaterielController@listeVenteMaterielByFacture');
+    Route::get('liste-vente-materiel-by-date/{date}', 'VenteMaterielController@listeVenteMaterielByDate');
+    Route::get('liste-vente-materiel-by-agence/{agence}', 'VenteMaterielController@listeVenteMaterielByAgence');
+
+    //Etat
+    //*** Agence **//
     Route::get('liste-agences-pdf', 'AgenceController@listeAgencePdf');
     Route::get('liste-agences-by-localite-pdf/{localite}', 'AgenceController@listeAgenceByLocalitePdf');
-    
-    //*** Caution canal **// 
+
+    //*** Caution canal **//
     Route::get('liste-caution-canal-pdf', 'DemandeApproviCanalController@listeCautionCanalPdf');
     Route::get('liste-caution-canal-by-type-pdf/{type}', 'DemandeApproviCanalController@listeCautionCanalByTypePdf');
     Route::get('liste-caution-canal-by-periode-pdf/{debut}/{fin}', 'DemandeApproviCanalController@listeCautionCanalByPeriodePdf');
     Route::get('liste-caution-canal-by-type-periode-pdf/{type}/{debut}/{fin}', 'DemandeApproviCanalController@listeCautionCanalByTypePeriodePdf');
-    
-    //*** Caution agence **// 
+
+    //*** Caution agence **//
     Route::get('liste-caution-agence-pdf', 'CautionAgenceController@listeCautionAgencePdf');
     Route::get('liste-caution-agence-by-agence-pdf/{agence}', 'CautionAgenceController@listeCautionAgenceByAgencePdf');
     Route::get('liste-caution-agence-by-periode-pdf/{debut}/{fin}', 'CautionAgenceController@listeCautionAgenceByPeriodePdf');
@@ -616,30 +618,30 @@ Route::namespace('Canal')->middleware('auth')->name('canal.')->prefix('canal')->
     Route::get('liste-rebis-pdf', 'RebiController@listeRebisPdf');
     Route::get('liste-rebis-by-periode-pdf/{debut}/{fin}', 'RebiController@listeRebisByPeriodePdf');
     Route::get('liste-rebis-by-type-caution-pdf/{type}', 'RebiController@listeRebiByTypeCautionPdf');
-    
-    Route::get('liste-mouvement-ventes-pdf', 'RebiController@listeMouvementVentePdf'); 
-    Route::get('liste-mouvement-ventes-by-periode-pdf/{debut}/{fin}', 'RebiController@listeMouvementVenteByPeriodePdf'); 
-    Route::get('liste-mouvement-ventes-by-agence-pdf/{agence}', 'RebiController@listeMouvementVenteByAgencePdf'); 
-    Route::get('liste-mouvement-ventes-by-agence-periode-pdf/{agence}/{debut}/{fin}', 'RebiController@listeMouvementVenteByAgencePeriodePdf'); 
 
-    
-    //*** Abonnés ***// 
+    Route::get('liste-mouvement-ventes-pdf', 'RebiController@listeMouvementVentePdf');
+    Route::get('liste-mouvement-ventes-by-periode-pdf/{debut}/{fin}', 'RebiController@listeMouvementVenteByPeriodePdf');
+    Route::get('liste-mouvement-ventes-by-agence-pdf/{agence}', 'RebiController@listeMouvementVenteByAgencePdf');
+    Route::get('liste-mouvement-ventes-by-agence-periode-pdf/{agence}/{debut}/{fin}', 'RebiController@listeMouvementVenteByAgencePeriodePdf');
+
+
+    //*** Abonnés ***//
     Route::get('liste-abonnes-pdf', 'AbonneController@listeAbonnePdf');
     Route::get('liste-abonnes-by-localite-pdf/{localite}', 'AbonneController@listeAbonneByLocalitePdf');
-    
-    //*** Abonnment ***// 
+
+    //*** Abonnment ***//
     Route::get('liste-abonnements-pdf', 'AbonnementController@listeAbonnementPdf');
     Route::get('liste-abonnements-by-agence-pdf/{agence}', 'AbonnementController@listeAbonnementByAgencePdf');
     Route::get('liste-abonnements-by-periode-pdf/{debut}/{fin}', 'AbonnementController@listeAbonnementByPeriodePdf');
     Route::get('liste-abonnements-by-periode-agence-pdf/{debut}/{fin}/{agence}', 'AbonnementController@listeAbonnementByPeriodeAgencePdf');
     Route::get('ticket-abonnements-pdf/{id}', 'AbonnementController@ticketAbonnementPdf');
-       
-    //*** Reabonnment ***//  
+
+    //*** Reabonnment ***//
     Route::get('liste-reabonnements-pdf', 'ReabonnementController@listeReabonnementPdf');
     Route::get('liste-reabonnements-by-agence-pdf/{agence}', 'ReabonnementController@listeReabonnementByAgencePdf');
     Route::get('liste-reabonnements-by-periode-pdf/{debut}/{fin}', 'ReabonnementController@listeReabonnementByPeriodePdf');
-    Route::get('liste-reabonnements-by-periode-agence-pdf/{debut}/{fin}/{agence}', 'ReabonnementController@listeReabonnementByPeriodeAgencePdf');     
-    
+    Route::get('liste-reabonnements-by-periode-agence-pdf/{debut}/{fin}/{agence}', 'ReabonnementController@listeReabonnementByPeriodeAgencePdf');
+
     //*** Vente matériel ***//
     Route::get('all-vente-materiel-pdf', 'VenteMaterielController@allVenteMaterielPdf');
     Route::get('all-vente-materiel-by-agence-pdf/{agence}', 'VenteMaterielController@allVenteMaterielByAgencePdf');
@@ -647,34 +649,34 @@ Route::namespace('Canal')->middleware('auth')->name('canal.')->prefix('canal')->
     Route::get('facture-vente-materiel-pdf/{id}', 'VenteMaterielController@factureVenteMaterielPdf');
 });
 
-//les routes du module Auth 
+//les routes du module Auth
 Route::namespace('Auth')->middleware('auth')->name('auth.')->prefix('auth')->group(function () {
     //Route resources
     Route::resource('users', 'UserController');
     Route::resource('restaurages', 'RestaurageDataController');
-    
+
     //Route pour les listes dans boostrap table
     Route::get('liste_users', 'UserController@listeUser')->name('liste_users');
     Route::get('liste_all_tables', 'RestaurageDataController@listeAllTable')->name('liste_all_tables');
     Route::get('liste-users-agences', 'UserController@listeUserAgence')->name('liste-users-agences');
-    
-    //Autres routes pour le profil 
+
+    //Autres routes pour le profil
     Route::get('profil-informations', 'UserController@profil')->name('profil-informations');
     Route::get('infos-profil-to-update', 'UserController@infosProfiTolUpdate')->name('infos-profil-to-update');
     Route::put('update-profil/{id}', 'UserController@updateProfil');
     Route::get('update-password-page', 'UserController@updatePasswordPage');
     Route::post('update-password', 'UserController@updatePasswordProfil')->name('update-password');
 
-    //Réinitialisation du mot de passe manuellement par l'administrateur 
+    //Réinitialisation du mot de passe manuellement par l'administrateur
     Route::delete('/reset_password_manualy/{user}', 'UserController@resetPasswordManualy');
-    
-    //Routes particulières 
-     Route::post('verification-access', 'UserController@verificationAccess')->name('verification-access');
-     Route::get('users-agence-canal', 'UserController@userAgenceCanal')->name('users-agence-canal');
-     Route::post('add-user-agence', 'UserController@addUserAgence')->name('add-user-agence');
-     Route::put('update-user-agence/{id}', 'UserController@updateUserAgence')->name('update-user-agence');
-     
-     //Routes avec parametre 
+
+    //Routes particulières
+    Route::post('verification-access', 'UserController@verificationAccess')->name('verification-access');
+    Route::get('users-agence-canal', 'UserController@userAgenceCanal')->name('users-agence-canal');
+    Route::post('add-user-agence', 'UserController@addUserAgence')->name('add-user-agence');
+    Route::put('update-user-agence/{id}', 'UserController@updateUserAgence')->name('update-user-agence');
+
+    //Routes avec parametre
     Route::get('one_table/{table}', 'RestaurageDataController@oneTable');
     Route::get('liste_content_one_table/{table}', 'RestaurageDataController@listeContentOneTable')->name('liste_content_one_table');
     Route::post('restaurage', 'RestaurageDataController@restaurage')->name('restaurage');

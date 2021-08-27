@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
+use App\Models\Boutique\ArticleRetourne;
+use App\Models\Boutique\RetourArticle;
 use function view;
 
 include_once(app_path() . "/number-to-letters/nombre_en_lettre.php");
@@ -48,6 +50,42 @@ class VenteController extends Controller
         $btnModalAjout = "TRUE";
         $btnModalAjout = "TRUE";
         return view('boutique.vente.index', compact('moyenReglements', 'caisses', 'unites', 'regimes', 'nations', 'depots', 'categories', 'clients', 'menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+    }
+
+    public function saveFactureImpaye(Request $request)
+    {
+        $jsonData = ["code" => 1, "msg" => "Enregistrement effectué avec succès."];
+        if ($request->isMethod('post') && $request->input('vente_id')) {
+            $data = $request->all();
+            try {
+                $vente = Vente::find($data['vente_id']);
+                if ($data['type_retour'] == "facture_impaye") {
+                    $retourArticle = new RetourArticle;
+                    $retourArticle->vente_id = $data['vente_id'];
+                    $retourArticle->client_impayer_id = $data['clients_impaye'];
+                    $retourArticle->date_retour = Carbon::createFromFormat('d-m-Y', $data['date_retour']);
+                    $retourArticle->created_by = Auth::user()->id;
+                    $retourArticle->save();
+                    // ! Modification du ticket de caisse
+                    DB::update('update ventes set impayer = 1, client_id = ? where id = ?', [$data['vente_id'], $data['clients_impaye']]);
+                    $jsonData["data"] = json_decode($retourArticle);
+                    // ! Génération de la facture
+                    $this->factureImpayePdf($data['vente_id']);
+                } else {
+                    $jsonData["code"] = -1;
+                    $jsonData["data"] = null;
+                    $jsonData["msg"] = "Erreur d'envoi de la facture à la base de données";
+                }
+
+                return response()->json($jsonData);
+            } catch (Exception $exc) {
+                $jsonData["code"] = -1;
+                $jsonData["data"] = NULL;
+                $jsonData["msg"] = $exc->getMessage();
+                return response()->json($jsonData);
+            }
+        }
+        return response()->json(["code" => 0, "msg" => "Saisie invalide", "data" => NULL]);
     }
 
     public function vueVente()
@@ -179,7 +217,7 @@ class VenteController extends Controller
             ->get();
         // ! Récupération des données du formulaire d'impayé
         $clients_impaye = DB::table('clients')->Where('deleted_at', null)->get();
-        $ventes = DB::table('ventes')->Where([['deleted_at', NULL], ['divers', 0], ['attente', 0], ['proformat', 0]])->get();
+        $ventes = DB::table('ventes')->Where([['deleted_at', NULL], ['impayer', 0], ['divers', 0], ['attente', 0], ['proformat', 0]])->get();
         $retours = DB::table('ventes')
             ->join('retour_articles', 'retour_articles.vente_id', '=', 'ventes.id')
             ->select('ventes.*')
@@ -267,7 +305,7 @@ class VenteController extends Controller
             ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', NULL], ['article_ventes.retourne', 0]])
             ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
             ->select('ventes.*', DB::raw('sum(article_ventes.quantite * article_ventes.prix - article_ventes.remise_sur_ligne) as sommeTotale'), DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'))
-            ->Where([['ventes.deleted_at', null], ['ventes.client_id', null], ['caisse_ouvertes.date_fermeture', null], ['caisse_ouvertes.caisse_id', $caisse_id]])
+            ->Where([['ventes.impayer', 0], ['ventes.deleted_at', null], ['ventes.client_id', null], ['caisse_ouvertes.date_fermeture', null], ['caisse_ouvertes.caisse_id', $caisse_id]])
             ->groupBy('article_ventes.vente_id')
             //->whereDate('ventes.date_vente',$date_jour)
             ->orderBy('ventes.id', 'DESC')
@@ -1256,6 +1294,180 @@ class VenteController extends Controller
         }
 
         $content = '<div class="container-table">
+                        <table border="1" cellspacing="-1" width="100%">
+                            <tr>
+                                <th cellspacing="0" border="2" width="55%" align="center">Article</th>
+                                <th cellspacing="0" border="2" width="10%" align="center">Qté</th>
+                                <th cellspacing="0" border="2" width="15%" align="center">Prix TTC.</th>
+                                <th cellspacing="0" border="2" width="20%" align="center">Montant TTC</th>
+                            </tr>';
+
+        foreach ($articlesVentes as $element) {
+            $content .= '<tr>
+                            <td style="font-size:13px;"  cellspacing="0" border="2" width="55%">&nbsp;&nbsp;&nbsp;' . $element->article->description_article . '</td>
+                            <td style="font-size:13px;"  cellspacing="0" border="2" align="center" width="10%">' . $element->quantite . '</td>
+                            <td style="font-size:13px;"  cellspacing="0" border="2" align="right" width="15%">' . number_format($element->prix, 0, ',', ' ') . '&nbsp;&nbsp;&nbsp;</td>
+                            <td style="font-size:13px;"  cellspacing="0" border="2" align="right" width="20%">' . number_format($element->prix * $element->quantite, 0, ',', ' ') . '&nbsp;&nbsp;&nbsp;</td>
+                       </tr>';
+        }
+
+        $content .= '<tr>
+                        <td style="font-size:13px;"  cellspacing="0" colspan="3" border="2" align="left" width="70%">&nbsp;&nbsp;Total HT</td>
+                        <td style="font-size:15px;"  cellspacing="0" colspan="3" border="2" align="right" width="30%">&nbsp;&nbsp;' . number_format($montantTHT_add, 0, ',', ' ') . '&nbsp;&nbsp;&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:13px;"  cellspacing="0" colspan="3" border="2" align="left" width="70%">&nbsp;&nbsp;Montant TVA</td>
+                        <td style="font-size:15px;"  cellspacing="0" colspan="3" border="2" align="right" width="30%">&nbsp;&nbsp;' . number_format($montantTTTC_add - $montantTHT_add, 0, ',', ' ') . '&nbsp;&nbsp;&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:13px;"  cellspacing="0" colspan="3" border="2" align="left" width="70%"><b>&nbsp;&nbsp;NET A PAYER</b></td>
+                        <td style="font-size:15px;"  cellspacing="0" colspan="3" border="2" align="right" width="30%">&nbsp;&nbsp;<b>' . number_format($montantTTTC_add, 0, ',', ' ') . '</b>&nbsp;&nbsp;&nbsp;</td>
+                    </tr>
+                </table>
+                <p style="font-style: italic;"> NET A PAYER <b>' . ucfirst(NumberToLetter($montantTTTC_add)) . ' F CFA</b></p>
+         </div>';
+
+        return $content;
+    }
+
+    //Facture vente ou proforma
+    public function factureImpayePdf($vente)
+    {
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        $pdf->loadHTML($this->factureImpaye($vente));
+        $facture = Vente::find($vente);
+        return $pdf->stream('Facture' . $facture->numero_facture . '.pdf');
+    }
+    public function factureImpaye($vente)
+    {
+        $outPut = "<h1> TEST <h1>";
+        //$outPut = $this->factureImpayeHeader($vente);
+        //$outPut .= $this->factureImpayeContent($vente);
+        //$outPut .= $this->factureFooter();
+        return $outPut;
+    }
+    public function factureImpayeHeader($vente)
+    {
+        $facture = Vente::with('client')
+            ->join('clients', 'clients.id', '=', 'ventes.client_id')
+            ->select('ventes.*', 'clients.full_name_client as nom_client', 'clients.contact_client as contact_client', 'clients.adresse_client as adresse_client', DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'))
+            ->Where([['ventes.deleted_at', NULL], ['ventes.id', $vente]])
+            ->first();
+        $nom_client = $facture->nom_client;
+        $contact_client = $facture->contact_client;
+        $adresse_client = $facture->adresse_client;
+        $facture->proformat == 1 ? $facture_proformat = " proforma " : $facture_proformat = "";
+        $header = "<html>
+                         <head>
+                            <meta charset='utf-8'>
+                            <title></title>
+                                    <style>
+                                        .container-table{
+                                            margin:200px 0;
+                                            width: 100%;
+                                        }
+                                        .container{
+                                            width: 100%;
+                                            margin: 2px 5px;
+                                            font-size:15px;
+                                        }
+                                        .fixed-header-left{
+                                            width: 34%;
+                                            height:4%;
+                                            position: absolute;
+                                            line-height:1;
+                                            font-size:13px;
+                                            top: 0;
+                                        }
+                                        .fixed-header-right{
+                                            width: 40%;
+                                            height:6%;
+                                            float: right;
+                                            position: absolute;
+                                            top: 0;
+                                            background: #fff;
+                                            padding: 10px 0;
+                                            color: #333;
+                                            border: 1px #333 solid;
+                                            border-radius: 3px;
+                                        }
+                                        .fixed-header-center{
+                                            width:35%;
+                                            height:7%;
+                                            margin: 0 150px;
+                                            top: 0;
+                                            text-align:center;
+                                            position: absolute;
+                                        }
+                                        .fixed-footer{
+                                            position: fixed;
+                                            bottom: -28;
+                                            left: 0px;
+                                            right: 0px;
+                                            height: 80px;
+                                            text-align:center;
+                                        }
+                                        .titre-style{
+                                         text-align:center;
+                                         text-decoration: underline;
+                                        }
+                                    footer{
+                                    font-size:13px;
+                                    position: absolute;
+                                    bottom: -35px;
+                                    left: 0px;
+                                    right: 0px;
+                                    height: 80px;
+                                    text-align:center;
+                                    }
+                                    </style>
+                        </head>
+                <body style='margin-bottom:0; margin-top:0px;'>
+                 <div class='fixed-header-left'>
+                    <div class='container'>
+                         <img src=" . $this->infosConfig()->logo . " width='200' height='160'/>
+                    </div>
+                </div>
+                <div class='fixed-header-center'>
+                    <div class='container'>
+                       Facture " . $facture_proformat . " N° : <b>" . $facture->numero_facture . "</b><br/>
+                       Date : <b>" . $facture->date_ventes . "</b><br/>
+                    </div>
+                </div>
+                <div class='fixed-header-right'>
+                    <div class='container'>
+                       Doit : <b>" . $nom_client . "</b><br/>
+                       Contact : <b>" . $contact_client . "</b><br/>
+                       Adresse : <b>" . $adresse_client . "</b>
+                    </div>
+                </div>";
+        return $header;
+    }
+    public function factureImpayeContent($vente)
+    {
+        $content = '';
+        $montantTHT_add = 0;
+        $montantTTTC_add = 0;
+        $articlesVentes = [];
+        /*
+        $articlesVentes =  ArticleVente::with('article', 'unite')
+            ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
+            ->leftjoin('param_tvas', 'param_tvas.id', '=', 'articles.param_tva_id')
+            ->select('article_ventes.*', 'param_tvas.montant_tva')
+            ->Where([['article_ventes.vente_id', $vente], ['article_ventes.retourne', 0]])
+            ->get();
+        foreach ($articlesVentes as $article) {
+            if ($article->article->param_tva_id != 0) {
+                $prix = round($article->prix / ($article->montant_tva + 1), 0);
+                $montantTHT_add = $montantTHT_add + $prix * $article->quantite;
+            } else {
+                $montantTHT_add = $montantTHT_add + $article->prix * $article->quantite;
+            }
+            $montantTTTC_add = $montantTTTC_add + $article->prix * $article->quantite;
+        }*/
+
+        $content .= '<div class="container-table">
                         <table border="1" cellspacing="-1" width="100%">
                             <tr>
                                 <th cellspacing="0" border="2" width="55%" align="center">Article</th>
