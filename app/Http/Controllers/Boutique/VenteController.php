@@ -46,6 +46,7 @@ class VenteController extends Controller
         $menuPrincipal = "Boutique";
         $titleControlleur = "Toutes les ventes";
         $btnModalAjout = "TRUE";
+        $btnModalAjout = "TRUE";
         return view('boutique.vente.index', compact('moyenReglements', 'caisses', 'unites', 'regimes', 'nations', 'depots', 'categories', 'clients', 'menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
 
@@ -111,17 +112,25 @@ class VenteController extends Controller
             ->Where([['ventes.deleted_at', null], ['categories.libelle_categorie', 'Conso'], ['ventes.pass_utiliser', 0]]) // ! Selectionner uniquement les pass d'entrée
             //->Where([['ventes.deleted_at', null]])
             ->get();
-        // Fin récup ticket d'entrée
+        // ! Récupération des articles par dépôt
         $articles = DepotArticle::with('unite', 'depot', 'article')
             ->join('articles', 'articles.id', '=', 'depot_articles.article_id')
             ->where('depot_articles.depot_id', $auth_user->depot_id)
             ->select('depot_articles.*', 'articles.id as id_article', 'articles.description_article')
             ->groupBy('depot_articles.article_id')
             ->get();
+        // ! Récupération des données du formulaire d'impayé
+        $ventes = DB::table('ventes')->Where([['deleted_at', NULL], ['divers', 0], ['attente', 0], ['proformat', 0]])->get();
+        $retours = DB::table('ventes')
+            ->join('retour_articles', 'retour_articles.vente_id', '=', 'ventes.id')
+            ->select('ventes.*')
+            ->Where('retour_articles.deleted_at', NULL)
+            ->get();
         $menuPrincipal = "Boutique";
         $titleControlleur = "Point de caisse";
         $btnModalAjout = $caisse_ouverte != null ? "TRUE" : "FALSE";
-        return view('boutique.vente.point-caisse', compact('articles', 'depot', 'auth_user', 'caisse_ouverte', 'caisse', 'moyenReglements', 'ticketsEntree', 'menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+        $btnModalImpaye = $caisse_ouverte != null ? "TRUE" : "FALSE";
+        return view('boutique.vente.point-caisse', compact('ventes', 'retours', 'articles', 'depot', 'auth_user', 'caisse_ouverte', 'caisse', 'moyenReglements', 'ticketsEntree', 'menuPrincipal', 'titleControlleur', 'btnModalAjout', 'btnModalImpaye'));
     }
 
     public function pointCaisseAdmin()
@@ -136,7 +145,8 @@ class VenteController extends Controller
         }
         $menuPrincipal = "Boutique";
         $btnModalAjout = "FALSE";
-        return view('boutique.vente.point-caisse-admin', compact('caisses', 'menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+        $btnModalImpaye = "FALSE";
+        return view('boutique.vente.point-caisse-admin', compact('caisses', 'menuPrincipal', 'titleControlleur', 'btnModalAjout', 'btnModalImpaye'));
     }
 
     public function ponitCaisseVuByAdminGerant(Request $request)
@@ -150,7 +160,7 @@ class VenteController extends Controller
         $ticketsEntree = Vente::with('depot', 'caisse_ouverte')
             ->join('caisse_ouvertes', 'caisse_ouvertes.id', '=', 'ventes.caisse_ouverte_id')
             ->join('caisses', 'caisses.id', '=', 'caisse_ouvertes.caisse_id')
-            ->join('reglements', 'reglements.vente_id', '=', 'ventes.id') // ! A corriger
+            ->join('reglements', 'reglements.vente_id', '=', 'ventes.id') // ! Vrai
             ->join('moyen_reglements', 'moyen_reglements.id', '=', 'reglements.moyen_reglement_id')
             ->join('users', 'users.id', '=', 'ventes.created_by')
             ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', null], ['article_ventes.retourne', 0]])
@@ -167,10 +177,20 @@ class VenteController extends Controller
             ->select('depot_articles.*', 'articles.id as id_article', 'articles.description_article')
             ->groupBy('depot_articles.article_id')
             ->get();
+        // ! Récupération des données du formulaire d'impayé
+        $clients_impaye = DB::table('clients')->Where('deleted_at', null)->get();
+        $ventes = DB::table('ventes')->Where([['deleted_at', NULL], ['divers', 0], ['attente', 0], ['proformat', 0]])->get();
+        $retours = DB::table('ventes')
+            ->join('retour_articles', 'retour_articles.vente_id', '=', 'ventes.id')
+            ->select('ventes.*')
+            ->Where('retour_articles.deleted_at', NULL)
+            ->get();
+        // ! Paramètres de la fenêtre
         $menuPrincipal = "Boutique";
         $titleControlleur = "Point de caisse du dépôt " . $depot->libelle_depot;
         $btnModalAjout = $caisse_ouverte != null ? "TRUE" : "FALSE";
-        return view('boutique.vente.point-caisse', compact('articles', 'depot', 'auth_user', 'caisse_ouverte', 'caisse', 'moyenReglements', 'ticketsEntree', 'menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+        $btnModalImpaye = $caisse_ouverte != null ? "TRUE" : "FALSE";
+        return view('boutique.vente.point-caisse', compact('clients_impaye', 'ventes', 'retours', 'articles', 'depot', 'auth_user', 'caisse_ouverte', 'caisse', 'moyenReglements', 'ticketsEntree', 'menuPrincipal', 'titleControlleur', 'btnModalAjout', 'btnModalImpaye'));
     }
 
     public function vueVenteDivers()

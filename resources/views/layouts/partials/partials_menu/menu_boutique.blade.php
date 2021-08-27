@@ -1,12 +1,12 @@
-<li class="{{ Route::currentRouteName() === 'boutique.promotions.index' 
-                        || Route::currentRouteName() === 'boutique.ventes.index' 
-                        || Route::currentRouteName() === 'boutique.reglements.index' 
-                        || Route::currentRouteName() === 'boutique.point-caisse-admin' 
+<li class="{{ Route::currentRouteName() === 'boutique.promotions.index'
+                        || Route::currentRouteName() === 'boutique.ventes.index'
+                        || Route::currentRouteName() === 'boutique.reglements.index'
+                        || Route::currentRouteName() === 'boutique.point-caisse-admin'
                         || Route::currentRouteName() === 'boutique.ponit-caisse-vu-by-admin-gerant'
                         || Route::currentRouteName() === 'boutique.point-vente'
                         || Route::currentRouteName() === 'boutique.vente-divers'
                         || Route::currentRouteName() === 'boutique.operation-caisses-admin'
-                        || Route::currentRouteName() === 'boutique.retour-articles.index' 
+                        || Route::currentRouteName() === 'boutique.retour-articles.index'
                         ? 'active treeview' : 'treeview'}}">
           <a href="#">
             <i class="fa fa-building"></i> <span>Boutique</span>
@@ -15,12 +15,12 @@
             </span>
           </a>
           <ul class="treeview-menu">
-           
+
               <li class="{{Route::currentRouteName() === 'boutique.point-vente'
                         ? 'active' : ''
                   }}">
                   <a href="{{route('boutique.point-vente')}}">
-                      &nbsp;&nbsp;&nbsp;<i class="fa fa-credit-card"></i> Vente
+                      &nbsp;&nbsp;&nbsp;<i class="fa fa-credit-card"></i> Facture client
                   </a>
               </li>
               <li class="{{Route::currentRouteName() === 'boutique.point-caisse-admin'

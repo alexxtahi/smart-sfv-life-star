@@ -22,7 +22,7 @@
         <link rel="dns-prefetch" href="//fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
 
-        <!-- Styles --> 
+        <!-- Styles -->
         <link href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet">
         <link href="{{ asset('assets/plugins/select2/select2-bootstrap.css') }}" rel="stylesheet">
@@ -59,7 +59,7 @@
                     </a>
                     <div class="navbar-custom-menu">
                         <ul class="nav navbar-nav">
-                           
+
                             <li class="dropdown user user-menu">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <img src="{{asset('images/profil.png')}}" class="user-image" alt="User Image">
@@ -84,13 +84,13 @@
                                     </li>
                                     <!-- Menu Footer-->
                                     <li class="user-footer">
-                                    
+
                                         <div class="pull-left">
                                             <a class="btn btn-primary btn-flat" href="{{route('auth.profil-informations')}}">
                                                 Profil
                                             </a>
                                         </div>
-                                       
+
                                         <div class="pull-right">
                                             <a class="btn btn-danger btn-flat" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                                 D&eacute;connexion
@@ -117,7 +117,7 @@
                 <a href="{{route('home')}}"><i class="fa fa-dashboard"></i> <span>Tableau de bord</span></a>
             </li>
             @if(Auth::user()->role == 'Gerant' or Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Comptable')
-                @include('layouts.partials.partials_menu.menu_parametre') 
+                @include('layouts.partials.partials_menu.menu_parametre')
             @endif
             @if(Auth::user()->role == 'Caissier')
             <li class="{{ request()->is('/boutique')
@@ -138,13 +138,13 @@
             </li>
             @endif
             @if(Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Gerant')
-            @include('layouts.partials.partials_menu.menu_stock') 
-            @include('layouts.partials.partials_menu.menu_boutique') 
-            @include('layouts.partials.partials_menu.menu_comptabilite') 
-            @include('layouts.partials.partials_menu.menu_etat') 
-            @endif 
+            @include('layouts.partials.partials_menu.menu_stock')
+            @include('layouts.partials.partials_menu.menu_boutique')
+            @include('layouts.partials.partials_menu.menu_comptabilite')
+            @include('layouts.partials.partials_menu.menu_etat')
+            @endif
             @if(Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Agence')
-              
+
                 <li class="{{ request()->is('/canal')
                             || Route::currentRouteName() === 'canal.abonnes.index'
                             ? 'active' : ''
@@ -198,9 +198,9 @@
                         &nbsp;&nbsp;&nbsp;<i class="fa fa-chrome"></i>Cautions
                     </a>
                 </li>
-            @endif 
+            @endif
             @if(Auth::user()->role == 'Comptable' or Auth::user()->role == 'Logistic')
-            @include('layouts.partials.partials_menu.menu_stock') 
+            @include('layouts.partials.partials_menu.menu_stock')
             @endif
             @if(Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Administrateur')
             <li class="{{ request()->is('/auth')
@@ -238,17 +238,26 @@
   <div class="content-wrapper">
     <section class="content-header">
       <h1>
-         {{ $menuPrincipal }} 
+         {{ $menuPrincipal }}
          <small>> {{$titleControlleur}}</small>
+        <!-- Bouton pour la fenêtre des factures impayés -->
+        <div class="row">
         @if ($btnModalAjout === 'TRUE')
-          <button id="btnModalAjout" class="btn btn-sm btn-primary pull-right">
-            @if(Auth::user()->role == 'Caissier') <!-- aucun accès caissier du caissier: Caissier -->
-                <i class="fa fa-plus"></i> Commande
-            @else
-                <i class="fa fa-plus"></i> Ajouter
+            @if (Route::currentRouteName() === 'boutique.ponit-caisse' || Route::currentRouteName() === 'boutique.ponit-caisse-vu-by-admin-gerant')
+            <button id="btnModalImpayer" class="btn btn-sm btn-primary pull-right" style="margin-left: 10px!important;">
+                <i class="fa fa-plus"></i> Impayé <!-- Bouton Impayé sur le point de caisse -->
+            </button>
             @endif
+
+          <button id="btnModalAjout" class="btn btn-sm btn-primary pull-right">
+              @if (Route::currentRouteName() === 'boutique.ponit-caisse' || Route::currentRouteName() === 'boutique.ponit-caisse-vu-by-admin-gerant')
+                <i class="fa fa-plus"></i> Commande <!-- Bouton nouvelle commande si on est sur le point de caisse-->
+              @else
+                <i class="fa fa-plus"></i> Ajouter <!-- Bouton Ajouter sur les autres pages-->
+              @endif
           </button>
         @endif
+        </div>
       </h1>
     </section>
     <section class="content">
@@ -268,9 +277,9 @@
 //      jQuery.cookie.json = true;
     $(document).ajaxStart(function() { Pace.restart(); });//Loader pour toutes les requetes Ajax, fourni par le template
     $('.loader, .loader-overlay, .processing, .loader-login').hide();
-    
+
     $(function () {
-       
+
              $('.loader, .loader-overlay, .processing').hide();
              $(document).ajaxComplete(function (event, xhr, settings) {
                     //console.log("xhr.status", xhr.status);
@@ -286,7 +295,7 @@
                         return;
                     }
                 });
-             
+
              //Reactivation de fenetre modal (le cas ou 2 fenetres sont superposées)
                 $(document).on('hidden.bs.modal', function (e) {
                     if ($('.modal:visible').length) {
@@ -296,9 +305,14 @@
              $("#btnModalAjout").on("click", function () {
                   ajout = true;
                   document.forms["formAjout"].reset();
-                  $(".bs-modal-ajout").modal("show");
+                  $(".bs-modal-ajout").modal("show"); // ! Vrai
               });
-             
+              $("#btnModalImpayer").on("click", function () {
+                  impaye = true;
+                  document.forms["formAjout"].reset();
+                  $(".bs-modal-impaye").modal("show"); // debug
+              });
+
    });
   </script>
 </body>

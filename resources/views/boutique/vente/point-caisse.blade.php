@@ -84,7 +84,7 @@
     </thead>
 </table>
 
-<!-- Modal ajout et modification -->
+<!-- Modal ajout et modification des commandes -->
 <div class="modal fade bs-modal-ajout" role="dialog" data-backdrop="static">
     <div class="modal-dialog" style="width: 75%">
         <form id="formAjout" ng-controller="formAjoutCtrl" action="#">
@@ -861,6 +861,177 @@
     </div>
 </div>
 
+<!-- Modal ajout et modification d'impayé -->
+<div class="modal fade bs-modal-impaye" role="dialog" data-backdrop="static">
+    <div class="modal-dialog" style="width: 80%">
+        <form id="formImpaye" ng-controller="formImpayeCtrl" action="#">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <span style="font-size: 16px;">
+                        <i class="fa fa-mail-forward fa-2x"></i>
+                        Facture d'impayé
+                    </span>
+                </div>
+                <div class="modal-body ">
+                    <input type="text" class="hidden" id="idRetourArticleModifier" name="idRetourArticleModifier" ng-hide="true" ng-model="retourArticle.id"/>
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Date de retour *</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text"  class="form-control" ng-model="retourArticle.date_retours" id="date_retour" name="date_retour" value="<?= date('d-m-Y'); ?>" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>N° du ticket ou de la facture *</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-bank"></i>
+                                    </div>
+                                    <select name="vente_id" id="vente_id" class="form-control" required>
+                                        <option value="" ng-show="false">-- Selectionner --</option>
+                                        @foreach($ventes as $vente)
+                                            @if($vente->numero_ticket!=null)
+                                            <option value="{{$vente->id}}"> {{$vente->numero_ticket}}</option>
+                                            @else
+                                            <option value="{{$vente->id}}"> {{'FACT '.$vente->numero_facture}}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>D&eacute;p&ocirc;t </label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-bank"></i>
+                                    </div>
+                                    <input type="text"  class="form-control" id="libelle_depot" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Date d'achat</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text"  class="form-control" id="date_achat" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div id="div_enregistrement_impaye">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Client *</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-list"></i>
+                                        </div>
+                                        <select id="client_impaye" class="form-control">
+                                            <option value="">-- Client --</option>
+                                            @foreach($clients_impaye as $client_impaye)
+                                                <option value="{{$client_impaye->id}}"> {{$client_impaye->full_name_client}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                                    <input type="hidden" class="form-control" id="unite">
+                                    <input type="hidden" id="unite_value">
+                            <!--<div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Retour *</label>
+                                    <input type="number" min="1" class="form-control" id="qte_retour" placeholder="Qté">
+                                </div>
+                            </div>-->
+                            <div class="col-md-2">
+                                <div class="form-group"><br/>
+                                    <button type="button" class="btn btn-success btn-sm  add-row"><i class="fa fa-plus">Ajouter</i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-xs delete-row">Supprimer ligne</button><br/><br/>
+                        <!--
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table id="tableAddRowArticle" class="table table-success table-striped box box-success"
+                                       data-toggle="table"
+                                       data-id-field="id"
+                                       data-unique-id="id"
+                                       data-click-to-select="true"
+                                       data-show-footer="false">
+                                    <thead>
+                                        <tr>
+                                            <th data-field="state" data-checkbox="true"></th>
+                                            <th data-field="id">Id</th>
+                                            <th data-field="code_barre">Code barre</th>
+                                            <th data-field="libelle_article">Article</th>
+                                            <th data-field="libelle_unite">Colis</th>
+                                            <th data-field="prix">Prix</th>
+                                            <th data-field="quantite_vendue">Qt&eacute; vendue</th>
+                                            <th data-field="quantite_retournee">Qt&eacute; retourn&eacute;e</th>
+                                            <th data-field="montant">Montant</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        -->
+                    </div>
+                    <!--
+                     <div id="div_update">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <button type="button" id="btnModalAjoutArticle" class="btn btn-primary btn-xs pull-right"><i class="fa fa-plus">Ajouter un article</i></button>
+                                </div>
+                            </div>
+                        </div><br/>
+                        <table id="tableArticle" class="table table-success table-striped box box-success"
+                               data-pagination="true"
+                               data-search="false"
+                               data-toggle="table"
+                               data-unique-id="id"
+                               data-show-toggle="false">
+                            <thead>
+                                <tr>
+                                    <th data-field="article.code_barre">Code</th>
+                                    <th data-field="article.description_article">Article</th>
+                                    <th data-field="unite.libelle_unite">Colis</th>
+                                    <th data-field="prix_unitaire">Prix</th>
+                                    <th data-field="quantite_vendue">Qt&eacute; vendue</th>
+                                    <th data-field="quantite" data-align="center">Qt&eacute; retourn&eacute;e </th>
+                                    <th data-formatter="montantRetourFormatter" data-align="center">Montant</th>
+                                    <th data-field="id" data-formatter="optionAArticleFormatter" data-width="100px" data-align="center"><i class="fa fa-wrench"></i></th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="sendButton" class="btn btn-primary btn-send"><span class="overlay loader-overlay"> <i class="fa fa-refresh fa-spin"></i> </span>Valider</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Fin modal ajout impayé -->
+
 <form>
     <input type="text" class="hidden" id="user_role" value="{{$auth_user->role}}"/>
 </form>
@@ -879,6 +1050,15 @@
     var user_role = $("#user_role").val();
     var caisse_id = $("#caisses_id").val()
 
+    appSmarty.controller('formImpayeCtrl', function ($scope) {
+        $scope.populateForm = function (retourArticle) {
+            $scope.retourArticle = retourArticle;
+        };
+        $scope.initForm = function () {
+            impaye = true;
+            $scope.retourArticle = {};
+        };
+    });
     appSmarty.controller('formAjoutCtrl', function ($scope) {
         $scope.populateForm = function (vente) {
         $scope.vente = vente;
@@ -950,7 +1130,7 @@
         $("#row_regle").hide();
         $(".delete-row").hide();
         $(".delete-billetage-row").hide();
-        $('#searchByDate').datetimepicker({
+        $('#searchByDate,#date_retour').datetimepicker({
             timepicker: false,
             formatDate: 'd-m-Y',
             format: 'd-m-Y',
@@ -975,6 +1155,46 @@
            }else{
                $("#montant_billet").val("");
            }
+        });
+
+        // Event form impayé
+        $('#vente_id').change(function(){
+            var vente = $("#vente_id").val();
+            if(vente!=""){
+                $tableAddRowArticle.bootstrapTable('removeAll');
+                lotArticle = [];
+                idTablle = 0;
+                $(".delete-row").hide();
+                $('#code_barre').val('');
+                $('#unite').val('');
+                $('#unite_value').val('');
+                $('#qte_retour').val('');
+                $('#qte_vendu').val('');
+                $('#libelle_depot').val('');
+                $('#prix').val('');
+                $.getJSON("../boutique/liste-articles-vente/" + vente , function (reponse) {
+                        $('#article').html('<option value="">-- Article --</option>');
+                        $.each(reponse.rows, function (index, article_vente) {
+                            $('#article').append('<option data-libellearticle= "' + article_vente.article.description_article + '"  value=' + article_vente.article.id + '>' + article_vente.article.description_article + ' -- ' + article_vente.unite.libelle_unite +  '</option>')
+                        });
+                });
+                $.getJSON("../boutique/find-one-vente/" + vente , function (reponse) {
+                    $('#date_achat').val(''); $('#depot').val('');
+                    $.each(reponse.rows, function (index, vente_trouver) {
+                        $('#date_achat').val(vente_trouver.date_ventes);
+                        $('#libelle_depot').val(vente_trouver.depot.libelle_depot);
+                    });
+                });
+            }else{
+                $("#article").select2("val", "");
+                $('#code_barre').val('');
+                $('#unite').val('');
+                $('#unite_value').val('');
+                $('#qte_retour').val('');
+                $('#qte_vendu').val('');
+                $('#libelle_depot').val('');
+                $('#article').html("<option value=''>-- Article --</option>");
+            }
         });
 
 
@@ -1090,6 +1310,26 @@
             $("#montant_a_payer").val(0);
             $("#montant_payer").val("");
             $(".montant_restant").html("");
+        });
+
+        // ! Afficher le formulaire d'enregistrement des factures impayées
+        $('#btnModalImpaye').click(function(){
+            $("#article").select2("val", "");
+            $("#vente_id").select2("val","");
+            $('#code_barre').val('');
+            $('#unite').val('');
+            $('#unite_value').val('');
+            $('#qte_retour').val('');
+            $('#qte_vendu').val('');
+            $('#prix').val('');
+            $('#libelle_depot').val('');
+            $('#clients_impaye').html("<option value=''>-- Client --</option>");
+            $tableAddRowArticle.bootstrapTable('removeAll');
+            lotArticle = [];
+            idTablle = 0;
+            $("#div_enregistrement_impaye").show();
+            $("#div_update_impaye").hide();
+            $(".delete-row-impaye").hide();
         });
 
         $('#code_barre').keyup(function(e){

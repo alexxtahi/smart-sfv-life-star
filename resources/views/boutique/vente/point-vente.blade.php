@@ -42,7 +42,7 @@
 </div>
 <table id="table" class="table table-warning table-striped box box-primary"
                data-pagination="true"
-               data-search="false" 
+               data-search="false"
                data-toggle="table"
                data-unique-id="id"
                data-show-toggle="false"
@@ -135,7 +135,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row"> 
+                    <div class="row">
                         <div class="col-md-5">
                             <h5 class="text-bold text-red">
                                 <label>
@@ -165,7 +165,7 @@
                                 <div class="form-group">
                                     <label>Article *</label>
                                     <select class="form-control" id="article">
-                                        <option value="">-- Selcetionner l'article --</option>
+                                        <option value="">-- Selectionner l'article --</option>
                                     </select>
                                 </div>
                             </div>
@@ -215,7 +215,7 @@
                             </div>
                             <div class="col-md-1">
                                 <div class="form-group"><br/>
-                                    <button type="button" class="btn btn-success btn-sm  add-row pull-left"><i class="fa fa-plus">Commande</i></button>
+                                    <button type="button" class="btn btn-success btn-sm  add-row pull-left"><i class="fa fa-plus">Ajouter</i></button>
                                 </div>
                             </div>
                         </div>
@@ -252,7 +252,7 @@
                                 <div class="form-group">
                                     <button type="button" id="btnModalAjoutArticle" class="btn btn-primary btn-xs pull-right"><i class="fa fa-plus">Ajouter un article</i></button>
                                 </div>
-                            </div> 
+                            </div>
                         </div><br/>
                         <table id="tableArticle" class="table table-success table-striped box box-success"
                                data-pagination="true"
@@ -273,7 +273,7 @@
                                 </tr>
                             </thead>
                         </table>
-                        <div class="row"> 
+                        <div class="row">
                             <div class="col-md-6"><br/>
                                 <ul class="nav nav-stacked" style="font-size: 15px;">
                                     <li><a class="text-bold" >Montant HT <span id="montantTHT_add" class="pull-right text-bold"></span></a></li>
@@ -285,7 +285,7 @@
                         </div>
                     </div>
                     <br/>
-                    <div class="row" id="row_regle"> 
+                    <div class="row" id="row_regle">
                         <div class="col-md-6"><br/>
                             <ul class="nav nav-stacked" style="font-size: 15px;">
                                 <li><a class="text-bold">Montant HT <span class="pull-right text-bold montantHT"></span></a></li>
@@ -294,7 +294,7 @@
                                 <li><a class="text-bold">Montant TTC<span class="pull-right text-bold text-red montantTTC"></span></a></li>
                                 <input id="montant_achat" value="0" type="tetx" class="hidden">
                             </ul>
-                        </div> 
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -525,7 +525,7 @@
                                     <input type="text" class="form-control bfh-phone" name="contact_client" data-format="(dd) dd-dd-dd-dd" pattern="[(0-9)]{4} [0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}" placeholder="Contact du client" required>
                                 </div>
                             </div>
-                        </div> 
+                        </div>
                          <div class="col-md-6">
                             <div class="form-group">
                                 <label>E-mail</label>
@@ -663,7 +663,7 @@
 </form>
 
 <script type="text/javascript">
-    var ajout = false; 
+    var ajout = false;
     var ajoutArticle = false;
     var montantHT = 0;
     var montantTTC = 0;
@@ -673,7 +673,7 @@
     var idTablle =  0;
     var user_role = $("#user_role").val();
     var user_depot = $("#user_depot").val();
-    
+
     appSmarty.controller('formAjoutCtrl', function ($scope) {
         $scope.populateForm = function (vente) {
         $scope.vente = vente;
@@ -682,8 +682,8 @@
         ajout = true;
         $scope.vente = {};
         };
-    }); 
-    
+    });
+
     appSmarty.controller('formAjoutArticleCtrl', function ($scope) {
         $scope.populateArticleForm = function (article) {
         $scope.article = article;
@@ -692,8 +692,8 @@
         ajout = true;
         $scope.article = {};
         };
-    }); 
-    
+    });
+
     appSmarty.controller('formSupprimerArticleCtrl', function ($scope) {
         $scope.populateSupArticleForm = function (article) {
         $scope.article = article;
@@ -702,7 +702,7 @@
         $scope.article = {};
         };
     });
-    
+
     appSmarty.controller('formSupprimerCtrl', function ($scope) {
         $scope.populateForm = function (vente) {
         $scope.vente = vente;
@@ -711,7 +711,7 @@
         $scope.vente = {};
         };
     });
-    
+
     appSmarty.controller('formReglementClientAnonymeCtrl', function ($scope) {
         $scope.populateClientAnonymeForm = function (vente) {
             $scope.vente = vente;
@@ -719,31 +719,31 @@
         $scope.initForm = function () {
             $scope.vente = {};
         };
-    }); 
-    
+    });
+
     appSmarty.controller('panierArticleCtrl', function ($scope) {
         $scope.populateFormPanier = function (vente) {
         $scope.vente = vente;
         };
     });
-    
+
     appSmarty.controller('listeReglementCtrl', function ($scope) {
         $scope.populateListeReglementForm = function (vente) {
             $scope.vente = vente;
         };
     });
-    
+
     $(function () {
         $table.on('load-success.bs.table', function (e, data) {
-            rows = data.rows; 
+            rows = data.rows;
         });
-        
+
         if(user_role=="Gerant"){
             $table.bootstrapTable('refreshOptions', {url: '../boutique/liste-ventes-by-depot/' + user_depot});
         }else{
             $table.bootstrapTable('refreshOptions', {url: "{{url('boutique', ['action' => 'liste-ventes'])}}"});
         }
-        
+
         $tableArticle.on('load-success.bs.table', function (e, data) {
             rowsArticle = data.rows;
             $("#montantTHT_add").html($.number(data.montantTHT_add));
@@ -753,7 +753,7 @@
             $("#plafond_client_aff").html('Plafond ' + $.number(data.plafond_client)+' F CFA');
             $("#client_doit_aff").html('Doit ' + $.number(data.doit_client)+' F CFA');
         });
-        
+
         $('#searchByDate,#date_reglement, #date_vente').datetimepicker({
             timepicker: false,
             formatDate: 'd-m-Y',
@@ -761,20 +761,20 @@
             local : 'fr',
             maxDate : new Date()
         });
-        
+
         $("#depot_id, #article,#client_id").select2({width: '100%'});
-       
+
         $(".addClient").on("click", function () {
             document.forms["formAjoutClient"].reset();
             $(".bs-modal-ajout-client").modal("show");
         });
-        
+
         $("#div_enregistrement").show();
         $("#div_update").hide();
         $("#row_regle").hide();
         $(".delete-row").hide();
-        
-        $("#searchByClient").change(function (e) { 
+
+        $("#searchByClient").change(function (e) {
             $("#searchByDepot").val(0);
             $("#searchByDate").val("");
             $("#searchByFacture").val("");
@@ -785,7 +785,7 @@
                $table.bootstrapTable('refreshOptions', {url: '../boutique/liste-ventes-by-client/' + client});
              }
          });
-        $("#searchByDepot").change(function (e) { 
+        $("#searchByDepot").change(function (e) {
             $("#searchByClient").val(0);
             $("#searchByDate").val("");
             $("#searchByFacture").val("");
@@ -819,7 +819,7 @@
                $table.bootstrapTable('refreshOptions', {url: '../boutique/liste-ventes-by-numero-facture/' + numero_facture});
             }
         });
-        
+
         $("#btnModalAjoutArticle").on("click", function () {
             ajoutArticle = true;
             var vente = $("#idVenteModifier").val();
@@ -829,7 +829,7 @@
             $.getJSON("../boutique/liste-article-by-unite-in-depot/" + depot, function (reponse) {
                 $('#article_add').html("<option value=''>-- Selectionner l'article --</option>");
                 if(reponse.total>0){
-                    $.each(reponse.rows, function (index, article) { 
+                    $.each(reponse.rows, function (index, article) {
                         $('#article_add').append('<option value=' + article.id_article + '>' + article.description_article + '</option>')
                     });
                 }else{
@@ -866,7 +866,7 @@
             $(".remiseTTC").html("<b>" + $.number(remiseTTC) +"</b>");
             $(".montantTTC").html("<b>" + $.number(montantTTC-remiseTTC) +"</b>");
         });
-        
+
         $("#client_id").change(function (e) {
             var client_id = $("#client_id").val();
             $('#montant_achat').val(0);
@@ -874,7 +874,7 @@
                 $.getJSON("../parametre/find-client-by-id/" + client_id, function (reponse) {
                     $('#contact_client').val("");
                     if(reponse.total>0 && client_id!=""){
-                        $.each(reponse.rows, function (index, client) { 
+                        $.each(reponse.rows, function (index, client) {
                             $('#contact_client').val(client.contact_client)
                             $('#plafond_client').val(client.plafond_client)
                             $("#plafond_client_aff").html('Plafond ' + $.number(client.plafond_client)+' F CFA');
@@ -887,11 +887,11 @@
                 $.getJSON("../parametre/get-all-doit-client/" + client_id, function (reponse) {
                     var doit_client = 0;
                     if(reponse.total>0){
-                        $.each(reponse.rows, function (index, client) { 
+                        $.each(reponse.rows, function (index, client) {
                             doit_client = doit_client + client.sommeTotale - client.acompte_facture;
                             $('#doit_client').val(doit_client)
                             $("#client_doit_aff").html('Doit ' + $.number(doit_client)+' F CFA');
-                            
+
                         });
                     }else{
                         $('#doit_client').val(0)
@@ -928,12 +928,12 @@
             $(".montantTTC").html("<b>" + $.number(montantTTC-remiseTTC) +"</b>");
             $("#row_regle").hide();
             $(".delete-row").hide();
-            
+
             if(depot_id!=""){
                 $.getJSON("../boutique/liste-article-by-unite-in-depot/" + depot_id, function (reponse) {
                     $('#article').html("<option value=''>-- Selectionner l'article --</option>");
                     if(reponse.total>0){
-                        $.each(reponse.rows, function (index, article) { 
+                        $.each(reponse.rows, function (index, article) {
                             $('#article').append('<option data-libellearticle= "' + article.description_article + '" value=' + article.id_article + '>' + article.description_article + '</option>')
                         });
                     }else{
@@ -959,11 +959,11 @@
                 $("#montantTC").val("");
                 $.getJSON("../boutique/liste-article-by-unite-in-depot-by-code/" + code_barre, function (reponse) {
                 if(reponse.total>0){
-                    $.each(reponse.rows, function (index, retour) { 
+                    $.each(reponse.rows, function (index, retour) {
                         $("#article").select2("val",retour.article.id);
                         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + retour.article.id , function (reponse) {
                             $('#unite').html("<option value=''>-- Colis --</option>");
-                            $.each(reponse.rows, function (index, colis) { 
+                            $.each(reponse.rows, function (index, colis) {
                                 $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                             });
                         })
@@ -986,12 +986,12 @@
             var depot_id = $("#depot_id").val();
             $.getJSON("../boutique/liste-article-by-unite-in-depot-by-code/" + code_barre, function (reponse) {
                 if(reponse.total>0){
-                    $.each(reponse.rows, function (index, retour) { 
-                 
+                    $.each(reponse.rows, function (index, retour) {
+
                         $("#article_add").val(retour.article.id);
                         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + retour.article.id , function (reponse) {
                             $('#unite_add').html("<option value=''>-- Colis --</option>");
-                            $.each(reponse.rows, function (index, colis) { 
+                            $.each(reponse.rows, function (index, colis) {
                                 $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                             });
                         })
@@ -1018,13 +1018,13 @@
             $("#remise_sur_ligne").val("");
             $('#code_barre').val("");
             $.getJSON("../parametre/find-article/" + article_id , function (reponse) {
-                $.each(reponse.rows, function (index, articles_trouver) { 
+                $.each(reponse.rows, function (index, articles_trouver) {
                     $("#code_barre").val(articles_trouver.code_barre);
                 });
             })
             $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + article_id , function (reponse) {
                 $('#unite').html("<option value=''>-- Colis --</option>");
-                $.each(reponse.rows, function (index, colis) { 
+                $.each(reponse.rows, function (index, colis) {
                     $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
             })
@@ -1039,13 +1039,13 @@
             var article_id = $("#article_add").val();
             var depot_id = $("#depot_id").val();
             $.getJSON("../parametre/find-article/" + article_id , function (reponse) {
-                $.each(reponse.rows, function (index, articles_trouver) { 
+                $.each(reponse.rows, function (index, articles_trouver) {
                     $("#code_barre_add").val(articles_trouver.code_barre);
                 });
             })
             $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + article_id , function (reponse) {
                 $('#unite_add').html("<option value=''>-- Colis --</option>");
-                $.each(reponse.rows, function (index, colis) { 
+                $.each(reponse.rows, function (index, colis) {
                     $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
             })
@@ -1056,7 +1056,7 @@
             var depot_id = $("#depot_id").val();
             var unite_id = $("#unite").val();
             $.getJSON("../boutique/find-article-in-depot-by-unite-caisse/" + article_id + "/" + depot_id + "/" +  unite_id, function (reponse) {
-                $.each(reponse.rows, function (index, article) { 
+                $.each(reponse.rows, function (index, article) {
                     if(article.article.stockable==0){
                         $("#en_stock").val(1000);
                     }else{
@@ -1067,7 +1067,7 @@
                     var tva = 0;
                    if(article.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + article.article.param_tva_id, function (reponse) {
-                            $.each(reponse.rows, function (index, tvas_infos) { 
+                            $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
                                 var prix_ht_article = (article.prix_ventes/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
@@ -1086,19 +1086,19 @@
             var depot_id = $("#depot_id").val();
             var unite_id = $("#unite_add").val();
             $.getJSON("../boutique/find-article-in-depot-by-unite-caisse/" + article_id + "/" + depot_id + "/" +  unite_id, function (reponse) {
-                $.each(reponse.rows, function (index, article) { 
+                $.each(reponse.rows, function (index, article) {
                     if(article.article.stockable==0){
                           $("#en_stock_add").val(1000);
                     }else{
                           $("#en_stock_add").val(article.quantite_disponible);
                     }
-                  
+
                     $("#prixTTC_add").val(article.prix_ventes);
                     //Calcul du prix HT
                     var tva = 0;
                    if(article.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + article.article.param_tva_id, function (reponse) {
-                            $.each(reponse.rows, function (index, tvas_infos) { 
+                            $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
                                 var prix_ht_article = (article.prix_ventes/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
@@ -1108,35 +1108,35 @@
                    }else{
                        $("#prixHT_add").val(article.prix_ventes);
                    }
-                
+
                 });
             })
         });
-        
-        $("#quantite").change(function (e) { 
+
+        $("#quantite").change(function (e) {
           var quantite = $("#quantite").val();
           var prix = $("#prixTTC").val();
           $("#montantTC").val(quantite*prix);
         });
-        $("#quantite").keyup(function (e) { 
+        $("#quantite").keyup(function (e) {
           var quantite = $("#quantite").val();
           var prix = $("#prixTTC").val();
           $("#montantTC").val(quantite*prix);
         });
-        $("#quantite_add").change(function (e) { 
+        $("#quantite_add").change(function (e) {
           var quantite = $("#quantite_add").val();
           var prix = $("#prixTTC_add").val();
           $("#montantTC_add").val(quantite*prix);
         });
-        $("#quantite_add").keyup(function (e) { 
+        $("#quantite_add").keyup(function (e) {
           var quantite = $("#quantite_add").val();
           var prix = $("#prixTTC_add").val();
           $("#montantTC_add").val(quantite*prix);
         });
-        
+
         //Add row on table
         $(".add-row").click(function () {
-                 
+
             if($("#article").val() != '' && $("#quantite").val() != '' && $("#unite").val() != '' && $("#quantite").val()!=0) {
                 if($("#client_id").val()==""){
                     alert("Choisissez un client svp!");
@@ -1165,7 +1165,7 @@
                 var doit_client = parseInt($('#doit_client').val());
                 var remise_sur_ligne = $("#remise_sur_ligne").val()!=0?$("#remise_sur_ligne").val():0;
                 var verif_plafond = montant_achat + ((quantite*prixTTC)-remise_sur_ligne) + doit_client;
-            
+
                 if((verif_plafond> plafond_client) && plafond_client!=0){
                  $.gritter.add({
                         title: "SMART-SFV",
@@ -1192,7 +1192,7 @@
                         //Si la ligne existe on recupere l'ancienne quantité et l'id de la ligne
                         oldQte = articleTrouver.quantites;
                         idElementLigne = articleTrouver.id;
-                       
+
                         //Si la somme des deux quantités depasse la quantité à ajouter en stock alors on block
                         var sommeDeuxQtes = parseInt(oldQte) + parseInt(quantite);
                         if(parseInt(sommeDeuxQtes)> parseInt(stock) && !document.getElementById('proformat').checked){
@@ -1219,7 +1219,7 @@
                             });
                             articleTrouver.quantites = sommeDeuxQtes;
                             articleTrouver.remises = remise_sur_ligne;
-                            
+
                             montantHT = montantHT + (sommeDeuxQtes*prixHT);
                             montantTTC = parseInt(montantTTC) + parseInt(sommeDeuxQtes*prixTTC);
                             remiseTTC = parseInt(remiseTTC) + parseInt(remise_sur_ligne);
@@ -1240,7 +1240,7 @@
                             return;
                         }
                     }
-                    idTablle++; 
+                    idTablle++;
                     $tableAddRowArticle.bootstrapTable('insertRow',{
                         index: idTablle,
                         row: {
@@ -1295,7 +1295,7 @@
                 return;
             }
         })
-        // Find and remove selected table rows  
+        // Find and remove selected table rows
         $(".delete-row").click(function () {
            var selecteds = $tableAddRowArticle.bootstrapTable('getSelections');
            var ids = $.map($tableAddRowArticle.bootstrapTable('getSelections'), function (row) {
@@ -1303,10 +1303,10 @@
                     })
                 $tableAddRowArticle.bootstrapTable('remove', {
                     field: 'id',
-                    values: ids 
+                    values: ids
                 })
-              
-                $.each(selecteds, function (index, value) { 
+
+                $.each(selecteds, function (index, value) {
                     var articleTrouver = _.findWhere(monPanier, {id: value.id})
                     montantHT = parseInt(montantHT) - (articleTrouver.quantites*articleTrouver.prix_ht);
                     montantTTC = parseInt(montantTTC) - parseInt(articleTrouver.quantites*articleTrouver.prix);
@@ -1316,7 +1316,7 @@
                         return article.id == value.id;
                     });
                 });
-              
+
                     $(".montantHT").html("<b>"+ $.number(montantHT)+"</b>");
                     $(".montantTVA").html("<b>" + $.number(montantTTC-montantHT) + "</b>");
                     $(".remiseTTC").html("<b>" + $.number(remiseTTC) +"</b>");
@@ -1336,10 +1336,10 @@
                     idTablle = 0;
                 }
         });
-        
+
         // Submit the add form
-        $("#sendButton").click(function(){  
-            $("#formAjout").submit(); 
+        $("#sendButton").click(function(){
+            $("#formAjout").submit();
             $("#sendButton").prop("disabled", true);
         });
         $("#formAjout").submit(function (e) {
@@ -1350,7 +1350,7 @@
                 return false;
             }
             var $ajaxLoader = $("#formAjout .loader-overlay");
-           
+
             if (ajout==true) {
                 var methode = 'POST';
                 var url = "{{route('boutique.ventes.store')}}";
@@ -1432,7 +1432,7 @@
         $("#client_id").select2("val", vente.client_id);
         $("#idVenteModifier").val(vente.id);
         $("#depot_id").prop('disabled',true);
-        vente.proformat == 1 ? $("#proformat").attr("checked", true) : $("#proformat").attr("checked", false); 
+        vente.proformat == 1 ? $("#proformat").attr("checked", true) : $("#proformat").attr("checked", false);
         $tableArticle.bootstrapTable('refreshOptions', {url: "../boutique/liste-articles-vente/" + idVente});
         $("#div_enregistrement").hide();
         $("#div_update").show();
@@ -1458,32 +1458,32 @@
         var depot = $("#depot_id").val();
         $.getJSON("../boutique/liste-article-by-unite-in-depot/" + depot, function (reponse) {
             $('#article_add').html("<option value=''>-- Selectionner l'article --</option>");
-                $.each(reponse.rows, function (index, articles) { 
+                $.each(reponse.rows, function (index, articles) {
                         $('#article_add').append('<option value=' + articles.id_article + '>' + articles.description_article + '</option>')
                 });
                 $("#article_add").val(article.article_id);
         })
         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot + "/" + article.article_id , function (reponse) {
                 $('#unite_add').html("<option value=''>-- Colis --</option>");
-                $.each(reponse.rows, function (index, colis) { 
+                $.each(reponse.rows, function (index, colis) {
                     $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
                 $("#unite_add").val(article.unite.id);
         })
         $.getJSON("../parametre/find-article/" + article.article_id , function (reponse) {
-                $.each(reponse.rows, function (index, articles_trouver) { 
+                $.each(reponse.rows, function (index, articles_trouver) {
                     $("#code_barre_add").val(articles_trouver.code_barre);
                 });
         })
         $.getJSON("../boutique/find-article-in-depot-by-unite/" + article.article_id + "/" + depot + "/" +  article.unite_id, function (reponse) {
-                $.each(reponse.rows, function (index, articles) { 
+                $.each(reponse.rows, function (index, articles) {
                     $("#en_stock_add").val(articles.quantite_disponible);
-                   
+
                     //Calcul du prix HT
                     var tva = 0;
                    if(articles.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + articles.article.param_tva_id, function (reponse) {
-                            $.each(reponse.rows, function (index, tvas_infos) { 
+                            $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
                                 var prix_ht_article = (article.prix/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
@@ -1498,7 +1498,7 @@
         $("#prixTTC_add").val(article.prix);
         $("#montantTC_add").val(article.prix*article.quantite);
         $("#quantite_add").val(article.quantite);
-        
+
         $(".bs-modal-add-article").modal("show");
     }
     function deleteArticleRow(idArticle){
@@ -1527,7 +1527,7 @@
         $tableListeReglement.bootstrapTable('refreshOptions', {url: "../boutique/liste-reglements-by-vente/" + idVente});
        $(".bs-modal-liste-reglement").modal("show");
     }
-    
+
     function facturePrintRow(idVente){
         window.open("facture-vente-pdf/" + idVente ,'_blank')
     }
@@ -1535,7 +1535,7 @@
     function montantFormatter(montant){
         return '<span class="text-bold">' + $.number(montant)+ '</span>';
     }
-    function optionFormatter(id, row) { 
+    function optionFormatter(id, row) {
         if(row.acompte_facture>0){
             return '<button type="button" class="btn btn-xs btn-success" data-placement="left" data-toggle="tooltip" title="Liste des règlements" onClick="javascript:reglementRow(' + row.id + ');"><i class="fa fa-money"></i></button>\n\
                     <button type="button" class="btn btn-xs btn-warning" data-placement="left" data-toggle="tooltip" title="Panier" onClick="javascript:listeArticleRow(' + id + ');"><i class="fa fa-cart-arrow-down"></i></button>';
@@ -1545,7 +1545,7 @@
                     <button type="button" class="btn btn-xs btn-danger" data-placement="left" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteRow(' + id + ');"><i class="fa fa-trash"></i></button>';
         }
     }
-    
+
     function montantTttcLigneFormatter(id, row){
         var montant = row.quantite*row.prix;
         return '<span class="text-bold">' + $.number(montant)+ '</span>';
@@ -1561,22 +1561,22 @@
            return '<span class="text-bold">' + $.number(prix_ttc)+ '</span>';
         }
     }
-    
-    function optionAArticleFormatter(id, row) { 
+
+    function optionAArticleFormatter(id, row) {
             return '<button type="button" class="btn btn-xs btn-primary" data-placement="left" data-toggle="tooltip" title="Modifier" onClick="javascript:updateArticleRow(' + id + ');"><i class="fa fa-edit"></i></button>\n\
                     <button type="button" class="btn btn-xs btn-danger" data-placement="left" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteArticleRow(' + id + ');"><i class="fa fa-trash"></i></button>';
     }
-    function imageFormatter(id, row) { 
+    function imageFormatter(id, row) {
           return row.scan_cheque ? "<a target='_blank' href='" + basePath + '/' + row.scan_cheque + "'>Voir la facture</a>" : "";
     }
-    
+
     function typeFactureFormatter(id, row){
         return row.proformat==0 ? row.numero_facture : "Proforma";
     }
     function factureFormatter(id, row){
         return '<button type="button" class="btn btn-xs btn-info" data-placement="left" data-toggle="tooltip" title="Facture" onClick="javascript:facturePrintRow(' + row.id + ');"><i class="fa fa-file-pdf-o"></i></button>';
     }
-    
+
     function editerVenteAction(methode, url, $formObject, formData, $ajoutLoader, $table, ajout = true) {
     jQuery.ajax({
         type: methode,
@@ -1622,7 +1622,7 @@
                 }
                 $("#row_regle").hide();
 //                if(reponse.data.attente!=1){
-//                  window.open("ticket-vente-pdf/" + reponse.data.id ,'_blank')  
+//                  window.open("ticket-vente-pdf/" + reponse.data.id ,'_blank')
 //                }
                 location.reload();
                 $formObject.trigger('eventAjouter', [reponse.data]);
@@ -1640,7 +1640,7 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-            
+
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -1703,7 +1703,7 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-            
+
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -1724,7 +1724,7 @@
         },
         });
     };
-  
+
     function editerClient(methode, url, $formObject, formData, $ajoutLoader) {
         jQuery.ajax({
         type: methode,
@@ -1736,16 +1736,16 @@
                 $.getJSON("../parametre/last-client/", function (reponse) {
                     $('#client_id').html("<option value=''>-- Selectionner client --</option>");
                     var doit_client = 0;
-                    $.each(reponse.rows, function (index, client) { 
+                    $.each(reponse.rows, function (index, client) {
                        $('#client_id').append("<option value=" + client.id + ">" + client.full_name_client + "</option>")
                         $("#client_id").select2("val",client.id)
                         $('#contact_client').val(client.contact_client)
                         $('#plafond_client').val(client.plafond_client)
                         $("#plafond_client_aff").html('Plafond ' + $.number(client.plafond_client)+' F CFA');
-                        
+
                         $.getJSON("../parametre/get-all-doit-client/" + client.id, function (reponse) {
                             if(reponse.total>0){
-                                $.each(reponse.rows, function (index, client_doi) { 
+                                $.each(reponse.rows, function (index, client_doi) {
                                     doit_client = doit_client + client_doi.sommeTotale - client_doi.acompte_facture;
                                     $('#doit_client').val(doit_client)
                                     $("#client_doit_aff").html('Doit ' + $.number(doit_client)+' F CFA');
@@ -1795,7 +1795,7 @@
         },
     });
     }
-    
+
     function editerReglementAction(methode, url, $formObject, formData, $ajoutLoader, $table) {
      jQuery.ajax({
         type: methode,
@@ -1826,7 +1826,7 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-            
+
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -1848,7 +1848,7 @@
     });
     };
 
-    //Supprimer un article 
+    //Supprimer un article
     function supprimerArticleAction(url, formData, $question, $ajaxLoader, $table, $tableVente) {
     jQuery.ajax({
         type: 'DELETE',
