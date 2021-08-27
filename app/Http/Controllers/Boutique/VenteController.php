@@ -22,12 +22,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
-//C:\laragon\www\smart-sfv-lf\vendor\rawilk\laravel-printing\src\Printing.php
 use function view;
 
 include_once(app_path() . "/number-to-letters/nombre_en_lettre.php");
-//include_once("C:/laragon/www/smart-sfv-lf/vendor/rawilk/laravel-printing/src/Printing.php");
-
+//require_once app_path() . "/number-to-letters/nombre_en_lettre.php";
 class VenteController extends Controller
 {
     /**
@@ -73,7 +71,7 @@ class VenteController extends Controller
     public function vuPointVente(Request $request)
     {
         /*
-         * Poit de caisse du caissier
+         * Point de caisse du caissier
         */
 
         $caisse = null;
@@ -247,12 +245,15 @@ class VenteController extends Controller
         $ventes = Vente::with('depot', 'caisse_ouverte')
             ->join('caisse_ouvertes', 'caisse_ouvertes.id', '=', 'ventes.caisse_ouverte_id')
             ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', NULL], ['article_ventes.retourne', 0]])
-            ->select('ventes.*', DB::raw('sum(article_ventes.quantite*article_ventes.prix-article_ventes.remise_sur_ligne) as sommeTotale'), DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'))
-            ->Where([['ventes.deleted_at', NULL], ['ventes.client_id', null], ['caisse_ouvertes.date_fermeture', null], ['caisse_ouvertes.caisse_id', $caisse_id]])
+            ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
+            ->select('ventes.*', DB::raw('sum(article_ventes.quantite * article_ventes.prix - article_ventes.remise_sur_ligne) as sommeTotale'), DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'))
+            ->Where([['ventes.deleted_at', null], ['ventes.client_id', null], ['caisse_ouvertes.date_fermeture', null], ['caisse_ouvertes.caisse_id', $caisse_id]])
             ->groupBy('article_ventes.vente_id')
-            //                ->whereDate('ventes.date_vente',$date_jour)
+            //->whereDate('ventes.date_vente',$date_jour)
             ->orderBy('ventes.id', 'DESC')
             ->get();
+
+        // ! Chargement du total des ventes d'une caisse
         foreach ($ventes as $vente) {
             $totalCaisse = $totalCaisse + $vente->sommeTotale;
         }
@@ -544,10 +545,9 @@ class VenteController extends Controller
 
                     $vente = new Vente;
                     $vente->numero_ticket = "TICKET" . $annee . $numero_id;
-                    // ? Association avec le pass d'entrée s'il y'en a un
                     //var_dump($request); // ! debug
                     //echo "<script> alert(" . $request . "); <script>"; // ! debug
-
+                    // ? Association avec le pass d'entrée s'il y'en a un
                     if ($data['pass_entree'] != null) {
                         $vente->pass_entree_id = $data['pass_entree'];
                         //$vente->pass_entree_id = explode('-', $data['pass_entree']);
@@ -578,7 +578,12 @@ class VenteController extends Controller
                                 $articleVente->depot_id = $data["depot_id"];
                                 $articleVente->unite_id = $data["monPanier"][$index]["unites"];
                                 $articleVente->quantite = $data["monPanier"][$index]["quantites"];
-                                $articleVente->prix = $data["monPanier"][$index]["prix"];
+                                // ! S'il y'a un pass d'entrée on enregistre pas le montant dans la caisse principale
+                                if ($data['pass_entree'] != null) {
+                                    $articleVente->prix = 0;
+                                } else { // ! Sinon on renseigne le montant dans la caisse
+                                    $articleVente->prix = $data["monPanier"][$index]["prix"];
+                                }
                                 $articleVente->remise_sur_ligne = $data["monPanier"][$index]["remises"];
                                 $articleVente->created_by = Auth::user()->id;
                                 $articleVente->save();
@@ -1029,8 +1034,21 @@ class VenteController extends Controller
             ->select('ventes.*', 'moyen_reglements.libelle_moyen_reglement', 'caisses.libelle_caisse', 'users.full_name', DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y à %H:%i:%s") as date_ventes'))
             ->Where([['ventes.deleted_at', NULL], ['ventes.client_id', NULL], ['ventes.id', $vente]])
             ->first();
-        //var_dump($info_en_tete); // ! debug
-        //echo "<script> alert(" . $info_en_tete . "); <script>"; // ! debug
+        // ? Récupérer les données du ticket d'entrée associé s'il y'en a un
+        $ticketEntree = Vente::with('depot', 'caisse_ouverte')
+            ->join('caisse_ouvertes', 'caisse_ouvertes.id', '=', 'ventes.caisse_ouverte_id')
+            ->join('reglements', 'reglements.vente_id', '=', 'ventes.id')
+            ->join('moyen_reglements', 'moyen_reglements.id', '=', 'reglements.moyen_reglement_id')
+            ->join('caisses', 'caisses.id', '=', 'caisse_ouvertes.caisse_id')
+            ->join('users', 'users.id', '=', 'caisse_ouvertes.user_id')
+            ->join('article_ventes', 'article_ventes.vente_id', '=', 'ventes.id')->Where([['article_ventes.deleted_at', NULL], ['article_ventes.retourne', 0]])
+            ->join('articles', 'articles.id', '=', 'article_ventes.article_id')
+            ->join('categories', 'categories.id', '=', 'articles.categorie_id')
+            ->select('ventes.*', 'articles.prix_vente_ttc_base as prix_pass', 'moyen_reglements.libelle_moyen_reglement', 'caisses.libelle_caisse', 'users.full_name', DB::raw('sum(article_ventes.quantite*article_ventes.prix-article_ventes.remise_sur_ligne) as sommeTotale'), DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'), DB::raw('DATE_FORMAT(ventes.updated_at, "%d-%m-%Y à %H:%i:%s") as date_edit'))
+            ->Where([['categories.libelle_categorie', 'Conso'], ['ventes.id', $info_en_tete['pass_entree_id']], ['ventes.deleted_at', null], ['ventes.client_id', null]])
+            ->first();
+        //var_dump($ticketEntree); // ! debug
+        //echo "<script> alert(" . $ticketEntree . "); <script>"; // ! debug
         $header = "<html>
                         <head>
                             <meta charset='utf-8'>
@@ -1060,9 +1078,14 @@ class VenteController extends Controller
                    Ticket : <b style='line-height:1.6; font-size:32px;'>" . str_replace('TICKET', '', $info_en_tete['numero_ticket']) . "</b><br/>
                    Du <b>" . $info_en_tete['date_ventes'] . "</b> au <b>" . $info_en_tete['depot']['libelle_depot'] . "</b><br/>
                    Caisse : <b>" . $info_en_tete['libelle_caisse'] . "</b><br/>
-                   Caissier(e) : <b>" . $info_en_tete['full_name'] . "</b><br/>
-                   Règlement : <b>" . $info_en_tete['libelle_moyen_reglement'] . "</b>
-                   <hr/>
+                   Caissier(e) : <b>" . $info_en_tete['full_name'] . "</b><br/>";
+        // ? Contrôle pour savoir si le client a payé avec ou sans pass d'entrée
+        if ($ticketEntree['numero_ticket'] != null) { // Pour les tickets payés avec pass d'entrée
+            $header .= "Règlement : <b>Pass d'entrée</b>";
+        } else {
+            $header .= "Règlement : <b>" . $info_en_tete['libelle_moyen_reglement'] . "</b>";
+        }
+        $header .= "<hr/>
                 </p>";
         return $header;
     }

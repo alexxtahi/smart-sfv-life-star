@@ -385,6 +385,7 @@
                                         <div class="input-group-addon">
                                             <i class="fa fa-cog"></i>
                                         </div>
+                                        <input type="hidden" name="montant_a_payer_save" id="montant_a_payer_save" value="0">
                                         <!--<select name="pass_entree" id="pass_entree" onchange="choisirPassEntree(this)" class="form-control">-->
                                         <select name="pass_entree" id="pass_entree" class="form-control">
                                             <option value="">-- Pass d'entrée --</option>
@@ -393,7 +394,6 @@
                                             <!--<option {{$ticketEntree->id}} value="{{ $ticketEntree->prix . '-' . $ticketEntree->id }}" >{{$ticketEntree->numero_ticket}}</option>-->
                                             <option {{$ticketEntree->id}} value="{{ $ticketEntree->id }}" >{{$ticketEntree->numero_ticket}}</option>
                                             @endforeach
-
                                         </select>
                                         <!-- script de sélection du pass d'entrée -->
                                         <script>
@@ -1309,39 +1309,44 @@
         $("#pass_entree").change(function () {
             var passValue = parseInt($("#prix_pass_" + $("#pass_entree").val()).val()); // récupérer la valeur du pass d'entrée
             var montant_a_payer = parseInt($("#montant_a_payer").val()); // récupérer le montant à payer
-            var montant_a_payer_add = parseInt($("#montant_a_payer_add").val()); // récupérer le montant à payer sauvegardé
-            alert("pass value : " + passValue); // ! debug
-            //alert("montant a payer: " + montant_a_payer); // ! debug
+            var montant_a_payer_save = parseInt($("#montant_a_payer_save").val()); // récupérer le montant à payer sauvegardé
+            alert("1\n- pass value : " + passValue + "\n- montant à payer : " + montant_a_payer + "\n- sauvegarde du montant à payer : " + montant_a_payer_save); // ! debug
             if (montant_a_payer <= 0) {
-                montant_a_payer = montant_a_payer_add;
+                montant_a_payer = parseInt($("#montant_a_payer_save").val());
+                alert("Recup du montant à payer");
             } else {
-                $("#montant_a_payer_add").val(montant_a_payer); // sauvegarde du montant à payer
+                $("#montant_a_payer_save").val(montant_a_payer); // sauvegarde du montant à payer
+                montant_a_payer_save = parseInt($("#montant_a_payer_save").val()); // récupérer le montant à payer sauvegardé
+                alert("Sauvegarde du montant à payer");
             }
+            alert("2\n- pass value : " + passValue + "\n- montant à payer : " + montant_a_payer + "\n- sauvegarde du montant à payer : " + montant_a_payer_save); // ! debug
 
             // Comparaison avec le montant à payer
             if (passValue > montant_a_payer) {
                 // Coté droit
                 var reste = passValue - montant_a_payer;
                 $("#montant_a_payer").val("-" + reste);
-                $("#montant_payer").val(passValue);
+                $("#montant_payer").val(0);
+               // $("#montant_payer").val(passValue);
                 $(".montant_restant").html("<b>" + $.number(reste) +"</b>");
                 // Coté gauche
                 $(".montantHT").html("<b>0</b>");
                 $(".montantTVA").html("<b>0</b>");
                 $(".remiseTTC").html("<b>0</b>");
                 $(".montantTTC").html("<b>0</b>");
-                //alert("Utilisation d'un pass de " + passValue + " FCFA");
+                alert("Utilisation d'un pass de " + passValue + " FCFA");
             } else if (passValue = montant_a_payer) {
                 // Coté droit
-                $("#montant_a_payer").val("0");
-                $("#montant_payer").val(passValue);
+                $("#montant_a_payer").val(0);
+                $("#montant_payer").val(0);
+                //$("#montant_payer").val(passValue);
                 $(".montant_restant").html("<b>0</b>");
                 // Coté gauche
                 $(".montantHT").html("<b>0</b>");
                 $(".montantTVA").html("<b>0</b>");
                 $(".remiseTTC").html("<b>0</b>");
                 $(".montantTTC").html("<b>0</b>");
-                //alert("Utilisation totale d'un pass de " + passValue + " FCFA");
+                alert("Utilisation totale d'un pass de " + passValue + " FCFA");
             } else {
                 alert("Ce pass d'entrée de " + passValue + " FCFA ne vous permet pas de faire cet achat");
                 $("#pass_entree").options[0].selected = true;
