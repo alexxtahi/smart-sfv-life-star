@@ -68,9 +68,9 @@ class VenteController extends Controller
                     $retourArticle->save();
                     // ! Modification du ticket de caisse
                     DB::update('update ventes set impayer = 1, client_id = ? where id = ?', [$data['vente_id'], $data['clients_impaye']]);
-                    $jsonData["data"] = json_decode($retourArticle);
                     // ! Génération de la facture
                     $this->factureImpayePdf($data['vente_id']);
+                    $jsonData["data"] = json_decode($retourArticle);
                 } else {
                     $jsonData["code"] = -1;
                     $jsonData["data"] = null;
@@ -1341,23 +1341,35 @@ class VenteController extends Controller
     }
     public function factureImpaye($vente)
     {
-        $outPut = "<h1> TEST <h1>";
-        //$outPut = $this->factureImpayeHeader($vente);
-        //$outPut .= $this->factureImpayeContent($vente);
-        //$outPut .= $this->factureFooter();
+        //$outPut = "<h1> TEST <h1>";
+        $outPut = $this->factureImpayeHeader($vente);
+        $outPut .= $this->factureImpayeContent($vente);
+        $outPut .= $this->factureFooter();
         return $outPut;
     }
     public function factureImpayeHeader($vente)
     {
+
         $facture = Vente::with('client')
-            ->join('clients', 'clients.id', '=', 'ventes.client_id')
-            ->select('ventes.*', 'clients.full_name_client as nom_client', 'clients.contact_client as contact_client', 'clients.adresse_client as adresse_client', DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'))
-            ->Where([['ventes.deleted_at', NULL], ['ventes.id', $vente]])
+            ->select('ventes.*', DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'))
+            ->Where([['ventes.deleted_at', null], ['ventes.id', $vente]])
             ->first();
-        $nom_client = $facture->nom_client;
-        $contact_client = $facture->contact_client;
-        $adresse_client = $facture->adresse_client;
-        $facture->proformat == 1 ? $facture_proformat = " proforma " : $facture_proformat = "";
+
+
+        /*$facture = Vente::where([['ventes.deleted_at', null], ['ventes.id', $vente]])
+            ->join('clients', 'clients.id', '=', 'ventes.client_id')
+            ->select('ventes.*', 'clients.full_name_client as nom_client', 'clients.contact_client as contact_client', 'clients.adresse_client as adresse_client', DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'), DB::raw('DATE_FORMAT(ventes.updated_at, "%d-%m-%Y à %H:%i:%s") as date_edit'))
+            ->first();*/
+        $client = Client::where('id', $facture['client_id'])->first();
+
+        //var_dump($facture);
+        //var_dump($client);
+        //echo "<script> alert(" . $facture . "); <script>"; // ! debug
+
+        $nom_client = $client->full_name_client;
+        $contact_client = $client->contact_client;
+        $adresse_client = $client->adresse_client;
+        $facture['proformat'] == 1 ? $facture_proformat = " proforma " : $facture_proformat = "";
         $header = "<html>
                          <head>
                             <meta charset='utf-8'>
