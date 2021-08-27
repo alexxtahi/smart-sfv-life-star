@@ -407,7 +407,7 @@
                                                 if (passValue >= montant_a_payer) {
                                                     montant_a_payer_input.value = passValue - montant_a_payer;
                                                 } else {
-                                                    alert("Ce pass d'entrée de " + passValue + " FCFA ne vous permet pas de faire cet achat");
+                                                    //alert("Ce pass d'entrée de " + passValue + " FCFA ne vous permet pas de faire cet achat");
                                                     list.options[0].selected = true;
                                                 }
                                             }
@@ -1253,7 +1253,7 @@
                         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + retour.article.id , function (reponse) {
                             //$('#unite').html("<option value=''>-- Carré --</option>");
                             $.each(reponse.rows, function (index, colis) {
-                                alert('index: ' + index);
+                                //alert('index: ' + index);
                                 $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                             });
                         })
@@ -1454,16 +1454,16 @@
             var passValue = parseInt($("#prix_pass_" + $("#pass_entree").val()).val()); // récupérer la valeur du pass d'entrée
             var montant_a_payer = parseInt($("#montant_a_payer").val()); // récupérer le montant à payer
             var montant_a_payer_save = parseInt($("#montant_a_payer_save").val()); // récupérer le montant à payer sauvegardé
-            alert("1\n- pass value : " + passValue + "\n- montant à payer : " + montant_a_payer + "\n- sauvegarde du montant à payer : " + montant_a_payer_save); // ! debug
+            //alert("1\n- pass value : " + passValue + "\n- montant à payer : " + montant_a_payer + "\n- sauvegarde du montant à payer : " + montant_a_payer_save); // ! debug
             if (montant_a_payer <= 0) {
                 montant_a_payer = parseInt($("#montant_a_payer_save").val());
-                alert("Recup du montant à payer");
+                //alert("Recup du montant à payer");
             } else {
                 $("#montant_a_payer_save").val(montant_a_payer); // sauvegarde du montant à payer
                 montant_a_payer_save = parseInt($("#montant_a_payer_save").val()); // récupérer le montant à payer sauvegardé
-                alert("Sauvegarde du montant à payer");
+                //alert("Sauvegarde du montant à payer");
             }
-            alert("2\n- pass value : " + passValue + "\n- montant à payer : " + montant_a_payer + "\n- sauvegarde du montant à payer : " + montant_a_payer_save); // ! debug
+            //alert("2\n- pass value : " + passValue + "\n- montant à payer : " + montant_a_payer + "\n- sauvegarde du montant à payer : " + montant_a_payer_save); // ! debug
 
             // Comparaison avec le montant à payer
             if (passValue > montant_a_payer) {
@@ -1478,7 +1478,7 @@
                 $(".montantTVA").html("<b>0</b>");
                 $(".remiseTTC").html("<b>0</b>");
                 $(".montantTTC").html("<b>0</b>");
-                alert("Utilisation d'un pass de " + passValue + " FCFA");
+                //alert("Utilisation d'un pass de " + passValue + " FCFA");
             } else if (passValue = montant_a_payer) {
                 // Coté droit
                 $("#montant_a_payer").val(0);
@@ -1490,9 +1490,9 @@
                 $(".montantTVA").html("<b>0</b>");
                 $(".remiseTTC").html("<b>0</b>");
                 $(".montantTTC").html("<b>0</b>");
-                alert("Utilisation totale d'un pass de " + passValue + " FCFA");
+                //alert("Utilisation totale d'un pass de " + passValue + " FCFA");
             } else {
-                alert("Ce pass d'entrée de " + passValue + " FCFA ne vous permet pas de faire cet achat");
+                //alert("Ce pass d'entrée de " + passValue + " FCFA ne vous permet pas de faire cet achat");
                 $("#pass_entree").options[0].selected = true;
             }
         });
@@ -1784,7 +1784,7 @@
            var reste = parseInt(montant_payer) - parseInt(montant_a_payer);
            if(parseInt(reste)<0 && !document.getElementById('attente').checked){
                $(".montant_restant").html("");
-               alert('Veillez vérifier le montant saisie pour le payement SVP');
+               //alert('Veillez vérifier le montant saisie pour le payement SVP');
            }else{
               $(".montant_restant").html("<b>" + $.number(reste) +"</b>");
            }
@@ -1802,7 +1802,7 @@
            var reste = parseInt(montant_payer_add) - parseInt(montant_a_payer_add);
            if(parseInt(reste)<0 && !document.getElementById('attente').checked){
                $(".montant_restant_add").html("");
-               alert('Veillez vérifier le montant saisie pour le payement SVP');
+               //alert('Veillez vérifier le montant saisie pour le payement SVP');
            }else{
               $(".montant_restant_add").html("<b>" + $.number(reste) +"</b>");
            }
@@ -1823,13 +1823,13 @@
             var $ajaxLoader = $("#formImpaye .loader-overlay");
 
              if (impaye==true) {
-                 alert("Création d'un nouvel impayé");
+                 //alert("Création d'un nouvel impayé");
                 var methode = 'POST';
                 var formData = new FormData($(this)[0]);
                 createFormData(formData, 'lotArticle', lotArticle);
                 var url = "{{route('boutique.save-facture-impaye')}}";
              }else{
-                 alert("modif d'un impayé");
+                 //alert("modif d'un impayé");
                 /*var methode = 'POST';
                 var url = "{{route('boutique.update-retour-article')}}";
                 var formData = new FormData($(this)[0]);*/
@@ -2109,7 +2109,7 @@
     }
 
     function editerImpaye(methode, url, $formObject, formData, $ajoutLoader, $table, impaye = true) {
-        alert("edition de l'impayé");
+        //alert("edition de l'impayé");
         jQuery.ajax({
             type: methode,
             url: url,
@@ -2119,7 +2119,7 @@
             processData: false,
             success:function (reponse, textStatus, xhr){
                 if (reponse.code === 1) {
-                    alert("Sauvegarde de l'impayé");
+                    //alert("Sauvegarde de l'impayé");
                     var $scope = angular.element($formObject).scope();
                     $scope.$apply(function () {
                         $scope.initForm();
@@ -2132,12 +2132,12 @@
                         $("#div_enregistrement_impaye").show();
                         lotArticle = [];
                         idTablle =  0;
-                        alert("Ajout réussi");
+                        //alert("Ajout réussi");
                     } else {
-                        alert("impaye = false");
+                        //alert("impaye = false");
                     }
                     if(reponse.data.attente!=1){
-                    window.open("facture-impaye-pdf/" + reponse.data.id ,'_blank')
+                    window.open("facture-impaye-pdf/" + reponse.data['vente_id'] ,'_blank')
                     }
                     location.reload();
                     $formObject.trigger('eventAjouter', [reponse.data]);
@@ -2145,7 +2145,7 @@
                     $("#sendImpayeButton").prop("disabled", false);
                 }else{
                     $("#sendImpayeButton").prop("disabled", false);
-                    alert("Erreur de sauvegarde de l'impayé");
+                    //alert("Erreur de sauvegarde de l'impayé");
                 }
                 $.gritter.add({
                     // heading of the notification
@@ -2160,7 +2160,7 @@
             error: function (err) {
                 var res = eval('('+err.responseText+')');
                 var messageErreur = res.message;
-                alert("Erreur d'envoi");
+                //alert("Erreur d'envoi");
                 $("#sendImpayeButton").prop("disabled", false);
                 $.gritter.add({
                     // heading of the notification
