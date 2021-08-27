@@ -1243,9 +1243,9 @@ class VenteController extends Controller
                     <p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Fait le ' . date('d-m-Y') . ' à ' . date("H:i:s") . '</i></p>';
         } else { // Pour les tickets payés sans pass d'entrée
             $content .= '<p align="right"  style="font-size:27px;">Ticket payé par pass dentrée</p>
-                    <p align="right" style="font-size:27px;"><b>Pass dentrée :&nbsp;&nbsp;' . $ticketEntree['numero_ticket'] . '</b></p>
-                    <p align="right" style="font-size:27px;"><b>Valeur du pass :&nbsp;&nbsp;' . number_format($ticketEntree['prix_pass'], 0, ',', ' ') . ' FCFA</b></p>
-                    <p align="center" style="font-size:24px;"><b>Merci de votre visite. Repassez nous voir.</b></p>
+                    <p align="right" style="font-size:27px;"><b>Pass dentrée :&nbsp;&nbsp;' . $ticketEntree['numero_ticket'] . '</b></p>';
+            //<p align="right" style="font-size:27px;"><b>Valeur du pass :&nbsp;&nbsp;' . number_format($ticketEntree['prix_pass'], 0, ',', ' ') . ' FCFA</b></p>'
+            $content .= '<p align="center" style="font-size:24px;"><b>Merci de votre visite. Repassez nous voir.</b></p>
                     <p align="center"><img src="data:image/png;base64,' . base64_encode($generator->getBarcode(123456789, $generator::TYPE_CODE_128)) . '"></p>
                     <p align="center" style="font-size:27px;"><i>&nbsp;&nbsp;&nbsp;&nbsp;Fait le ' . date('d-m-Y') . ' à ' . date("H:i:s") . '</i></p>';
         }

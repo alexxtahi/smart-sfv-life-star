@@ -243,11 +243,13 @@
         <!-- Bouton pour la fenêtre des factures impayés -->
         <div class="row">
         @if ($btnModalAjout === 'TRUE')
+            <!--
             @if ((Route::currentRouteName() === 'boutique.ponit-caisse' || Route::currentRouteName() === 'boutique.ponit-caisse-vu-by-admin-gerant') && Auth::user()->role != 'Caissier')
             <button id="btnModalImpayer" class="btn btn-sm btn-primary pull-right" style="margin-left: 10px!important;">
-                <i class="fa fa-plus"></i> Impayé <!-- Bouton Impayé sur le point de caisse -->
+                <i class="fa fa-plus"></i> Impayé <!-- Bouton Impayé sur le point de caisse
             </button>
             @endif
+        -->
 
           <button id="btnModalAjout" class="btn btn-sm btn-primary pull-right">
               @if (Route::currentRouteName() === 'boutique.ponit-caisse' || Route::currentRouteName() === 'boutique.ponit-caisse-vu-by-admin-gerant')
