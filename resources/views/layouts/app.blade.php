@@ -143,62 +143,6 @@
             @include('layouts.partials.partials_menu.menu_comptabilite')
             @include('layouts.partials.partials_menu.menu_etat')
             @endif
-            @if(Auth::user()->role == 'Concepteur' or Auth::user()->role == 'Agence')
-
-                <li class="{{ request()->is('/canal')
-                            || Route::currentRouteName() === 'canal.abonnes.index'
-                            ? 'active' : ''
-                    }}">
-                    <a href="{{route('canal.abonnes.index')}}">
-                        &nbsp;&nbsp;&nbsp;<i class="fa fa-users"></i>Abonn&eacute;s
-                    </a>
-                </li>
-                <li class="{{ request()->is('/boutique')
-                            || Route::currentRouteName() === 'canal.abonnements.index'
-                            ? 'active' : ''
-                    }}">
-                    <a href="{{route('canal.abonnements.index')}}">
-                        &nbsp;&nbsp;&nbsp;<i class="fa fa-minus-circle"></i>Abonnement
-                    </a>
-                </li>
-                <li class="{{Route::currentRouteName() === 'canal.reabonnements.index'
-                            ? 'active' : ''
-                    }}">
-                    <a href="{{route('canal.reabonnements.index')}}">
-                        &nbsp;&nbsp;&nbsp;<i class="fa fa-retweet"></i>R&eacute;abonnement
-                    </a>
-                </li>
-                <li class="{{ request()->is('/canal') || Route::currentRouteName() === 'canal.vente-materiels.index'
-                            ? 'active' : ''
-                    }}">
-                    <a href="{{route('canal.vente-materiels.index')}}">
-                        &nbsp;&nbsp;&nbsp;<i class="fa fa-cog"></i>Vente de mat&eacute;riel
-                    </a>
-                </li>
-<!--                <li class="{{Route::currentRouteName() === 'boutique.retour-materiel'
-                            ? 'active' : ''
-                    }}">
-                    <a href="{{route('boutique.retour-materiel')}}">
-                        &nbsp;&nbsp;&nbsp;<i class="fa fa-reply"></i>Retour de mat&eacute;riel
-                    </a>
-                </li>-->
-<!--                <li class="{{ request()->is('/boutique')
-                            || Route::currentRouteName() === 'canal.rebis-agence'
-                            ? 'active' : ''
-                    }}">
-                    <a href="{{route('canal.rebis-agence')}}">
-                        &nbsp;&nbsp;&nbsp;<i class="fa fa-exchange"></i>Rechargements
-                    </a>
-                </li>-->
-                 <li class="{{ request()->is('/boutique')
-                            || Route::currentRouteName() === 'canal.caution-agence'
-                            ? 'active' : ''
-                    }}">
-                    <a href="{{route('canal.caution-agence')}}">
-                        &nbsp;&nbsp;&nbsp;<i class="fa fa-chrome"></i>Cautions
-                    </a>
-                </li>
-            @endif
             @if(Auth::user()->role == 'Comptable' or Auth::user()->role == 'Logistic')
             @include('layouts.partials.partials_menu.menu_stock')
             @endif
@@ -241,25 +185,11 @@
          {{ $menuPrincipal }}
          <small>> {{$titleControlleur}}</small>
         <!-- Bouton pour la fenêtre des factures impayés -->
-        <div class="row">
         @if ($btnModalAjout === 'TRUE')
-            <!--
-            @if ((Route::currentRouteName() === 'boutique.ponit-caisse' || Route::currentRouteName() === 'boutique.ponit-caisse-vu-by-admin-gerant') && Auth::user()->role != 'Caissier')
-            <button id="btnModalImpayer" class="btn btn-sm btn-primary pull-right" style="margin-left: 10px!important;">
-                <i class="fa fa-plus"></i> Impayé <!-- Bouton Impayé sur le point de caisse
-            </button>
-            @endif
-        -->
-
           <button id="btnModalAjout" class="btn btn-sm btn-primary pull-right">
-              @if (Route::currentRouteName() === 'boutique.ponit-caisse' || Route::currentRouteName() === 'boutique.ponit-caisse-vu-by-admin-gerant')
-                <i class="fa fa-plus"></i> Commande <!-- Bouton nouvelle commande si on est sur le point de caisse-->
-              @else
                 <i class="fa fa-plus"></i> Ajouter <!-- Bouton Ajouter sur les autres pages-->
-              @endif
           </button>
         @endif
-        </div>
       </h1>
     </section>
     <section class="content">
@@ -308,11 +238,6 @@
                   ajout = true;
                   document.forms["formAjout"].reset();
                   $(".bs-modal-ajout").modal("show");
-              });
-              $("#btnModalImpayer").on("click", function () {
-                  impaye = true;
-                  document.forms["formImpaye"].reset();
-                  $(".bs-modal-impaye").modal("show");
               });
 
    });

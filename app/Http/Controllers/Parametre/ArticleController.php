@@ -289,6 +289,7 @@ class ArticleController extends Controller
                     $depots = $data["depots"];
                     $unites = $data["unites"];
                     $prix_ventes = $data["prix_ventes"];
+                    $prix_vip = $data["prix_vip"];
                     
                     foreach ($depots as $index => $depot) {
                         $DepotArticle = DepotArticle::where([['depot_id', $depot],['article_id', $article->id],['unite_id', $unites[$index]]])->first();
@@ -299,6 +300,7 @@ class ArticleController extends Controller
                             $depotArticle->article_id = $article->id;
                             $depotArticle->depot_id = $depot;
                             $depotArticle->prix_vente = $prix_ventes[$index];
+                            $depotArticle->prix_vip = $prix_vip[$index];
                             $depotArticle->unite_id = $unites[$index];
                             $depotArticle->created_by = Auth::user()->id;
                             $depotArticle->save();

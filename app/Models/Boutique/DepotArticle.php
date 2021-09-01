@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DepotArticle extends Model
 {
-    protected $fillable = ['quantite_disponible', 'article_id','approvisionnement_id', 'depot_id', 'prix_vente','promotion','unite_id', 'updated_by', 'deleted_by', 'created_by'];
+    protected $fillable = ['quantite_disponible', 'article_id','approvisionnement_id', 'depot_id', 'prix_vente','prix_vip', 'promotion','unite_id', 'updated_by', 'deleted_by', 'created_by'];
     
     protected $dates = ['deleted_at','date_peremption','date_debut_promotion','date_fin_promotion'];
     public function depot() {

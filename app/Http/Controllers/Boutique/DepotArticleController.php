@@ -128,13 +128,13 @@ class DepotArticleController extends Controller
             }else{
                 $depots = DepotArticle::with('depot','unite','article')
                     ->where([['depot_articles.article_id', $article], ['depot_articles.depot_id', $depot],['depot_articles.unite_id', $unite]])
-                    ->select('depot_articles.*','depot_articles.prix_vente as prix_ventes')
+                    ->select('depot_articles.*','depot_articles.prix_vente as prix_ventes','depot_articles.prix_vip')
                     ->get();  
             }
         }else{
             $depots = DepotArticle::with('depot','unite','article')
                     ->where([['depot_articles.article_id', $article], ['depot_articles.depot_id', $depot],['depot_articles.unite_id', $unite]])
-                    ->select('depot_articles.*','depot_articles.prix_vente as prix_ventes')
+                    ->select('depot_articles.*','depot_articles.prix_vente as prix_ventes','depot_articles.prix_vip')
                     ->get();  
         }
        
@@ -295,6 +295,7 @@ class DepotArticleController extends Controller
                 $depotArticle->article_id = $data['article_id'];
                 $depotArticle->depot_id = $data['depot_id'];
                 $depotArticle->prix_vente = $data['prix_vente'];
+                $depotArticle->prix_vip = $data['prix_vip'];
                 $depotArticle->unite_id = $data['unite_id'];
                 $depotArticle->created_by = Auth::user()->id;
                 $depotArticle->save();
@@ -327,6 +328,7 @@ class DepotArticleController extends Controller
               
                 $depotArticle->depot_id = $data['depot_id'];
                 $depotArticle->prix_vente = $data['prix_vente'];
+                $depotArticle->prix_vip = $data['prix_vip'];
                 $depotArticle->unite_id = $data['unite_id'];
                 $depotArticle->updated_by = Auth::user()->id;
                 $depotArticle->save();

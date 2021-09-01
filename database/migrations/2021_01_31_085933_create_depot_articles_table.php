@@ -19,6 +19,7 @@ class CreateDepotArticlesTable extends Migration
             $table->integer('article_id');
             $table->integer('depot_id');
             $table->integer('prix_vente');
+            $table->integer('prix_vip');
             $table->integer('unite_id')->nullable();
             $table->date('date_peremption')->nullable();
             $table->date('date_debut_promotion')->nullable();

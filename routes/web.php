@@ -200,6 +200,7 @@ Route::namespace('Boutique')->middleware('auth')->name('boutique.')->prefix('bou
     Route::get('mouvement-stocks-grouper', 'MouvementStockController@vueMouvementStockGrouper')->name('mouvement-stocks-grouper');
     Route::get('ticket-declare', 'TvaDeclareeController@index')->name('ticket-declare');
     Route::get('retour-materiel', 'RetourArticleController@vueRetourMateriel')->name('retour-materiel');
+    Route::post('transform-ticket-to-facture', 'VenteController@transformTicketToFacture')->name('transform-ticket-to-facture');
 
 
     //Routes parametrées

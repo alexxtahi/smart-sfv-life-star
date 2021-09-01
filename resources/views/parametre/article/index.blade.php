@@ -474,7 +474,7 @@
                     </div>
                     <div id="div_enregistrement">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>D&eacute;p&ocirc;t *</label>
                                     <select id="depot" class="form-control">
@@ -496,10 +496,16 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Prix de vente *</label>
                                     <input type="number" min="0" class="form-control" id="prix_vente" placeholder="prix de vente">
+                                </div>
+                            </div>
+                             <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Prix VIP *</label>
+                                    <input type="number" min="0" class="form-control" id="prix_vip" placeholder="prix VIP">
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -515,6 +521,7 @@
                                     <th>D&eacute;p&ocirc;t</th>
                                     <th>Colis</th>
                                     <th>Prix vente</th>
+                                    <th>Prix VIP</th>
                                 </tr>
                             </thead>
                             <tbody class="articles-depot-info">
@@ -542,6 +549,7 @@
                                     <th data-field="depot.libelle_depot">D&eacute;p&ocirc;t</th>
                                     <th data-field="unite.libelle_unite">Unit&eacute; </th>
                                     <th data-field="prix_vente" data-formatter="montantFormatter">Prix de vente </th>
+                                    <th data-field="prix_vip" data-formatter="montantFormatter">Prix VIP </th>
                                     <th data-field="id" data-formatter="optionArticleDepotFormatter" data-width="100px" data-align="center"><i class="fa fa-wrench"></i></th>
                                 </tr>
                             </thead>
@@ -570,7 +578,7 @@
                    <input type="text" class="hidden" id="idDepotArticleModifier"  ng-model="depotArticle.id"/>
                    <input type="text" class="hidden" id="article_id"  name="article_id"/>
                    <div class="row">
-                       <div class="col-md-6">
+                       <div class="col-md-5">
                            <div class="form-group">
                                <label>D&eacute;p&ocirc;t *</label>
                                <select name="depot_id" id="depot_id_add" ng-model="depotArticle.depot_id" ng-init="deporArticle.depot_id=''" class="form-control" required>
@@ -592,10 +600,16 @@
                                     </select>
                                 </div>
                        </div>
-                       <div class="col-md-3">
+                       <div class="col-md-2">
                            <div class="form-group">
                                <label>Prix de vente *</label>
                                <input type="number" class="form-control" min="0" id="prix_vente_add" name="prix_vente" ng-model="depotArticle.prix_vente" placeholder="prix de vente" required>
+                           </div>
+                       </div>
+                       <div class="col-md-2">
+                           <div class="form-group">
+                               <label>Prix VIP *</label>
+                               <input type="number" class="form-control" min="0" id="prix_vip_add" name="prix_vip" ng-model="depotArticle.prix_vip" placeholder="prix VIP" required>
                            </div>
                        </div>
                    </div>
@@ -865,13 +879,15 @@
                 var libelle_unite = $("#unite").children(":selected").data("libelleunite");
                 var depot = $("#depot").val();
                 var prix_vente = $("#prix_vente").val();
+                var prix_vip = $("#prix_vip").val();
                 var unite = $("#unite").val();
 
-                var markup = "<tr><td><input type='checkbox' name='record'></td><td><input type='hidden' name='depots[]' value='" + depot + "'>" + libelle_depot + "</td><td><input type='hidden' name='unites[]' value='" + unite + "'>" + libelle_unite + "</td><td><input type='hidden' name='prix_ventes[]' value='" + prix_vente + "'>" + prix_vente + "</td></tr>";
+                var markup = "<tr><td><input type='checkbox' name='record'></td><td><input type='hidden' name='depots[]' value='" + depot + "'>" + libelle_depot + "</td><td><input type='hidden' name='unites[]' value='" + unite + "'>" + libelle_unite + "</td><td><input type='hidden' name='prix_ventes[]' value='" + prix_vente + "'>" + prix_vente + "</td><td><input type='hidden' name='prix_vip[]' value='" + prix_vip + "'>" + prix_vip + "</td></tr>";
                 $(".articles-depot-info").append(markup);
                 $("#depot").val("");
                 $("#unite").val("");
                 $("#prix_vente").val("");
+                $("#prix_vip").val("");
             }else{
                 alert("Les champs dépôt, colis et prix de vente ne doivent pas être vide!");
             }

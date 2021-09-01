@@ -171,6 +171,13 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
+                                    <label> <br/>
+                                        <input type="checkbox" id="prix_vip_choice">&nbsp;&nbsp; Prix VIP
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
                                     <label>Colis *</label>
                                     <select class="form-control" id="unite">
                                         <option value="" ng-show="false">-- Colis--</option>
@@ -213,6 +220,7 @@
                                     <input type="number" min="0" class="form-control" id="remise_sur_ligne" value="0" placeholder="Faire une remise">
                                 </div>
                             </div>
+                            
                             <div class="col-md-1">
                                 <div class="form-group"><br/>
                                     <button type="button" class="btn btn-success btn-sm  add-row pull-left"><i class="fa fa-plus">Ajouter</i></button>
@@ -365,6 +373,13 @@
                                </select>
                            </div>
                        </div>
+                       <div class="col-md-2">
+                                <div class="form-group">
+                                    <label> <br/>
+                                        <input type="checkbox" id="prix_vip_choice_add">&nbsp;&nbsp; Prix VIP
+                                    </label>
+                                </div>
+                            </div>
                        <div class="col-md-2">
                            <div class="form-group">
                                <label>Colis *</label>
@@ -1062,20 +1077,29 @@
                     }else{
                         $("#en_stock").val(article.quantite_disponible);
                     }
-                    $("#prixTTC").val(article.prix_ventes);
+                    
+                    let checkbox1 = document.querySelector('#prix_vip_choice');
+                    if(checkbox1.checked){
+                         $("#prixTTC").val(article.prix_vip);
+                         var prixs = article.prix_vip;
+                    }else{
+                         $("#prixTTC").val(article.prix_ventes);
+                         var prixs = article.prix_ventes;
+                    }
+                   
                     //Calcul du prix HT
                     var tva = 0;
                    if(article.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + article.article.param_tva_id, function (reponse) {
                             $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
-                                var prix_ht_article = (article.prix_ventes/(tva + 1));
+                                var prix_ht_article = (prixs/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
                                 $("#prixHT").val(prix);
                             });
                         })
                    }else{
-                       $("#prixHT").val(article.prix_ventes);
+                       $("#prixHT").val(prixs);
                    }
                 });
             })
@@ -1093,20 +1117,28 @@
                           $("#en_stock_add").val(article.quantite_disponible);
                     }
 
-                    $("#prixTTC_add").val(article.prix_ventes);
+                    let checkbox1 = document.querySelector('#prix_vip_choice_add');
+                    if(checkbox1.checked){
+                         $("#prixTTC_add").val(article.prix_vip);
+                         var prixs = article.prix_vip;
+                    }else{
+                         $("#prixTTC_add").val(article.prix_ventes);
+                         var prixs = article.prix_ventes;
+                    }
+               
                     //Calcul du prix HT
                     var tva = 0;
                    if(article.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + article.article.param_tva_id, function (reponse) {
                             $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
-                                var prix_ht_article = (article.prix_ventes/(tva + 1));
+                                var prix_ht_article = (prixs/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
                                 $("#prixHT_add").val(prix);
                             });
                         })
                    }else{
-                       $("#prixHT_add").val(article.prix_ventes);
+                       $("#prixHT_add").val(prixs);
                    }
 
                 });
@@ -1421,6 +1453,7 @@
             formData.append(key, data);
         }
     }
+
     function updateRow(idVente) {
         ajout = false;
         var $scope = angular.element($("#formAjout")).scope();

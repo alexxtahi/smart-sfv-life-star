@@ -217,6 +217,7 @@ class VenteController extends Controller
             ->select('depot_articles.*', 'articles.id as id_article', 'articles.description_article')
             ->groupBy('depot_articles.article_id')
             ->get();
+
         // ! Récupération des données du formulaire d'impayé
         $clients_impaye = DB::table('clients')->Where('deleted_at', null)->get();
         $ventes = DB::table('ventes')->Where([['deleted_at', NULL], ['impayer', 0], ['divers', 0], ['attente', 0], ['proformat', 0]])->get();
@@ -557,6 +558,46 @@ class VenteController extends Controller
         return response()->json($jsonData);
     }
 
+
+    //transformer un ticket en facture
+
+    public function transformTicketToFacture(Request $request){
+        $jsonData = ["code" => 1, "msg" => "Enregistrement effectué avec succès."];
+
+        if ($request->isMethod('post') && $request->input('client_id')) {
+
+             $data = $request->all();
+
+            try{
+
+                $vente = Vente::find($data['idVenteTransformer']);
+
+                if($vente){
+                     //formation numéro facture
+                    $maxIdVente = DB::table('ventes')->max('id');
+                    $numero_facture = sprintf("%06d", ($maxIdVente + 1));
+
+                    $vente->client_id = $data['client_id'];
+                    $vente->numero_ticket = null;
+                    $vente->numero_facture = $numero_facture;
+                    $vente->save();
+                }else{
+                    return response()->json(["code" => 0, "msg" => "Ticket introuvable", "data" => NULL]);
+                }
+                
+                $jsonData["data"] = json_decode($vente);
+                return response()->json($jsonData);
+            }catch (Exception $exc) {
+                $jsonData["code"] = -1;
+                $jsonData["data"] = NULL;
+                $jsonData["msg"] = $exc->getMessage();
+                //$jsonData["msg"] = "Il y'a un problème de suppression";
+                return response()->json($jsonData);
+            }
+            
+        }
+        return response()->json(["code" => 0, "msg" => "Saisie invalide", "data" => NULL]);
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -599,9 +640,9 @@ class VenteController extends Controller
                     }
 
 
-                    if ($data['montant_a_payer'] > $data['montant_payer'] && !isset($data['attente'])) {
-                        return response()->json(["code" => 0, "msg" => "Le montant payé n'est pas juste", "data" => NULL]);
-                    }
+                    // if ($data['montant_a_payer'] > $data['montant_payer'] && !isset($data['attente'])) {
+                    //     return response()->json(["code" => 0, "msg" => "Le montant payé n'est pas juste", "data" => NULL]);
+                    // }
 
                     $vente = new Vente;
                     $vente->numero_ticket = "TICKET" . $annee . $numero_id;

@@ -61,7 +61,12 @@
                data-show-columns="false">
     <thead>
         <tr>
+            @if(Auth::user()->role != 'Caissier')
+                <th data-formatter="adminTiketFormatter" data-width="100px" data-align="center">Ticket</th>
+            @endif
+            @if(Auth::user()->role == 'Caissier')
             <th data-formatter="tiketFormatter" data-width="100px" data-align="center">Ticket</th>
+            @endif
             <th data-field="numero_ticket">N° Ticket</th>
             <th data-field="date_ventes">Date</th>
             <th data-field="sommeTotale" data-formatter="montantFormatter">Montant TTC</th>
@@ -148,6 +153,13 @@
                                         <option data-libellearticle="{{$article->description_article}}"  value="{{$article->id_article}}"> {{$article->description_article}}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label> <br/>
+                                        <input type="checkbox" id="prix_vip_choice">&nbsp;&nbsp; Prix VIP
+                                    </label>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -296,7 +308,6 @@
                                              <script>
                                                  function checkToutPayer(champ) {
                                                     var montant_a_payer = document.querySelector('#montant_a_payer_add').value;
-
                                                     var checkbox = document.querySelector("#tout_payer_input");
                                                     checkbox.checked = (champ.value == montant_a_payer) ? false : true;
                                                  }
@@ -338,7 +349,7 @@
                                              <div class="input-group-addon">
                                                  <i class="fa fa-cog"></i>
                                              </div>
-                                             <select name="moyen_reglement_id_add" id="moyen_reglement_id_add" class="form-control" required ng-model="moyen_reglement.moyen_reglement_id">
+                                             <select name="moyen_reglement_id_add" id="moyen_reglement_id_add" class="form-control" required>
                                                  @foreach($moyenReglements as $moyenReglement)
                                                  <option  {{$moyenReglement->id}} value="{{$moyenReglement->id}}">{{$moyenReglement->libelle_moyen_reglement}}</option>
                                                  @endforeach
@@ -346,9 +357,6 @@
                                          </div>
                                      </div>
                                  </div>
-
-
-
                              </div>
                             </div>
                         </div>
@@ -481,6 +489,7 @@
                 <div class="modal-body ">
                    <input type="text" class="hidden" id="idArticleModifier"  ng-model="article.id"/>
                    <input type="text" class="hidden" id="vente"  name="vente_id"/>
+                   <input type="text" class="hidden" name="depot_id" value="{{$auth_user->depot_id}}"/>
                    <div class="row">
                        <!--
                        <div class="col-md-2">
@@ -500,6 +509,13 @@
                                </select>
                            </div>
                        </div>
+                        <div class="col-md-2">
+                                <div class="form-group">
+                                    <label> <br/>
+                                        <input type="checkbox" id="prix_vip_choice_add">&nbsp;&nbsp; Prix VIP
+                                    </label>
+                                </div>
+                            </div>
                        <div class="col-md-2">
                            <div class="form-group">
                                <label>Carré *</label>
@@ -605,6 +621,40 @@
                     </div>
                 </div>
             </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal transformation ticket en facture --> 
+<div class="modal fade bs-modal-tranform" category="dialog" data-backdrop="static">
+    <div class="modal-dialog ">
+        <form id="tranformFacture" ng-controller="tranformFactureCtrl" action="#">
+            <div class="modal-content">
+                <div class="modal-header bg-green">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        Confimation de la transformation
+                </div>
+                @csrf 
+                 <div class="modal-body">
+                    <div class="box-body">
+                        <input type="text" class="hidden" name="idVenteTransformer"  ng-model="vente.id"/>
+                        <div class="text-center question"><i class="fa fa-question-circle fa-2x"></i> Etes vous certains de vouloir transformer ce ticket en facture<br/><b>@{{vente.numero_ticket}}</b></div>
+                        <br/>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <select class="form-control" name="client_id" id="client_id" required="required">
+                                    <option value="">-- Chosir le client --</option>
+                                    @foreach($clients_impaye as $client)
+                                        <option value="{{$client->id}}">{{$client->full_name_client}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-sm btn-success"><span class="overlay loader-overlay"> <i class="fa fa-refresh fa-spin"></i> </span> Valider</button>
+                </div>
         </form>
     </div>
 </div>
@@ -980,7 +1030,6 @@
     var idTablleBillet =  0;
     var user_role = $("#user_role").val();
     var caisse_id = $("#caisses_id").val()
-
     appSmarty.controller('formImpayeCtrl', function ($scope) {
         $scope.populateForm = function (retourArticle) {
             $scope.retourArticle = retourArticle;
@@ -999,7 +1048,6 @@
         $scope.vente = {};
         };
     });
-
     appSmarty.controller('formAjoutArticleCtrl', function ($scope) {
         $scope.populateArticleForm = function (article) {
         $scope.article = article;
@@ -1009,7 +1057,6 @@
         $scope.article = {};
         };
     });
-
     appSmarty.controller('formSupprimerArticleCtrl', function ($scope) {
         $scope.populateSupArticleForm = function (article) {
         $scope.article = article;
@@ -1018,7 +1065,6 @@
         $scope.article = {};
         };
     });
-
     appSmarty.controller('formSupprimerCtrl', function ($scope) {
         $scope.populateForm = function (vente) {
         $scope.vente = vente;
@@ -1027,9 +1073,14 @@
         $scope.vente = {};
         };
     });
-
     appSmarty.controller('panierArticleCtrl', function ($scope) {
         $scope.populateFormPanier = function (vente) {
+        $scope.vente = vente;
+        };
+    });
+
+    appSmarty.controller('tranformFactureCtrl', function ($scope) {
+        $scope.populateTranformFacture = function (vente) {
         $scope.vente = vente;
         };
     });
@@ -1039,13 +1090,11 @@
             rows = data.rows;
             $("#total_caisse_caissier").html($.number(data.totalCaisse));
         });
-
         if(user_role=="Caissier"){
             $table.bootstrapTable('refreshOptions', {url: "{{url('boutique', ['action' => 'liste-ventes-caisse'])}}"});
         }else{
             $table.bootstrapTable('refreshOptions', {url: '../boutique/liste-ventes-by-caisse/' + caisse_id});
         }
-
         $tableArticle.on('load-success.bs.table', function (e, data) {
             rowsArticle = data.rows;
             $("#montantTHT_add").html($.number(data.montantTHT_add));
@@ -1054,7 +1103,7 @@
             $("#montantTTTC_add").html($.number(data.montantTTTC_add-data.montantRemise_add));
             $("#montant_a_payer_add").val(data.montantTTTC_add-data.montantRemise_add);
         });
-        $("#article").select2({width: '100%'});
+        $("#article, #client_id").select2({width: '100%'});
         $(".remise_add_row").show();
         $("#div_enregistrement").show();
         $("#div_update").hide();
@@ -1087,7 +1136,6 @@
                $("#montant_billet").val("");
            }
         });
-
         // Event form impayé
         $('#vente_id').change(function(){
             var vente = $("#vente_id").val();
@@ -1108,8 +1156,6 @@
                 $('#libelle_depot').val('');
             }
         });
-
-
         $("#searchByTicket").keyup(function (e) {
             var numero_ticke = $("#searchByTicket").val();
             $("#searchByDate").val("");
@@ -1128,8 +1174,6 @@
                $table.bootstrapTable('refreshOptions', {url: '../boutique/liste-vente-by-caisse-date-vente/' + caisse_id + '/' + date});
             }
         });
-
-
         $("#btnOuvrirCaisse").on("click", function () {
             if(user_role=="Caissier"){
                 var depot = $('#depot_id').val();
@@ -1150,7 +1194,6 @@
             }
            $(".bs-modal-ouverture-caisse").modal("show");
         });
-
         $("#btnFermerCaisse").on("click", function () {
             if(user_role=="Caissier"){
                 $.getJSON("../boutique/get-one-caisse-ouverte-by-caisse/" + caisse_id, function (reponse) {
@@ -1197,7 +1240,6 @@
             $("#vente").val(vente);
             $(".bs-modal-add-article").modal("show");
         });
-
         $("#btnModalAjout").on("click", function () {
             ajout = true;
             document.getElementById("code_barre").focus();
@@ -1223,7 +1265,6 @@
             $("#montant_payer").val("");
             $(".montant_restant").html("");
         });
-
         // ! Afficher le formulaire d'enregistrement des factures impayées
         $('#btnModalImpaye').click(function(){
             $("#article").select2("val", "");
@@ -1235,7 +1276,6 @@
             idTablle = 0;
             $("#div_enregistrement_impaye").show();
         });
-
         $('#code_barre').keyup(function(e){
             if(e.which == '10' || e.which == '13') {
             $("#remise_sur_ligne").prop('readonly',true);
@@ -1311,7 +1351,7 @@
                 $.each(reponse.rows, function (index, colis) {
                     //alert("Index: " + index); // ! debug
                     if (index == 0) // Choisir automatiquement le carré salle
-                        $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + ' selected>' + colis.unite.libelle_unite + '</option>')
+                        $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                     else
                         $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
@@ -1374,20 +1414,28 @@
             var unite_id = $("#unite").val();
             $.getJSON("../boutique/find-article-in-depot-by-unite-caisse/" + article_id + "/" + depot_id + "/" +  unite_id, function (reponse) {
                 $.each(reponse.rows, function (index, article) {
-                    $("#prixTTC").val(article.prix_ventes);
+             
+                    let checkbox1 = document.querySelector('#prix_vip_choice');
+                    if(checkbox1.checked){
+                         $("#prixTTC").val(article.prix_vip);
+                         var prixs = article.prix_vip;
+                    }else{
+                         $("#prixTTC").val(article.prix_ventes);
+                         var prixs = article.prix_ventes;
+                    }
                     //Calcul du prix HT
                     var tva = 0;
                    if(article.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + article.article.param_tva_id, function (reponse) {
                             $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
-                                var prix_ht_article = (article.prix_ventes/(tva + 1));
+                                var prix_ht_article = (prixs/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
                                 $("#prixHT").val(prix);
                             });
                         })
                    }else{
-                       $("#prixHT").val(article.prix_ventes);
+                       $("#prixHT").val(prixs);
                    }
                     if(article.article.stockable==0){
                           $("#en_stock").val(1000);
@@ -1409,26 +1457,32 @@
                     }else{
                           $("#en_stock_add").val(article.quantite_disponible);
                     }
-                    $("#prixTTC_add").val(article.prix_ventes);
+                    let checkbox1 = document.querySelector('#prix_vip_choice_add');
+                    if(checkbox1.checked){
+                         $("#prixTTC_add").val(article.prix_vip);
+                         var prixs = article.prix_vip;
+                    }else{
+                         $("#prixTTC_add").val(article.prix_ventes);
+                         var prixs = article.prix_ventes;
+                    }
+                  
                     //Calcul du prix HT
                     var tva = 0;
                    if(article.article.param_tva_id!=null){
                        $.getJSON("../parametre/find-param-tva/" + article.article.param_tva_id, function (reponse) {
                             $.each(reponse.rows, function (index, tvas_infos) {
                                 tva = tvas_infos.montant_tva;
-                                var prix_ht_article = (article.prix_ventes/(tva + 1));
+                                var prix_ht_article = (prixs/(tva + 1));
                                 var prix = Math.round(prix_ht_article);
                                 $("#prixHT_add").val(prix);
                             });
                         })
                    }else{
-                       $("#prixHT_add").val(article.prix_ventes);
+                       $("#prixHT_add").val(prixs);
                    }
-
                 });
             })
         });
-
         $("#quantite").change(function (e) {
           var quantite = $("#quantite").val();
           var prix = $("#prixTTC").val();
@@ -1464,7 +1518,6 @@
                 //alert("Sauvegarde du montant à payer");
             }
             //alert("2\n- pass value : " + passValue + "\n- montant à payer : " + montant_a_payer + "\n- sauvegarde du montant à payer : " + montant_a_payer_save); // ! debug
-
             // Comparaison avec le montant à payer
             if (passValue > montant_a_payer) {
                 // Coté droit
@@ -1496,7 +1549,6 @@
                 $("#pass_entree").options[0].selected = true;
             }
         });
-
         //Add row on table
         $(".add-row").click(function () {
             if($("#article").val() != '' && $("#quantite").val() != '' && $("#unite").val() != '' && $("#quantite").val()!=0) {
@@ -1510,7 +1562,6 @@
                 var prixTTC = $("#prixTTC").val();
                 var prixHT = $("#prixHT").val();
                 var remise_sur_ligne = $("#remise_sur_ligne").val()!=0?$("#remise_sur_ligne").val():0;
-
                 if(parseInt(quantite) > parseInt(stock)){
                     $.gritter.add({
                         title: "SMART-SFV",
@@ -1527,7 +1578,6 @@
                         //Si la ligne existe on recupere l'ancienne quantité et l'id de la ligne
                         oldQte = articleTrouver.quantites;
                         idElementLigne = articleTrouver.id;
-
                         //Si la somme des deux quantités depasse la quantité à ajouter en stock alors on block
                         var sommeDeuxQtes = parseInt(oldQte) + parseInt(quantite);
                         if(parseInt(sommeDeuxQtes)> parseInt(stock)){
@@ -1554,7 +1604,6 @@
                             });
                             articleTrouver.quantites = sommeDeuxQtes;
                             articleTrouver.remises = remise_sur_ligne;
-
                             montantHT = montantHT + (sommeDeuxQtes*prixHT);
                             montantTTC = parseInt(montantTTC) + parseInt(sommeDeuxQtes*prixTTC);
                             remiseTTC = parseInt(remiseTTC) + parseInt(remise_sur_ligne);
@@ -1648,7 +1697,6 @@
                     field: 'id',
                     values: ids
                 })
-
                 $.each(selecteds, function (index, value) {
                     var articleTrouver = _.findWhere(monPanier, {id: value.id})
                     montantHT = parseInt(montantHT) - (articleTrouver.quantites*articleTrouver.prix_ht);
@@ -1658,7 +1706,6 @@
                         return article.id == value.id;
                     });
                 });
-
                     $(".montantHT").html("<b>"+ $.number(montantHT)+"</b>");
                     $(".montantTVA").html("<b>" + $.number(montantTTC-montantHT) + "</b>");
                     $(".remiseTTC").html("<b>" + $.number(remiseTTC) +"</b>");
@@ -1682,21 +1729,17 @@
                     idTablle = 0;
                 }
         });
-
-
         //Add billet row on table
         $(".add-billetage-row").click(function () {
             if($("#billet").val() != '' && $("#quantite_billet").val() != '' && $("#quantite_billet").val()!=0) {
                 var billet = $("#billet").val();
                 var quantite_billet = $("#quantite_billet").val();
-
                 //Vérification Si la ligne existe déja dans le tableau
                 var ligneBilletTrouver = _.findWhere(panierBillet, {billets: billet})
                 if(ligneBilletTrouver!=null) {
                         //Si la ligne existe on recupere l'ancienne quantité et l'id de la ligne
                         oldQte = ligneBilletTrouver.quantite_billets;
                         idElementLigne = ligneBilletTrouver.id;
-
                         //Si la somme des deux quantités depasse la quantité à ajouter en stock alors on block
                         var sommeDeuxQtes = parseInt(oldQte) + parseInt(quantite_billet);
                             //MAJ de la ligne
@@ -1708,7 +1751,6 @@
                                 }
                             });
                             ligneBilletTrouver.quantite_billets = sommeDeuxQtes;
-
                             $("#quantite_billet").val("");
                             $("#billet").val("");
                             $("#montant_billet").val("");
@@ -1724,11 +1766,9 @@
                           montant_billet: $.number(quantite_billet*billet)
                         }
                     })
-
                     //Creation de l'article dans le tableau virtuel (panier)
                     var DataBillet= {'id':idTablleBillet, 'billets':billet, 'quantite_billets':quantite_billet};
                     panierBillet.push(DataBillet);
-
                     $("#quantite_billet").val("");
                     $("#billet").val("");
                     $("#montant_billet").val("");
@@ -1737,7 +1777,6 @@
                     }else{
                         $(".delete-billetage-row").hide();
                     }
-
             }else{
                 $.gritter.add({
                     title: "SMART-SFV",
@@ -1758,20 +1797,17 @@
                     field: 'id',
                     values: ids
                 })
-
                 $.each(selecteds, function (index, value) {
                     var ligneTrouver = _.findWhere(panierBillet, {id: value.id})
                     panierBillet = _.reject(panierBillet, function (article) {
                         return article.id == value.id;
                     });
                 });
-
                 if(panierBillet.length==0){
                     $(".delete-billetage-row").hide();
                     idTablleBillet = 0;
                 }
         });
-
         $("#montant_payer").keyup(function(){
            var montant_payer = $("#montant_payer").val();
            var montant_a_payer = $("#montant_a_payer").val();
@@ -1793,7 +1829,6 @@
            var montant_payer_add = $("#montant_payer_add").val();
            var montant_a_payer_add = $("#montant_a_payer_add").val();
            var reste = parseInt(montant_payer_add) - parseInt(montant_a_payer_add);
-
            $(".montant_restant_add").html("<b>" + $.number(reste) +"</b>");
        });
         $("#montant_payer_add").focusout(function(){
@@ -1807,7 +1842,6 @@
               $(".montant_restant_add").html("<b>" + $.number(reste) +"</b>");
            }
        });
-
        // ! Envoyer le formulaire d'impayé
         $("#sendImpayeButton").click(function(){
             $("#formImpaye").submit();
@@ -1821,7 +1855,6 @@
                 return false;
             }
             var $ajaxLoader = $("#formImpaye .loader-overlay");
-
              if (impaye==true) {
                  //alert("Création d'un nouvel impayé");
                 var methode = 'POST';
@@ -1836,7 +1869,6 @@
              }
             editerImpaye(methode, url, $(this), formData, $ajaxLoader, $table, ajout);
         });
-
         // Submit the add form
         $("#sendButton").click(function(){
             $("#formAjout").submit();
@@ -1850,7 +1882,6 @@
                 return false;
             }
             var $ajaxLoader = $("#formAjout .loader-overlay");
-
             if (ajout==true) {
                 var methode = 'POST';
                 var url = "{{route('boutique.ventes.store')}}";
@@ -1871,7 +1902,6 @@
                 return false;
             }
             var $ajaxLoader = $("#formAjoutArticle .loader-overlay");
-
             if (ajoutArticle==true) {
                 var methode = 'POST';
                 var url = "{{route('boutique.articles-vente.store')}}";
@@ -1909,6 +1939,19 @@
             var formData = new FormData($(this)[0]);
             createFormData(formData, 'panierBillet', panierBillet);
             fermetureCaisseAction(methode, url, $(this), formData, $ajaxLoader);
+        });
+
+        $("#tranformFacture").submit(function(e){
+            e.preventDefault();
+            var $valid = $(this).valid();
+            if (!$valid) {
+                $validator.focusInvalid();
+                return false;
+            }
+            var $ajaxLoader = $("#tranformFacture .loader-overlay");
+            var methode = 'POST';
+            var url = "{{route('boutique.transform-ticket-to-facture')}}";
+            tranformCaisseAction(methode, url, $(this), $(this).serialize(), $ajaxLoader);
         });
 
         $("#formSupprimer").submit(function (e) {
@@ -1965,7 +2008,6 @@
         $("#div_update").show();
         $(".bs-modal-ajout").modal("show");
     }
-
     function deleteRow(idVente){
         var $scope = angular.element($("#formSupprimer")).scope();
         var vente =_.findWhere(rows, {id: idVente});
@@ -1974,7 +2016,6 @@
         });
         $(".bs-modal-suppression").modal("show");
     }
-
     function updateArticleRow(idArticle){
         ajoutArticle = false;
         var $scope = angular.element($("#formAjoutArticle")).scope();
@@ -1987,7 +2028,6 @@
         var depot = $("#depot_id").val();
         $("#remise_sur_ligne_add").prop('readonly',true);
         $("#quantite_add").val(article.quantite);
-
         $("#article_add").val(article.article_id);
         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot + "/" + article.article_id , function (reponse) {
                 $('#unite_add').html("<option value=''>-- Carré --</option>");
@@ -2004,7 +2044,6 @@
         $.getJSON("../boutique/find-article-in-depot-by-unite/" + article.article_id + "/" + depot + "/" +  article.unite_id, function (reponse) {
                 $.each(reponse.rows, function (index, articles) {
                     $("#en_stock_add").val(articles.quantite_disponible);
-
                     //Calcul du prix HT
                     var tva = 0;
                    if(articles.article.param_tva_id!=null){
@@ -2025,7 +2064,6 @@
         $("#montantTC_add").val(article.prix*article.quantite);
         $(".bs-modal-add-article").modal("show");
     }
-
     function deleteArticleRow(idArticle){
         var $scope = angular.element($("#formSupprimerArticle")).scope();
         var article =_.findWhere(rowsArticle, {id: idArticle});
@@ -2034,7 +2072,6 @@
         });
         $(".bs-modal-supprimer-article").modal("show");
     }
-
     function ticketPrintRow(idVente){
         window.open("ticket-vente-pdf/" + idVente ,'_blank')
     }
@@ -2085,13 +2122,32 @@
             return '<button type="button" class="btn btn-xs btn-info" data-placement="left" data-toggle="tooltip" title="Ticket" onClick="javascript:ticketPrintRow(' + row.id + ');"><i class="fa fa-file-pdf-o"></i></button>';
         }
     }
+
+    function transformRow(idVente){
+        var $scope = angular.element($("#tranformFacture")).scope();
+        var vente =_.findWhere(rows, {id: idVente});
+         $scope.$apply(function () {
+            $scope.populateTranformFacture(vente);
+        });
+        $(".bs-modal-tranform").modal("show");
+    }
+
+    function adminTiketFormatter(id, row){
+        if(row.attente!=0){
+            return '<button type="button" class="btn btn-xs btn-success" data-placement="left" data-toggle="tooltip" title="Recupérer" onClick="javascript:updateRow(' + row.id + ');">Recupérer</button>\n\
+            <button type="button" class="btn btn-xs btn-success" data-placement="left" data-toggle="tooltip" title="Transformer en facture" onClick="javascript:transformRow(' + row.id + ');"><i class="fa fa-question"></i></button>';
+        }else{
+            return '<button type="button" class="btn btn-xs btn-info" data-placement="left" data-toggle="tooltip" title="Ticket" onClick="javascript:ticketPrintRow(' + row.id + ');"><i class="fa fa-file-pdf-o"></i></button>\n\
+            <button type="button" class="btn btn-xs btn-success" data-placement="left" data-toggle="tooltip" title="Transformer en facture" onClick="javascript:transformRow(' + row.id + ');"><i class="fa fa-question"></i></button>';
+        }
+    }
     function montantFormatter(montant){
         return '<span class="text-bold">' + $.number(montant)+ '</span>';
     }
     function optionFormatter(id, row) {
         var options = '<button type="button" class="btn btn-xs btn-warning" data-placement="left" data-toggle="tooltip" title="Panier" onClick="javascript:listeArticleRow(' + id + ');"><i class="fa fa-cart-arrow-down"></i></button>';
-        options += '<button class="btn btn-xs btn-primary" data-placement="left" data-toggle="tooltip" title="Modifier" onClick="javascript:updateRow(' + id + ');"><i class="fa fa-edit"></i></button>';
-        options += '<button type="button" class="btn btn-xs btn-danger" data-placement="left" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteRow(' + id + ');"><i class="fa fa-trash"></i></button>';
+        options += '\n\<button class="btn btn-xs btn-primary" data-placement="left" data-toggle="tooltip" title="Modifier" onClick="javascript:updateRow(' + id + ');"><i class="fa fa-edit"></i></button>';
+        options += '\n\<button type="button" class="btn btn-xs btn-danger" data-placement="left" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteRow(' + id + ');"><i class="fa fa-trash"></i></button>';
         return options;
     }
     function optionFormatterGerant(id, row) {
@@ -2103,11 +2159,9 @@
             return '<button type="button" class="btn btn-xs btn-primary" data-placement="left" data-toggle="tooltip" title="Modifier" onClick="javascript:updateArticleRow(' + id + ');"><i class="fa fa-edit"></i></button>\n\
                     <button type="button" class="btn btn-xs btn-danger" data-placement="left" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteArticleRow(' + id + ');"><i class="fa fa-trash"></i></button>';
     }
-
    function listeArticleFormatter(id, row){
         return '<button type="button" class="btn btn-xs btn-warning" data-placement="left" data-toggle="tooltip" title="Panier" onClick="javascript:listeArticleRow(' + id + ');"><i class="fa fa-cart-arrow-down"></i></button>';
     }
-
     function editerImpaye(methode, url, $formObject, formData, $ajoutLoader, $table, impaye = true) {
         //alert("edition de l'impayé");
         jQuery.ajax({
@@ -2249,7 +2303,6 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -2270,8 +2323,7 @@
             $ajoutLoader.hide();
         },
     });
-	};
-
+    };
     function editerVentesArticlesAction(methode, url, $formObject, formData, $ajoutLoader, $table,$tableVente, ajoutArticle = true) {
     jQuery.ajax({
         type: methode,
@@ -2313,7 +2365,6 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -2334,7 +2385,6 @@
         },
     });
 };
-
    function ouvertureCaisseAction(methode, url, $formObject, formData, $ajoutLoader) {
     jQuery.ajax({
         type: methode,
@@ -2358,7 +2408,6 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -2405,7 +2454,50 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
+            $.gritter.add({
+                // heading of the notification
+                title: "SMART-SFV",
+                // the text inside the notification
+                text: messageErreur,
+                sticky: false,
+                image: basePath + "/assets/img/gritter/confirm.png",
+            });
+            $formObject.removeAttr("disabled");
+            $ajoutLoader.hide();
+        },
+         beforeSend: function () {
+            $formObject.attr("disabled", true);
+            $ajoutLoader.show();
+        },
+        complete: function () {
+            $ajoutLoader.hide();
+        },
+    });
+    };
 
+    function tranformCaisseAction(methode, url, $formObject, formData, $ajoutLoader) {
+    jQuery.ajax({
+        type: methode,
+        url: url,
+        cache: false,
+        data: formData,
+        success:function (reponse, textStatus, xhr){
+            if (reponse.code === 1) {
+                //Si les données sont envoyées
+                location.reload();
+            }
+            $.gritter.add({
+                // heading of the notification
+                title: "SMART-SFV",
+                // the text inside the notification
+                text: reponse.msg,
+                sticky: false,
+                image: basePath + "/assets/img/gritter/confirm.png",
+            });
+         },
+          error: function (err) {
+            var res = eval('('+err.responseText+')');
+            var messageErreur = res.message;
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -2454,7 +2546,6 @@
           error: function (err) {
             var res = eval('('+err.responseText+')');
             var messageErreur = res.message;
-
             $.gritter.add({
                 // heading of the notification
                 title: "SMART-SFV",
@@ -2475,7 +2566,6 @@
         },
     });
     };
-
     //Supprimer un article
     function supprimerArticleAction(url, formData, $question, $ajaxLoader, $table, $tableVente) {
     jQuery.ajax({
