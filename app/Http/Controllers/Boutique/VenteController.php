@@ -580,6 +580,8 @@ class VenteController extends Controller
                     $vente->client_id = $data['client_id'];
                     $vente->numero_ticket = null;
                     $vente->numero_facture = $numero_facture;
+                    $vente->acompte_facture = $vente->montant_payer;
+                    $vente->montant_payer = null;
                     $vente->save();
                 }else{
                     return response()->json(["code" => 0, "msg" => "Ticket introuvable", "data" => NULL]);
