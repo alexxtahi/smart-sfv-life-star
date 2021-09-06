@@ -158,8 +158,25 @@ class BilletageController extends Controller
                             <td  cellspacing="0" border="2" align="center">'.number_format($data->billet*$data->quantite, 0, ',', ' ').'</td>
                         </tr>';
        }
+
+        $ventes_by_categories = Vente::with('depot','caisse_ouverte')
+                ->join('caisse_ouvertes', 'caisse_ouvertes.id', '=', 'ventes.caisse_ouverte_id')
+                ->join('article_ventes','article_ventes.vente_id','=','ventes.id')->Where('article_ventes.deleted_at', NULL)
+                ->join('articles','article_ventes.article_id','=','articles.id')
+                ->join('categories','categories.id','=','articles.categorie_id')
+                ->select('ventes.*','categories.libelle_categorie',DB::raw('sum(article_ventes.quantite*article_ventes.prix-article_ventes.remise_sur_ligne) as sommeTotale'),DB::raw('DATE_FORMAT(ventes.date_vente, "%d-%m-%Y") as date_ventes'))
+                ->Where([['ventes.deleted_at', NULL],['ventes.client_id',null],['ventes.caisse_ouverte_id',$caisse_ouverte]])
+                ->groupBy('categories.id')
+                ->get();
+
        $info_caisse_ouverte->motif_non_conformite !=null?$motif_non_conformite='Motif : '.$info_caisse_ouverte->motif_non_conformite : $motif_non_conformite = null;
-        $outPut .='</table>';
+   
+        $outPut .='</table><br/>';
+        
+        $outPut .='Montant par catégories<br/>';
+        foreach($ventes_by_categories as $categorie){
+            $outPut.= $categorie->libelle_categorie.' : &nbsp;'.$categorie->sommeTotale.'<br/>';
+        }
         $outPut.='<br/> Montant total : <b> '.number_format($montantTotal, 0, ',', ' ').' F CFA</b><br/>'.$motif_non_conformite;
        
         $outPut.= $this->footer();
