@@ -199,7 +199,11 @@
                             @foreach($articleRupture as $article)
                             <tr>
                                 <td>{{$article->description_article}}</td>
-                                <td>{{$article->categorie->libelle_categorie}}</td>
+                                <td>
+                                @if($article->categorie != null)
+                                    {{ $article->categorie->libelle_categorie }}
+                                @endif
+                                </td>
                                 <td>{{$article->sous_categorie_id!=null ? $article->sous_categorie->libelle_sous_categorie : ""}}</td>
                                 <td>{{$article->totalStock}}</td>
                                 <td>{{$article->libelle_depot}}</td>

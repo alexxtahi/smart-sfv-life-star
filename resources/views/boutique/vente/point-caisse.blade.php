@@ -166,7 +166,7 @@
                                 <div class="form-group">
                                     <label>Carré *</label>
                                     <select class="form-control" id="unite">
-                                        <option value="">-- Carré--</option>
+                                        <option value="1">-- Carré--</option>
                                     </select>
                                 </div>
                             </div>
@@ -520,7 +520,7 @@
                            <div class="form-group">
                                <label>Carré *</label>
                                <select name="unite_id" class="form-control" id="unite_add" required>
-                                   <option value="">-- Carré --</option>
+                                   <option value="1">-- Carré --</option>
                                </select>
                            </div>
                        </div>
@@ -625,7 +625,7 @@
     </div>
 </div>
 
-<!-- Modal transformation ticket en facture --> 
+<!-- Modal transformation ticket en facture -->
 <div class="modal fade bs-modal-tranform" category="dialog" data-backdrop="static">
     <div class="modal-dialog ">
         <form id="tranformFacture" ng-controller="tranformFactureCtrl" action="#">
@@ -634,7 +634,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         Confimation de la transformation
                 </div>
-                @csrf 
+                @csrf
                  <div class="modal-body">
                     <div class="box-body">
                         <input type="text" class="hidden" name="idVenteTransformer"  ng-model="vente.id"/>
@@ -1292,7 +1292,7 @@
                     $.each(reponse.rows, function (index, retour) {
                         $("#article").select2("val",retour.article.id);
                         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + retour.article.id , function (reponse) {
-                            //$('#unite').html("<option value=''>-- Carré --</option>");
+                            //$('#unite').html("<option value='1'>-- Carré --</option>");
                             $.each(reponse.rows, function (index, colis) {
                                 //alert('index: ' + index);
                                 $('#unite').append('<option data-libelleunite= "' + colis.unite.libelle_unite + '" value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
@@ -1320,7 +1320,7 @@
                     $.each(reponse.rows, function (index, retour) {
                          $("#article_add").val(retour.article.id);
                         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + retour.article.id , function (reponse) {
-                            //$('#unite_add').html("<option value=''>-- Carré --</option>");
+                            //$('#unite_add').html("<option value='1'>-- Carré --</option>");
                             $.each(reponse.rows, function (index, colis) {
                                 $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                             });
@@ -1348,7 +1348,7 @@
             })
             $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + article_id , function (reponse) {
                 //$('#unite').html("<option value=''>-- Zaza --</option>"); // ! debug
-                $('#unite').html("<option value=''>-- Carré --</option>"); // Modification sur le carré
+                $('#unite').html("<option value='1'>-- Carré --</option>"); // Modification sur le carré
                 $.each(reponse.rows, function (index, colis) {
                     //alert("Index: " + index); // ! debug
                     if (index == 0) // Choisir automatiquement le carré salle
@@ -1402,7 +1402,7 @@
                 });
             })
             $.getJSON("../boutique/liste-unites-by-depot-article/" + depot_id + "/" + article_id , function (reponse) {
-                $('#unite_add').html("<option value=''>-- Carré --</option>");
+                $('#unite_add').html("<option value='1'>-- Carré --</option>");
                 $.each(reponse.rows, function (index, colis) {
                     $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
@@ -1415,7 +1415,7 @@
             var unite_id = $("#unite").val();
             $.getJSON("../boutique/find-article-in-depot-by-unite-caisse/" + article_id + "/" + depot_id + "/" +  unite_id, function (reponse) {
                 $.each(reponse.rows, function (index, article) {
-             
+
                     let checkbox1 = document.querySelector('#prix_vip_choice');
                     if(checkbox1.checked){
                          $("#prixTTC").val(article.prix_vip);
@@ -1466,7 +1466,7 @@
                          $("#prixTTC_add").val(article.prix_ventes);
                          var prixs = article.prix_ventes;
                     }
-                  
+
                     //Calcul du prix HT
                     var tva = 0;
                    if(article.article.param_tva_id!=null){
@@ -1608,7 +1608,7 @@
                             montantHT = montantHT + (sommeDeuxQtes*prixHT);
                             montantTTC = parseInt(montantTTC) + parseInt(sommeDeuxQtes*prixTTC);
                             remiseTTC = parseInt(remiseTTC) + parseInt(remise_sur_ligne);
-                            $('#unite').html("<option value=''>-- Carré --</option>");
+                            $('#unite').html("<option value='1'>-- Carré --</option>");
                             $("#quantite").val("");
                             $("#en_stock").val("");
                             $("#prixTTC").val("");
@@ -1652,7 +1652,7 @@
                     //Creation de l'article dans le tableau virtuel (panier)
                     var DataArticle = {'id':idTablle, 'articles':articleId, 'unites':uniteId, 'quantites':quantite,'prix':prixTTC,'prix_ht':prixHT,'remises':remise_sur_ligne};
                     monPanier.push(DataArticle);
-                    $('#unite').html("<option value=''>-- Carré --</option>");
+                    $('#unite').html("<option value='1'>-- Carré --</option>");
                     $("#quantite").val("");
                     $("#en_stock").val("");
                     $("#prixTTC").val("");
@@ -2031,7 +2031,7 @@
         $("#quantite_add").val(article.quantite);
         $("#article_add").val(article.article_id);
         $.getJSON("../boutique/liste-unites-by-depot-article/" + depot + "/" + article.article_id , function (reponse) {
-                $('#unite_add').html("<option value=''>-- Carré --</option>");
+                $('#unite_add').html("<option value='1'>-- Carré --</option>");
                 $.each(reponse.rows, function (index, colis) {
                     $('#unite_add').append('<option value=' + colis.unite.id + '>' + colis.unite.libelle_unite + '</option>')
                 });
